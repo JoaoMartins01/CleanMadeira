@@ -1,0 +1,95 @@
+﻿@using CleanMadeira.Web.ViewModels.CleaningTask
+@model CreateCleaningTaskVM
+
+@{
+    ViewData["Title"] = "Nova Limpeza";
+}
+
+<div class="card">
+    <div class="card-header">
+        <h3>Nova Limpeza</h3>
+    </div>
+
+    <div class="card-body">
+
+        <form asp-action="Create" method="post">
+            @Html.AntiForgeryToken()
+
+            <div class="mb-3">
+                <label asp-for="PropriedadeId" class="form-label">
+                    Propriedade
+                </label>
+
+                <select asp-for="PropriedadeId"
+                        asp-items="ViewBag.Propriedades"
+                        class="form-select">
+                    <option value="">Selecionar propriedade</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="AssignedUserId" class="form-label">
+                    Funcionária
+                </label>
+
+                <select asp-for="AssignedUserId"
+                        asp-items="ViewBag.Limpadores"
+                        class="form-select">
+                    <option value="">Não atribuída</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="ScheduledDate" class="form-label">
+                    Data/Hora
+                </label>
+
+                <input asp-for="ScheduledDate"
+                       type="datetime-local"
+                       class="form-control" />
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Prioridade" class="form-label">
+                    Prioridade
+                </label>
+
+                <select asp-for="Prioridade" class="form-select">
+                    <option value="1">Baixa</option>
+                    <option value="2">Normal</option>
+                    <option value="3">Alta</option>
+                    <option value="4">Urgente</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="EstimatedMinutes" class="form-label">
+                    Duração estimada
+                </label>
+
+                <input asp-for="EstimatedMinutes"
+                       class="form-control" />
+            </div>
+
+            <div class="mb-4">
+                <label asp-for="Notas" class="form-label">
+                    Observações
+                </label>
+
+                <textarea asp-for="Notas"
+                          class="form-control"
+                          rows="4">
+                </textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                Guardar
+            </button>
+
+            <a asp-action="Index" class="btn btn-secondary">
+                Cancelar
+            </a>
+        </form>
+
+    </div>
+</div>

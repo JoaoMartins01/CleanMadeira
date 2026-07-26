@@ -1,0 +1,53 @@
+﻿@model CleanMadeira.Web.ViewModels.Inventory.InventoryItemVM
+
+@{
+    ViewData["Title"] = "Remover Produto";
+}
+
+<div class="card border-0 shadow-sm">
+
+    <div class="card-header bg-danger text-white">
+        <h4 class="mb-0">
+            <i class="bi bi-trash-fill me-2"></i>
+            Remover Produto
+        </h4>
+    </div>
+
+    <div class="card-body">
+
+        <div class="alert alert-warning">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            Este produto será eliminado definitivamente.
+        </div>
+
+        <dl class="row">
+            <dt class="col-sm-3">Produto</dt>
+            <dd class="col-sm-9">@Model.Nome</dd>
+
+            <dt class="col-sm-3">Propriedade</dt>
+            <dd class="col-sm-9">@Model.PropriedadeNome</dd>
+
+            <dt class="col-sm-3">Quantidade</dt>
+            <dd class="col-sm-9">@Model.Quantidade @Model.Unidade</dd>
+
+            <dt class="col-sm-3">Mínimo</dt>
+            <dd class="col-sm-9">@Model.QuantidadeMinima @Model.Unidade</dd>
+        </dl>
+
+        <form asp-action="Delete" method="post">
+            @Html.AntiForgeryToken()
+
+            <input asp-for="Id" type="hidden" />
+
+            <button type="submit" class="btn btn-danger">
+                <i class="bi bi-trash-fill me-1"></i>
+                Remover
+            </button>
+
+            <a asp-action="Index" class="btn btn-secondary">
+                Cancelar
+            </a>
+        </form>
+
+    </div>
+</div>

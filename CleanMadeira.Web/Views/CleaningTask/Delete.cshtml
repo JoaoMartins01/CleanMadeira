@@ -1,0 +1,83 @@
+﻿@using CleanMadeira.Domain.Entities
+@using CleanMadeira.Domain.Entities.Enums
+@model CleanMadeira.Web.ViewModels.CleaningTask.CleaningTaskVM
+
+@{
+    ViewData["Title"] = "Eliminar Limpeza";
+}
+
+<div class="container">
+
+    <div class="card shadow-sm border-0">
+
+        <div class="card-header bg-danger text-white">
+            <h4 class="mb-0">
+                <i class="bi bi-trash-fill me-2"></i>
+                Eliminar Limpeza
+            </h4>
+        </div>
+
+        <div class="card-body">
+
+            @if (Model.Status == CleaningStatus.Pendente)
+            {
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    Tem a certeza que pretende eliminar esta limpeza? Esta ação não pode ser anulada.
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-danger">
+                    <i class="bi bi-x-circle-fill me-2"></i>
+                    Apenas é possível eliminar limpezas com estado <strong>Pendente</strong>.
+                </div>
+            }
+
+            <dl class="row">
+
+                <dt class="col-sm-3">Propriedade</dt>
+                <dd class="col-sm-9">@Model.PropriedadeNome</dd>
+
+                <dt class="col-sm-3">Funcionário</dt>
+                <dd class="col-sm-9">@Model.AssignedUserName</dd>
+
+                <dt class="col-sm-3">Data</dt>
+                <dd class="col-sm-9">
+                    @Model.ScheduledDate.ToString("dd/MM/yyyy HH:mm")
+                </dd>
+
+                <dt class="col-sm-3">Estado</dt>
+                <dd class="col-sm-9">@Model.Status</dd>
+
+                <dt class="col-sm-3">Prioridade</dt>
+                <dd class="col-sm-9">@Model.Prioridade</dd>
+
+            </dl>
+
+            <form asp-action="Delete" method="post">
+
+                @Html.AntiForgeryToken()
+
+                <input asp-for="Id" type="hidden" />
+
+                @if (Model.Status == CleaningStatus.Pendente)
+                {
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash-fill me-1"></i>
+                        Eliminar
+                    </button>
+                }
+
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left me-1"></i>
+                    Voltar
+                </a>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>

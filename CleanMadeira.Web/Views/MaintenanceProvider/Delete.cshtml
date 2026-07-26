@@ -1,0 +1,106 @@
+﻿@model CleanMadeira.Web.ViewModels.MaintenanceProvider.MaintenanceProviderVM
+
+@{
+    ViewData["Title"] = "Eliminar Prestador de Manutenção";
+}
+
+<div class="container">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-danger">
+            <i class="bi bi-trash"></i>
+            Eliminar Prestador de Manutenção
+        </h2>
+
+        <a asp-action="Index" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i>
+            Voltar
+        </a>
+    </div>
+
+    <div class="alert alert-warning">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        Tem a certeza que pretende eliminar este prestador de manutenção?
+    </div>
+
+    <div class="card shadow-sm">
+
+        <div class="card-body">
+
+            <dl class="row">
+
+                <dt class="col-sm-3">
+                    @Html.DisplayNameFor(m => m.Name)
+                </dt>
+                <dd class="col-sm-9">
+                    @Model.Name
+                </dd>
+
+                <dt class="col-sm-3">
+                    @Html.DisplayNameFor(m => m.CompanyName)
+                </dt>
+                <dd class="col-sm-9">
+                    @(string.IsNullOrWhiteSpace(Model.CompanyName) ? "-" : Model.CompanyName)
+                </dd>
+
+                <dt class="col-sm-3">
+                    @Html.DisplayNameFor(m => m.Specialty)
+                </dt>
+                <dd class="col-sm-9">
+                    @Model.Specialty
+                </dd>
+
+                <dt class="col-sm-3">
+                    @Html.DisplayNameFor(m => m.PhoneNumber)
+                </dt>
+                <dd class="col-sm-9">
+                    @Model.PhoneNumber
+                </dd>
+
+                <dt class="col-sm-3">
+                    @Html.DisplayNameFor(m => m.Email)
+                </dt>
+                <dd class="col-sm-9">
+                    @(string.IsNullOrWhiteSpace(Model.Email) ? "-" : Model.Email)
+                </dd>
+
+                <dt class="col-sm-3">
+                    @Html.DisplayNameFor(m => m.Active)
+                </dt>
+                <dd class="col-sm-9">
+                    @if (Model.Active)
+                    {
+                        <span class="badge bg-success">Ativo</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">Inativo</span>
+                    }
+                </dd>
+
+            </dl>
+
+        </div>
+
+        <div class="card-footer">
+
+            <form asp-action="Delete" method="post">
+
+                <input asp-for="Id" type="hidden" />
+
+                <button type="submit" class="btn btn-danger">
+                    <i class="bi bi-trash"></i>
+                    Eliminar
+                </button>
+
+                <a asp-action="Index" class="btn btn-secondary">
+                    Cancelar
+                </a>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>

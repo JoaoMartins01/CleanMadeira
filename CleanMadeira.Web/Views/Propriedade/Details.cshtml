@@ -1,0 +1,297 @@
+﻿@model PropriedadeDetailsVM
+
+@{
+    ViewData["Title"] = "Detalhes da Propriedade";
+}
+
+<div class="container py-4">
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show"
+             role="alert">
+
+            @TempData["Success"]
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert"
+                    aria-label="Fechar">
+            </button>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show"
+             role="alert">
+
+            @TempData["Error"]
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert"
+                    aria-label="Fechar">
+            </button>
+        </div>
+    }
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <h2 class="fw-bold">@Model.Propriedade.Nome</h2>
+
+            <p class="text-muted mb-0">
+                @Model.Propriedade.Endereco
+            </p>
+        </div>
+
+        <div>
+
+            <a asp-action="Edit"
+               asp-route-id="@Model.Propriedade.Id"
+               class="btn btn-warning">
+
+                Editar
+            </a>
+
+            <a asp-action="Index"
+               class="btn btn-outline-secondary">
+
+                Voltar
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <div class="row">
+
+        <div class="col-lg-3 mb-3">
+
+            <div class="card shadow-sm">
+
+                <div class="card-body text-center">
+
+                    <h5>📅 Calendários</h5>
+
+                    <h2>@Model.CalendarCount</h2>
+
+                    <a asp-controller="CalendarIntegration"
+                       asp-action="Index"
+                       asp-route-propriedadeId="@Model.Propriedade.Id"
+                       class="btn btn-primary btn-sm mt-2">
+
+                        Gerir
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-lg-3 mb-3">
+
+            <div class="card shadow-sm">
+
+                <div class="card-body text-center">
+
+                    <h5>🧹 Limpezas</h5>
+
+                    @if (Model.NextCleaningTask != null)
+                    {
+                        <p>
+
+                            @Model.NextCleaningTask.ScheduledDate.ToString("dd/MM/yyyy")
+
+                        </p>
+                    }
+                    else
+                    {
+                        <p>Sem limpezas.</p>
+                    }
+
+                    <a asp-controller="CleaningTask"
+                       asp-action="Index"
+                       asp-route-propertyId="@Model.Propriedade.Id"
+                       class="btn btn-primary btn-sm">
+
+                        Ver
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-lg-3 mb-3">
+
+            <div class="card shadow-sm">
+
+                <div class="card-body text-center">
+
+                    <h5>📦 Inventário</h5>
+
+                    <h2>@Model.InventoryCount</h2>
+
+                    <a asp-controller="Inventory"
+                       asp-action="Index"
+                       asp-route-propertyId="@Model.Propriedade.Id"
+                       class="btn btn-primary btn-sm">
+
+                        Gerir
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-lg-3 mb-3">
+
+            <div class="card shadow-sm">
+
+                <div class="card-body text-center">
+
+                    <h5>📸 Fotografias</h5>
+
+                    <h2>@Model.PhotoCount</h2>
+
+                    <a asp-controller="Photo"
+                       asp-action="Index"
+                       asp-route-propertyId="@Model.Propriedade.Id"
+                       class="btn btn-primary btn-sm">
+
+                        Ver
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="card shadow-sm mt-4">
+
+        <div class="card-header">
+
+            <h4 class="mb-0">
+
+                Calendários Configurados
+
+            </h4>
+
+        </div>
+
+        <div class="card-body">
+
+            @if (Model.CalendarIntegrations.Any())
+            {
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>Plataforma</th>
+                            <th>Estado</th>
+                            <th>Última sincronização</th>
+                            <th class="text-end">Ações</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var item in Model.CalendarIntegrations)
+                        {
+                            <tr>
+                                <td>@item.Provider</td>
+
+                                <td>
+                                    @if (item.IsEnabled)
+                                    {
+                                        <span class="badge bg-success">
+                                            Ativa
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">
+                                            Desativada
+                                        </span>
+                                    }
+                                </td>
+
+                                <td>
+                                    @if (item.LastSync.HasValue)
+                                    {
+                                         @item.LastSync.Value.ToLocalTime().ToString("dd/MM/yyyy HH:mm")
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">
+                                            Nunca
+                                        </span>
+                                    }
+                                </td>
+
+                                <td class="text-end">
+                                    <form asp-controller="CalendarIntegration"
+                                          asp-action="Sync"
+                                          method="post"
+                                          class="d-inline">
+
+                                        <input type="hidden"
+                                               name="id"
+                                               value="@item.Id" />
+
+                                        <input type="hidden"
+                                               name="propriedadeId"
+                                               value="@Model.Propriedade.Id" />
+
+                                        <button type="submit"
+                                                class="btn btn-sm btn-outline-primary"
+                                                disabled="@(!item.IsEnabled)">
+
+                                            <i class="bi bi-arrow-repeat"></i>
+                                            Sincronizar
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <div class="text-center py-5">
+
+                    <h5>
+
+                        Ainda não existem calendários.
+
+                    </h5>
+
+                    <a asp-controller="CalendarIntegration"
+                       asp-action="Index"
+                       asp-route-propriedadeId="@Model.Propriedade.Id"
+                       class="btn btn-primary">
+
+                        Adicionar Calendário
+
+                    </a>
+
+                </div>
+            }
+        </div>
+    </div>
+</div>

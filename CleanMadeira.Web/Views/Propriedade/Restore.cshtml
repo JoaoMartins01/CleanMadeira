@@ -1,0 +1,87 @@
+﻿@model CleanMadeira.Web.ViewModels.Propriedade.PropriedadeVM
+
+@{
+    ViewData["Title"] = "Reativar Propriedade";
+}
+
+<div class="container">
+
+    <div class="card shadow-sm border-0">
+
+        <div class="card-header bg-success text-white">
+            <h4 class="mb-0">
+                <i class="bi bi-arrow-counterclockwise me-2"></i>
+                Reativar Propriedade
+            </h4>
+        </div>
+
+        <div class="card-body">
+
+            <div class="alert alert-success">
+                <i class="bi bi-info-circle-fill me-2"></i>
+                Tem a certeza que pretende reativar esta propriedade?
+            </div>
+
+            <div class="alert alert-light border">
+                <strong>Ao reativar esta propriedade:</strong>
+
+                <ul class="mb-0 mt-2">
+                    <li>A propriedade voltará a aparecer nas listas.</li>
+                    <li>As limpezas voltarão a aparecer no calendário.</li>
+                    <li>Será novamente possível criar novas limpezas.</li>
+                    <li>Todo o histórico (inventário, notas e fotos) continuará disponível.</li>
+                </ul>
+            </div>
+
+            <dl class="row mt-4">
+
+                <dt class="col-sm-3">
+                    Nome
+                </dt>
+
+                <dd class="col-sm-9">
+                    @Model.Nome
+                </dd>
+
+                <dt class="col-sm-3">
+                    Morada
+                </dt>
+
+                <dd class="col-sm-9">
+                    @Model.Endereco
+                </dd>
+
+                <dt class="col-sm-3">
+                    Freguesia
+                </dt>
+
+                <dd class="col-sm-9">
+                    @Model.Freguesia
+                </dd>
+
+            </dl>
+
+            <form asp-action="RestoreConfirmed" method="post">
+
+                @Html.AntiForgeryToken()
+
+                <input asp-for="Id" type="hidden" />
+
+                <button type="submit" class="btn btn-success">
+                    <i class="bi bi-arrow-counterclockwise me-1"></i>
+                    Reativar
+                </button>
+
+                <a asp-action="Inactive"
+                   class="btn btn-secondary">
+                    <i class="bi bi-arrow-left me-1"></i>
+                    Cancelar
+                </a>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>

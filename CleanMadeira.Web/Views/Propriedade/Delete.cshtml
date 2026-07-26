@@ -1,0 +1,63 @@
+﻿@model CleanMadeira.Web.ViewModels.Propriedade.PropriedadeVM
+
+@{
+    ViewData["Title"] = "Desativar Propriedade";
+}
+
+<div class="card border-0 shadow-sm">
+
+    <div class="card-header bg-danger text-white">
+        <h4 class="mb-0">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            Desativar Propriedade
+        </h4>
+    </div>
+
+    <div class="card-body">
+
+        <div class="alert alert-warning">
+            <strong>Atenção:</strong> esta propriedade será desativada, não apagada definitivamente.
+        </div>
+
+        <div class="alert alert-light border">
+            <p class="mb-2">
+                Ao desativar esta propriedade:
+            </p>
+
+            <ul class="mb-0">
+                <li>Deixará de aparecer nas listas principais.</li>
+                <li>Não poderá criar novas limpezas para esta propriedade.</li>
+                <li>O histórico de limpezas, notas, fotos e inventário será preservado.</li>
+                <li>Poderá ser reativada mais tarde, se necessário.</li>
+            </ul>
+        </div>
+
+        <dl class="row mt-4">
+            <dt class="col-sm-3">Nome</dt>
+            <dd class="col-sm-9">@Model.Nome</dd>
+
+            <dt class="col-sm-3">Morada</dt>
+            <dd class="col-sm-9">@Model.Endereco</dd>
+
+            <dt class="col-sm-3">Freguesia</dt>
+            <dd class="col-sm-9">@Model.Freguesia</dd>
+        </dl>
+
+        <form asp-action="Delete" method="post">
+            @Html.AntiForgeryToken()
+
+            <input asp-for="Id" type="hidden" />
+
+            <button type="submit" class="btn btn-danger">
+                <i class="bi bi-trash-fill me-1"></i>
+                Sim, desativar
+            </button>
+
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="bi bi-arrow-left me-1"></i>
+                Cancelar
+            </a>
+        </form>
+
+    </div>
+</div>

@@ -1,0 +1,224 @@
+﻿@model IEnumerable<CleanMadeira.Web.ViewModels.Propriedade.PropriedadeVM>
+
+@{
+    ViewData["Title"] = "Propriedades";
+}
+
+<div class="properties-header">
+
+    <div class="properties-title">
+        <h2>
+            <i class="bi bi-house-door-fill text-primary me-2"></i>
+            Propriedades
+        </h2>
+
+        <p class="text-muted">
+            Gestão das propriedades registadas.
+        </p>
+    </div>
+
+    <div class="properties-actions">
+
+        <a asp-action="Inactive"
+           class="btn btn-outline-secondary">
+            <i class="bi bi-archive-fill"></i>
+            Desativadas
+            <span class="badge bg-secondary ms-1">
+                @ViewBag.InactiveCount
+            </span>
+        </a>
+
+        <a asp-action="Create"
+           class="btn btn-primary">
+            <i class="bi bi-plus-circle-fill"></i>
+            Nova Propriedade
+        </a>
+
+    </div>
+
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle-fill me-2"></i>
+        Ainda não existem propriedades registadas.
+    </div>
+}
+else
+{
+    <div class="row g-4">
+        @foreach (var item in Model)
+        {
+            <div class="col-md-6 col-xl-4 mb-4">
+                <div class="card property-card h-100">
+
+                    <div class="property-header">
+                        <i class="bi bi-house-door-fill"></i>
+                        <span>@item.Nome</span>
+                    </div>
+
+                    <div class="card-body">
+
+                        <div class="property-info">
+                            <i class="bi bi-geo-alt-fill text-danger"></i>
+                            <span>@item.Endereco</span>
+                        </div>
+
+                        <div class="property-info">
+                            <i class="bi bi-map-fill text-success"></i>
+                            <span>@item.Freguesia</span>
+                        </div>
+
+                        <hr />
+
+                        <div class="property-actions">
+
+                            <a asp-action="Details"
+                               asp-route-id="@item.Id"
+                               class="btn btn-primary property-view-btn">
+                                <i class="bi bi-eye-fill me-1"></i>
+                                Ver
+                            </a>
+
+                            <div class="property-secondary-actions">
+
+                                <a asp-action="Edit"
+                                   asp-route-id="@item.Id"
+                                   class="btn btn-outline-warning">
+                                    <i class="bi bi-pencil-fill me-1"></i>
+                                    Editar
+                                </a>
+
+                                <a asp-action="Delete"
+                                   asp-route-id="@item.Id"
+                                   class="btn btn-outline-danger">
+                                    <i class="bi bi-trash-fill me-1"></i>
+                                    Eliminar
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        }
+    </div>
+}
+
+<style>
+    ..property-card {
+        border: none;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 10px 25px rgba(0,0,0,.08);
+        transition: .2s;
+        margin-bottom: 30px;
+        border: 1px solid #ececec;
+    }
+
+    .property-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 15px 35px rgba(0,0,0,.12);
+    }
+
+    .property-header {
+        background: #f8fafc;
+        border-bottom: 1px solid #ececec;
+        padding: 18px 22px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 1.25rem;
+        font-weight: 700;
+    }
+
+        .property-header i {
+            color: #0d6efd;
+            font-size: 1.6rem;
+        }
+
+    .property-info {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 18px;
+        color: #555;
+        font-size: 1rem;
+    }
+
+        .property-info i {
+            width: 24px;
+            text-align: center;
+            font-size: 1.2rem;
+        }
+
+    .card-body hr {
+        margin: 24px 0;
+    }
+
+    .btn {
+        border-radius: 10px;
+    }
+
+    .property-info span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    @@media(max - width:768px) {
+
+        .property-card {
+            margin-bottom: 24px;
+        }
+
+        .property-header {
+            font-size: 1.1rem;
+        }
+    }
+
+    .properties-header {
+        margin-bottom: 30px;
+    }
+
+    .properties-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-top: 20px;
+    }
+
+        .properties-actions .btn {
+            width: 100%;
+            min-height: 56px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            border-radius: 14px;
+        }
+
+    @@media(min - width:992px) {
+
+        .properties-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: end;
+        }
+
+        .properties-actions {
+            display: flex;
+            margin-top: 0;
+        }
+
+            .properties-actions .btn {
+                width: auto;
+                min-width: 180px;
+            }
+    }
+
+</style>

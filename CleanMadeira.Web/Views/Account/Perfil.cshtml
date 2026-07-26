@@ -1,0 +1,190 @@
+﻿@model EditPerfilVM
+
+@{
+    ViewData["Title"] = "O meu perfil";
+}
+
+<div class="profile-page">
+
+    <div class="profile-heading mb-4">
+        <div class="profile-avatar">
+            <i class="bi bi-person-fill"></i>
+        </div>
+
+        <div>
+            <h2 class="fw-bold mb-1">O meu perfil</h2>
+            <p class="text-muted mb-0">
+                Atualize os seus dados pessoais e informações de contacto.
+            </p>
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            @TempData["Success"]
+        </div>
+    }
+
+    <div class="card border-0 shadow-sm profile-card">
+        <div class="card-body p-4">
+
+            <form asp-action="Profile" method="post">
+                @Html.AntiForgeryToken()
+
+                <div asp-validation-summary="ModelOnly"
+                     class="text-danger mb-3">
+                </div>
+
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+                        <label asp-for="PrimeiroNome"
+                               class="form-label">
+                            Primeiro nome
+                        </label>
+
+                        <input asp-for="PrimeiroNome"
+                               class="form-control" />
+
+                        <span asp-validation-for="PrimeiroNome"
+                              class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="UltimoNome"
+                               class="form-label">
+                            Último nome
+                        </label>
+
+                        <input asp-for="UltimoNome"
+                               class="form-control" />
+
+                        <span asp-validation-for="UltimoNome"
+                              class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="Email"
+                               class="form-label">
+                            Email
+                        </label>
+
+                        <input asp-for="Email"
+                               class="form-control"
+                               readonly />
+
+                        <div class="form-text">
+                            A alteração do email poderá ser adicionada posteriormente.
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="Telemovel"
+                               class="form-label">
+                            Telefone
+                        </label>
+
+                        <input asp-for="Telemovel"
+                               class="form-control"
+                               type="tel" />
+
+                        <span asp-validation-for="Telemovel"
+                              class="text-danger"></span>
+                    </div>
+
+                    @if (!string.IsNullOrWhiteSpace(Model.EmpresaNome))
+                    {
+                        <div class="col-12">
+                            <label asp-for="EmpresaNome"
+                                   class="form-label">
+                                Nome da empresa
+                            </label>
+
+                            <input asp-for="EmpresaNome"
+                                   class="form-control" />
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(Model.LimpadorCodigo))
+                    {
+                        <div class="col-md-6">
+                            <label class="form-label">
+                                Código do limpador
+                            </label>
+
+                            <input value="@Model.LimpadorCodigo"
+                                   class="form-control"
+                                   readonly />
+                        </div>
+                    }
+
+                </div>
+
+                <hr class="my-4" />
+
+                <div class="profile-actions">
+                    <button type="submit"
+                            class="btn btn-primary">
+                        <i class="bi bi-save-fill me-1"></i>
+                        Guardar alterações
+                    </button>
+
+                    <a asp-action="ChangePassword"
+                       class="btn btn-outline-secondary">
+                        <i class="bi bi-key-fill me-1"></i>
+                        Alterar palavra-passe
+                    </a>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+</div>
+
+<style>
+    .profile-heading {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .profile-avatar {
+        width: 58px;
+        height: 58px;
+        flex-shrink: 0;
+        border-radius: 18px;
+        background: #eaf2ff;
+        color: #0d6efd;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.7rem;
+    }
+
+    .profile-card {
+        border-radius: 20px;
+    }
+
+    .profile-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    @@media (max-width: 768px) {
+        .profile-actions {
+            flex-direction: column;
+        }
+
+            .profile-actions .btn {
+                width: 100%;
+            }
+    }
+</style>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,83 @@
+﻿@using CleanMadeira.Web.ViewModels
+@model UtilizadorVM
+
+@{
+    ViewData["Title"] = "Detalhes";
+}
+
+<div class="card shadow-sm">
+
+    <div class="card-header">
+
+        <h3>
+            @Model.PrimeiroNome @Model.UltimoNome
+        </h3>
+
+    </div>
+
+    <div class="card-body">
+
+        <div class="row mb-3">
+
+            <div class="col-md-3">
+                <strong>Email</strong>
+            </div>
+
+            <div class="col-md-9">
+                @Model.Email
+            </div>
+
+        </div>
+
+        <div class="row mb-3">
+
+            <div class="col-md-3">
+                <strong>Telefone</strong>
+            </div>
+
+            <div class="col-md-9">
+                @Model.Telemovel
+            </div>
+
+        </div>
+
+        <div class="row mb-3">
+
+            <div class="col-md-3">
+                <strong>Perfil</strong>
+            </div>
+
+            <div class="col-md-9">
+                @Model.Role
+            </div>
+
+        </div>
+
+        <div class="row">
+
+            <div class="col-md-3">
+                <strong>Estado</strong>
+            </div>
+
+            <div class="col-md-9">
+
+                @if (Model.Active)
+                {
+                    <span class="badge bg-success">
+                        Ativo
+                    </span>
+                }
+                else
+                {
+                    <span class="badge bg-danger">
+                        Inativo
+                    </span>
+                }
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

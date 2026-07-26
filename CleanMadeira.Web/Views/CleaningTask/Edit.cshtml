@@ -1,0 +1,110 @@
+﻿@using CleanMadeira.Web.ViewModels.CleaningTask
+@model EditCleaningTaskVM
+
+@{
+    ViewData["Title"] = "Editar Limpeza";
+}
+
+<div class="card">
+    <div class="card-header">
+        <h3>Editar Limpeza</h3>
+    </div>
+
+    <div class="card-body">
+
+        <form asp-action="Edit" method="post">
+            @Html.AntiForgeryToken()
+
+            <input asp-for="Id" type="hidden" />
+
+            <div class="mb-3">
+                <label asp-for="PropriedadeId" class="form-label">
+                    Propriedade
+                </label>
+
+                <select asp-for="PropriedadeId"
+                        asp-items="ViewBag.Propriedades"
+                        class="form-select">
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="AssignedUserId" class="form-label">
+                    Funcionária
+                </label>
+
+                <select asp-for="AssignedUserId"
+                        asp-items="ViewBag.Limpadores"
+                        class="form-select">
+                    <option value="">Não atribuída</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="ScheduledDate" class="form-label">
+                    Data/Hora
+                </label>
+
+                <input asp-for="ScheduledDate"
+                       type="datetime-local"
+                       class="form-control" />
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Status" class="form-label">
+                    Estado
+                </label>
+
+                <select asp-for="Status" class="form-select">
+                    <option value="1">Pendente</option>
+                    <option value="2">Atribuída</option>
+                    <option value="3">Em Curso</option>
+                    <option value="4">Concluída</option>
+                    <option value="5">Cancelada</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Prioridade" class="form-label">
+                    Prioridade
+                </label>
+
+                <select asp-for="Prioridade" class="form-select">
+                    <option value="1">Baixa</option>
+                    <option value="2">Normal</option>
+                    <option value="3">Alta</option>
+                    <option value="4">Urgente</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="EstimatedMinutes" class="form-label">
+                    Duração estimada
+                </label>
+
+                <input asp-for="EstimatedMinutes"
+                       class="form-control" />
+            </div>
+
+            <div class="mb-4">
+                <label asp-for="Notas" class="form-label">
+                    Observações
+                </label>
+
+                <textarea asp-for="Notas"
+                          class="form-control"
+                          rows="4">
+                </textarea>
+            </div>
+
+            <button type="submit" class="btn btn-success">
+                Atualizar
+            </button>
+
+            <a asp-action="Index" class="btn btn-secondary">
+                Cancelar
+            </a>
+        </form>
+
+    </div>
+</div>

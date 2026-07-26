@@ -1,0 +1,122 @@
+﻿@model CleanMadeira.Web.ViewModels.MaintenanceProvider.MaintenanceProviderVM;
+
+@{
+    ViewData["Title"] = "Novo Prestador";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white py-3">
+                    <h3 class="mb-1">Novo Prestador</h3>
+                    <p class="text-muted mb-0">
+                        Registe um técnico ou empresa de manutenção.
+                    </p>
+                </div>
+
+                <div class="card-body p-4">
+
+                    <form asp-action="Create" method="post">
+                        @Html.AntiForgeryToken()
+
+                        <div asp-validation-summary="ModelOnly"
+                             class="alert alert-danger"
+                             role="alert">
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Name" class="form-label">
+                                Nome do prestador
+                            </label>
+
+                            <input asp-for="Name"
+                                   class="form-control"
+                                   placeholder="Ex.: João Silva ou Reparações Madeira" />
+
+                            <span asp-validation-for="Name"
+                                  class="text-danger">
+                            </span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Specialty" class="form-label">
+                                Categoria
+                            </label>
+
+                            <select asp-for="Specialty" class="form-select">
+                                <option value="">Selecione uma categoria</option>
+                                <option value="Canalizador">Canalizador</option>
+                                <option value="Eletricista">Eletricista</option>
+                                <option value="Pintor">Pintor</option>
+                                <option value="Jardineiro">Jardineiro</option>
+                                <option value="Ar Condicionado">Ar Condicionado</option>
+                                <option value="Eletrodomésticos">Eletrodomésticos</option>
+                                <option value="Carpinteiro">Carpinteiro</option>
+                                <option value="Outro">Outro</option>
+                            </select>
+
+                            <span asp-validation-for="Specialty"
+                                  class="text-danger">
+                            </span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="PhoneNumber" class="form-label">
+                                Telefone
+                            </label>
+
+                            <input asp-for="PhoneNumber"
+                                   class="form-control"
+                                   placeholder="Ex.: 912 345 678" />
+
+                            <span asp-validation-for="PhoneNumber"
+                                  class="text-danger">
+                            </span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Email" class="form-label">
+                                Email
+                            </label>
+
+                            <input asp-for="Email"
+                                   type="email"
+                                   class="form-control"
+                                   placeholder="Ex.: prestador@email.com" />
+
+                            <div class="form-text">
+                                O email é opcional, mas será necessário para enviar manutenções automaticamente.
+                            </div>
+
+                            <span asp-validation-for="Email"
+                                  class="text-danger">
+                            </span>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2">
+                            <a asp-action="Index"
+                               class="btn btn-outline-secondary">
+                                Cancelar
+                            </a>
+
+                            <button type="submit"
+                                    class="btn btn-primary">
+                                Guardar prestador
+                            </button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -1,0 +1,1004 @@
+﻿@model CleanMadeira.Web.ViewModels.Propriedade.PropriedadeVM
+
+@{
+    ViewData["Title"] = "Nova Propriedade";
+}
+
+<div class="container-fluid property-create-page">
+    <link rel="stylesheet"
+          href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <div class="property-create-header mb-4">
+        <div class="property-create-icon">
+            <i class="bi bi-house-add-fill"></i>
+        </div>
+
+        <div>
+            <h2 class="fw-bold mb-1">Nova Propriedade</h2>
+
+            <p class="text-muted mb-0">
+                Adicione um novo alojamento à sua conta.
+            </p>
+        </div>
+    </div>
+
+    <form asp-action="Create"
+          method="post"
+          id="propertyCreateForm">
+
+        @Html.AntiForgeryToken()
+
+        <div asp-validation-summary="ModelOnly"
+             class="alert alert-danger"
+             role="alert">
+        </div>
+
+        <div class="row g-4">
+
+            <!-- FORMULÁRIO -->
+            <div class="col-12 col-xl-8">
+
+                <!-- Informações gerais -->
+                <div class="card property-form-card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-info-circle-fill text-primary me-2"></i>
+                            Informações gerais
+                        </h5>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label asp-for="Nome"
+                                       class="form-label">
+                                    Nome da propriedade
+                                </label>
+
+                                <input asp-for="Nome"
+                                       class="form-control"
+                                       id="propertyName"
+                                       placeholder="Ex.: Apartamento Vista Mar" />
+
+                                <span asp-validation-for="Nome"
+                                      class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label asp-for="Quartos"
+                                       class="form-label">
+                                    Quartos
+                                </label>
+
+                                <input asp-for="Quartos"
+                                       class="form-control"
+                                       id="propertyRooms"
+                                       type="number"
+                                       min="0"
+                                       placeholder="0" />
+                            
+                                <span asp-validation-for="Quartos"
+                                      class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label asp-for="CasasBanho"
+                                       class="form-label">
+                                    Casas de Banho
+                                </label>
+
+                                <input asp-for="CasasBanho"
+                                       class="form-control"
+                                       id="propertyCasasBanho"
+                                       type="number"
+                                       min="0"
+                                       placeholder="0" />
+
+                                <span asp-validation-for="CasasBanho"
+                                      class="text-danger"></span>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Morada -->
+                <div class="card property-form-card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-geo-alt-fill text-danger me-2"></i>
+                            Morada
+                        </h5>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="row g-3">
+
+                            <div class="col-12">
+                                <label asp-for="Endereco"
+                                       class="form-label">
+                                    Morada
+                                </label>
+
+                                <input asp-for="Endereco"
+                                       class="form-control"
+                                       id="propertyAddress"
+                                       placeholder="Rua, número e andar" />
+
+                                <span asp-validation-for="Endereco"
+                                      class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label asp-for="CodigoPostal"
+                                       class="form-label">
+                                    Código postal
+                                </label>
+
+                                <input asp-for="CodigoPostal"
+                                       class="form-control"
+                                       id="propertyPostalCode"
+                                       placeholder="0000-000" />
+
+                                <span asp-validation-for="CodigoPostal"
+                                      class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label asp-for="Freguesia"
+                                       class="form-label">
+                                    Freguesia
+                                </label>
+
+                                <input asp-for="Freguesia"
+                                       class="form-control"
+                                       id="propertyParish"
+                                       placeholder="Ex.: Calheta" />
+
+                                <span asp-validation-for="Freguesia"
+                                      class="text-danger"></span>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label">
+                        Localização no mapa
+                    </label>
+
+                    <p class="text-muted small mb-2">
+                        Clique no mapa para indicar a localização exata da propriedade.
+                    </p>
+
+                    <div id="propertyMap"></div>
+
+                    <input asp-for="Latitude"
+                           type="hidden"
+                           id="propertyLatitude" />
+
+                    <input asp-for="Longitude"
+                           type="hidden"
+                           id="propertyLongitude" />
+
+                    <span asp-validation-for="Latitude"
+                          class="text-danger"></span>
+
+                    <span asp-validation-for="Longitude"
+                          class="text-danger"></span>
+                    <button type="button"
+                            id="useCurrentLocation"
+                            class="btn btn-outline-primary btn-sm mb-3">
+                        <i class="bi bi-crosshair me-1"></i>
+                        Usar localização atual
+                    </button>
+                </div>
+
+                <!-- Informações adicionais -->
+                <div class="card property-form-card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-journal-text text-primary me-2"></i>
+                            Informações adicionais
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                    <div class="col-md-4">
+                        <label asp-for="NumeroHospedes"
+                               class="form-label">
+                            Nº máximo de Hospedes
+                        </label>
+
+                        <input asp-for="NumeroHospedes"
+                               class="form-control"
+                               id="propertyGuests"/>
+
+                        <span asp-validation-for="Descricao"
+                              class="text-danger"></span>
+
+                        <label asp-for="Descricao"
+                               class="form-label">
+                            Descrição
+                        </label>
+
+                        <textarea asp-for="Descricao"
+                                      class="form-control"
+                                      id="propertyDescricao"
+                                      rows="3">
+                        </textarea>
+
+                        <span asp-validation-for="Descricao"
+                              class="text-danger"></span>
+
+                    </div>
+                    </div>
+                </div>
+
+                <div class="property-create-actions">
+                    <a asp-action="Index"
+                       class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left me-1"></i>
+                        Cancelar
+                    </a>
+
+                    <button type="submit"
+                            class="btn btn-primary">
+                        <i class="bi bi-save-fill me-1"></i>
+                        Guardar propriedade
+                    </button>
+                </div>
+
+            </div>
+
+            <!-- RESUMO -->
+            <div class="col-12 col-xl-4">
+                <div class="property-summary-wrapper">
+
+                    <div class="card property-summary-card">
+                        <div class="property-summary-header">
+                            <div class="property-summary-house">
+                                <i class="bi bi-house-door-fill"></i>
+                            </div>
+
+                            <div class="flex-grow-1 overflow-hidden">
+                                <small>Resumo da propriedade</small>
+
+                                <h4 id="summaryName"
+                                    class="mb-0 text-truncate">
+                                    Nova propriedade
+                                </h4>
+                            </div>
+                        </div>
+
+                        <div class="card-body">
+
+                            <div class="summary-status mb-4">
+                                <span class="badge bg-success">
+                                    <i class="bi bi-check-circle-fill me-1"></i>
+                                    Ativa
+                                </span>
+
+                                <span class="badge bg-light text-dark border"
+                                      id="summaryType">
+                                    Tipo não definido
+                                </span>
+                            </div>
+
+                            <div class="property-summary-item">
+                                <i class="bi bi-geo-alt-fill text-danger"></i>
+
+                                <div>
+                                    <small>Morada</small>
+                                    <strong id="summaryAddress">
+                                        Ainda não indicada
+                                    </strong>
+                                </div>
+                            </div>
+
+                            <div class="property-summary-item">
+                                <i class="bi bi-map-fill text-success"></i>
+
+                                <div>
+                                    <small>Localização</small>
+                                    <strong id="summaryLocation">
+                                        Ainda não indicada
+                                    </strong>
+                                </div>
+                            </div>
+
+                            <div class="property-summary-numbers">
+
+                                <div class="summary-number-box">
+                                    <i class="bi bi-door-closed-fill"></i>
+
+                                    <div>
+                                        <strong id="summaryRooms">0</strong>
+                                        <small>Quartos</small>
+                                    </div>
+                                </div>
+
+                                <div class="summary-number-box">
+                                    <i class="bi bi-people-fill"></i>
+
+                                    <div>
+                                        <strong id="summaryGuests">1</strong>
+                                        <small>Hóspedes</small>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="property-summary-description mt-4">
+                                <small>Descrição</small>
+
+                                <p id="summaryDescription"
+                                   class="mb-0">
+                                    A descrição da propriedade aparecerá aqui.
+                                </p>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info mt-3 mb-0">
+                        <i class="bi bi-info-circle-fill me-2"></i>
+                        Confirme os dados no resumo antes de guardar.
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+    </form>
+
+</div>
+
+<style>
+    .property-create-page {
+        max-width: 1500px;
+    }
+
+    .property-create-header {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .property-create-icon {
+        width: 62px;
+        height: 62px;
+        flex-shrink: 0;
+        border-radius: 18px;
+        background: #eaf2ff;
+        color: #0d6efd;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.7rem;
+    }
+
+    .property-form-card,
+    .property-summary-card {
+        border: 1px solid #e5e7eb;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 8px 24px rgba(15, 23, 42, .07);
+    }
+
+        .property-form-card .card-header {
+            padding: 18px 22px;
+            background: #f8fafc;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .property-form-card .card-body {
+            padding: 24px;
+        }
+
+        .property-form-card .form-control,
+        .property-form-card .form-select {
+            min-height: 48px;
+            border-radius: 11px;
+        }
+
+        .property-form-card textarea.form-control {
+            min-height: 110px;
+        }
+
+    .property-create-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+    }
+
+        .property-create-actions .btn {
+            min-height: 46px;
+            padding-left: 22px;
+            padding-right: 22px;
+            border-radius: 11px;
+        }
+
+    .property-summary-wrapper {
+        position: sticky;
+        top: 90px;
+    }
+
+    .property-summary-header {
+        padding: 20px;
+        background: #f8fafc;
+        border-bottom: 1px solid #e5e7eb;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+
+        .property-summary-header small {
+            display: block;
+            color: #64748b;
+            margin-bottom: 2px;
+        }
+
+    .property-summary-house {
+        width: 48px;
+        height: 48px;
+        flex-shrink: 0;
+        border-radius: 14px;
+        background: #eaf2ff;
+        color: #0d6efd;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.35rem;
+    }
+
+    .summary-status {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .property-summary-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 13px;
+        margin-bottom: 20px;
+    }
+
+        .property-summary-item > i {
+            width: 24px;
+            flex-shrink: 0;
+            text-align: center;
+            font-size: 1.15rem;
+        }
+
+        .property-summary-item small,
+        .property-summary-description small {
+            display: block;
+            color: #64748b;
+            margin-bottom: 3px;
+        }
+
+        .property-summary-item strong {
+            display: block;
+            color: #111827;
+            overflow-wrap: anywhere;
+        }
+
+    .property-summary-numbers {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+
+    .summary-number-box {
+        padding: 15px;
+        border-radius: 14px;
+        background: #f8fafc;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+        .summary-number-box i {
+            color: #0d6efd;
+            font-size: 1.25rem;
+        }
+
+        .summary-number-box strong {
+            display: block;
+            font-size: 1.15rem;
+        }
+
+        .summary-number-box small {
+            display: block;
+            color: #64748b;
+        }
+
+    .property-summary-description {
+        padding: 15px;
+        border-radius: 14px;
+        background: #f8fafc;
+    }
+
+        .property-summary-description p {
+            color: #334155;
+            overflow-wrap: anywhere;
+        }
+
+    @@media (max-width: 1199.98px) {
+        .property-summary-wrapper {
+            position: static;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .property-create-header {
+            align-items: flex-start;
+        }
+
+        .property-create-icon {
+            width: 52px;
+            height: 52px;
+            font-size: 1.4rem;
+        }
+
+        .property-form-card .card-body {
+            padding: 18px;
+        }
+
+        .property-create-actions {
+            flex-direction: column-reverse;
+        }
+
+            .property-create-actions .btn {
+                width: 100%;
+            }
+    }
+    #propertyMap {
+        width: 100%;
+        height: 380px;
+        border-radius: 16px;
+        border: 1px solid #e5e7eb;
+        overflow: hidden;
+    }
+
+    @@media (max-width: 768px) {
+        #propertyMap {
+            height: 300px;
+        }
+    }
+</style>
+
+@section Scripts {
+        <partial name="_ValidationScriptsPartial" />
+
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+
+                // =====================================================
+                // CAMPOS DO FORMULÁRIO
+                // =====================================================
+
+                const nameInput =
+                    document.getElementById("propertyName");
+
+                const typeInput =
+                    document.getElementById("propertyType");
+
+                const roomsInput =
+                    document.getElementById("propertyRooms");
+
+                const guestsInput =
+                    document.getElementById("propertyGuests");
+
+                const addressInput =
+                    document.getElementById("propertyAddress");
+
+                const postalCodeInput =
+                    document.getElementById("propertyPostalCode");
+
+                const parishInput =
+                    document.getElementById("propertyParish");
+
+                const municipalityInput =
+                    document.getElementById("propertyMunicipality");
+
+                const descriptionInput =
+                    document.getElementById("propertyDescricao");
+
+                const latitudeInput =
+                    document.getElementById("propertyLatitude");
+
+                const longitudeInput =
+                    document.getElementById("propertyLongitude");
+
+                const currentLocationButton =
+                    document.getElementById("useCurrentLocation");
+
+                // =====================================================
+                // CAMPOS DO RESUMO
+                // =====================================================
+
+                const summaryName =
+                    document.getElementById("summaryName");
+
+                const summaryType =
+                    document.getElementById("summaryType");
+
+                const summaryRooms =
+                    document.getElementById("summaryRooms");
+
+                const summaryGuests =
+                    document.getElementById("summaryGuests");
+
+                const summaryAddress =
+                    document.getElementById("summaryAddress");
+
+                const summaryLocation =
+                    document.getElementById("summaryLocation");
+
+                const summaryDescription =
+                    document.getElementById("summaryDescription");
+
+                // =====================================================
+                // FUNÇÕES DO RESUMO
+                // =====================================================
+
+                function getValue(input, fallback) {
+                    if (!input || !input.value.trim()) {
+                        return fallback;
+                    }
+
+                    return input.value.trim();
+                }
+
+                function updateName() {
+                    if (!summaryName) {
+                        return;
+                    }
+
+                    summaryName.textContent =
+                        getValue(nameInput, "Nova propriedade");
+                }
+
+                function updateType() {
+                    if (!summaryType) {
+                        return;
+                    }
+
+                    if (!typeInput || !typeInput.value) {
+                        summaryType.textContent =
+                            "Tipo não definido";
+
+                        return;
+                    }
+
+                    const selectedOption =
+                        typeInput.options[typeInput.selectedIndex];
+
+                    summaryType.textContent =
+                        selectedOption?.text || "Tipo não definido";
+                }
+
+                function updateNumbers() {
+                    if (summaryRooms) {
+                        summaryRooms.textContent =
+                            getValue(roomsInput, "0");
+                    }
+
+                    if (summaryGuests) {
+                        summaryGuests.textContent =
+                            getValue(guestsInput, "1");
+                    }
+                }
+
+                function updateAddress() {
+                    if (!summaryAddress) {
+                        return;
+                    }
+
+                    const address =
+                        getValue(addressInput, "");
+
+                    const postalCode =
+                        getValue(postalCodeInput, "");
+
+                    const completeAddress = [
+                        address,
+                        postalCode
+                    ]
+                        .filter(Boolean)
+                        .join(", ");
+
+                    summaryAddress.textContent =
+                        completeAddress || "Ainda não indicada";
+                }
+
+                function updateLocation() {
+                    if (!summaryLocation) {
+                        return;
+                    }
+
+                    const parish =
+                        getValue(parishInput, "");
+
+                    const municipality =
+                        getValue(municipalityInput, "");
+
+                    const location = [
+                        parish,
+                        municipality
+                    ]
+                        .filter(Boolean)
+                        .join(", ");
+
+                    summaryLocation.textContent =
+                        location || "Ainda não indicada";
+                }
+
+                function updateDescription() {
+                    if (!summaryDescription) {
+                        return;
+                    }
+
+                    summaryDescription.textContent =
+                        getValue(
+                            descriptionInput,
+                            "A descrição da propriedade aparecerá aqui."
+                        );
+                }
+
+                const bindings = [
+                    [nameInput, updateName],
+                    [typeInput, updateType],
+                    [roomsInput, updateNumbers],
+                    [guestsInput, updateNumbers],
+                    [addressInput, updateAddress],
+                    [postalCodeInput, updateAddress],
+                    [parishInput, updateLocation],
+                    [municipalityInput, updateLocation],
+                    [descriptionInput, updateDescription]
+                ];
+
+                bindings.forEach(function (binding) {
+                    const input = binding[0];
+                    const callback = binding[1];
+
+                    if (!input) {
+                        return;
+                    }
+
+                    input.addEventListener(
+                        "input",
+                        callback
+                    );
+
+                    input.addEventListener(
+                        "change",
+                        callback
+                    );
+                });
+
+                updateName();
+                updateType();
+                updateNumbers();
+                updateAddress();
+                updateLocation();
+                updateDescription();
+
+                // =====================================================
+                // MAPA LEAFLET
+                // =====================================================
+
+                const mapElement =
+                    document.getElementById("propertyMap");
+
+                if (!mapElement) {
+                    console.error(
+                        "Não foi encontrado o elemento #propertyMap."
+                    );
+
+                    return;
+                }
+
+                if (typeof L === "undefined") {
+                    console.error(
+                        "Leaflet não foi carregado."
+                    );
+
+                    return;
+                }
+
+                const defaultLatitude = 32.7607;
+                const defaultLongitude = -16.9595;
+
+                const hasSavedCoordinates =
+                    latitudeInput?.value &&
+                    longitudeInput?.value;
+
+                const initialLatitude =
+                    hasSavedCoordinates
+                        ? Number(latitudeInput.value)
+                        : defaultLatitude;
+
+                const initialLongitude =
+                    hasSavedCoordinates
+                        ? Number(longitudeInput.value)
+                        : defaultLongitude;
+
+                const initialZoom =
+                    hasSavedCoordinates ? 16 : 11;
+
+                const map = L.map(
+                    "propertyMap"
+                ).setView(
+                    [
+                        initialLatitude,
+                        initialLongitude
+                    ],
+                    initialZoom
+                );
+
+                L.tileLayer(
+                    "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                    {
+                        maxZoom: 19,
+                        attribution:
+                            "&copy; OpenStreetMap contributors"
+                    }
+                ).addTo(map);
+
+                let marker = null;
+
+                function updateCoordinates(
+                    latitude,
+                    longitude
+                ) {
+                    const lat = Number(latitude)
+                        .toFixed(8)
+                        .replace(".", ",");
+
+                    const lng = Number(longitude)
+                        .toFixed(8)
+                        .replace(".", ",");
+                    if (latitudeInput) {
+                        latitudeInput.value =
+        Number(latitude).toFixed(7).replace(".", ",");
+                    }
+
+                    if (longitudeInput) {
+                        longitudeInput.value =
+                            Number(longitude).toFixed(7).replace(".", ",");
+                    }
+                }
+
+                function setLocation(
+                    latitude,
+                    longitude,
+                    moveMap = true
+                ) {
+                    const coordinates = [
+                        latitude,
+                        longitude
+                    ];
+
+                    if (marker) {
+                        marker.setLatLng(coordinates);
+                    } else {
+                        marker = L.marker(
+                            coordinates,
+                            {
+                                draggable: true
+                            }
+                        ).addTo(map);
+
+                        marker.on(
+                            "dragend",
+                            function () {
+                                const position =
+                                    marker.getLatLng();
+
+                                updateCoordinates(
+                                    position.lat,
+                                    position.lng
+                                );
+                            }
+                        );
+                    }
+
+                    updateCoordinates(
+                        latitude,
+                        longitude
+                    );
+
+                    if (moveMap) {
+                        map.setView(
+                            coordinates,
+                            16
+                        );
+                    }
+                }
+
+                map.on(
+                    "click",
+                    function (event) {
+                        setLocation(
+                            event.latlng.lat,
+                            event.latlng.lng
+                        );
+                    }
+                );
+
+                if (hasSavedCoordinates) {
+                    setLocation(
+                        initialLatitude,
+                        initialLongitude,
+                        false
+                    );
+                }
+
+                // =====================================================
+                // LOCALIZAÇÃO ATUAL
+                // =====================================================
+
+                if (currentLocationButton) {
+                    currentLocationButton.addEventListener(
+                        "click",
+                        function () {
+
+                            if (!navigator.geolocation) {
+                                alert(
+                                    "O dispositivo não suporta localização."
+                                );
+
+                                return;
+                            }
+
+                            currentLocationButton.disabled = true;
+
+                            const originalText =
+                                currentLocationButton.innerHTML;
+
+                            currentLocationButton.innerHTML =
+                                '<span class="spinner-border spinner-border-sm me-2"></span>A obter localização...';
+
+                            navigator.geolocation.getCurrentPosition(
+                                function (position) {
+                                    setLocation(
+                                        position.coords.latitude,
+                                        position.coords.longitude
+                                    );
+
+                                    currentLocationButton.disabled =
+                                        false;
+
+                                    currentLocationButton.innerHTML =
+                                        originalText;
+
+                                    currentLocationButton.disabled =
+                                        false;
+
+                                    currentLocationButton.innerHTML =
+                                        originalText;
+                                },
+                                {
+                                    enableHighAccuracy: true,
+                                    timeout: 10000,
+                                    maximumAge: 0
+                                }
+                            );
+                        }
+                    );
+                }
+
+                // Corrige o tamanho do mapa em cards e layouts responsivos.
+                setTimeout(function () {
+                    map.invalidateSize();
+                }, 300);
+            });
+        </script>
+    }

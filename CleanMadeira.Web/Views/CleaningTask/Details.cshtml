@@ -1,0 +1,848 @@
+﻿@using System.Globalization
+@using CleanMadeira.Domain.Entities
+@using CleanMadeira.Domain.Entities.Enums
+@using Microsoft.AspNetCore.Identity
+
+@inject UserManager<ApplicationUser> UserManager
+
+@model CleanMadeira.Web.ViewModels.CleaningTask.CleaningTaskVM
+
+@{
+    ViewData["Title"] = "Detalhes da Limpeza";
+
+    var currentUser = await UserManager.GetUserAsync(User);
+    var isCleaner = currentUser?.Role == UserRole.Limpador;
+}
+
+<a asp-action="MyTasks" class="btn btn-outline-secondary btn-sm mb-4">
+    <i class="bi bi-arrow-left"></i>
+    Voltar
+</a>
+
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+
+        <h3 class="fw-bold mb-3">
+            <i class="bi bi-house-door-fill text-primary me-2"></i>
+            @Model.PropriedadeNome
+        </h3>
+
+        <p class="text-muted">
+            <i class="bi bi-geo-alt-fill text-danger me-2"></i>
+            @Model.Morada
+        </p>
+
+        <div class="row g-3">
+            @if (!isCleaner)
+            {
+                <div class="col-md-6">
+                    <div class="detail-box">
+                        <i class="bi bi-person-fill text-primary"></i>
+
+                        <div class="flex-grow-1">
+                            <small>Funcionário</small>
+
+                            <strong>@Model.AssignedUserName</strong>
+
+                            @if (!string.IsNullOrWhiteSpace(Model.AssignedUserCode))
+                            {
+                                <span class="badge bg-light text-dark mt-1">
+                                    @Model.AssignedUserCode
+                                </span>
+                            }
+
+                            @if (!string.IsNullOrWhiteSpace(Model.AssignedUserPhone))
+                            {
+                                <div class="mt-2 d-flex flex-wrap gap-2">
+                                    <a href="tel:@Model.AssignedUserPhone"
+                                    class="btn btn-outline-primary btn-sm">
+                                        <i class="bi bi-telephone-fill me-1"></i>
+                                        Ligar
+                                    </a>
+
+                                    <a href="https://wa.me/@Model.AssignedUserPhone.Replace("+", "").Replace(" ", "")"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    class="btn btn-outline-success btn-sm">
+                                        <i class="bi bi-whatsapp me-1"></i>
+                                        WhatsApp
+                                    </a>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>            
+            }
+            else
+            {
+                <div class="col-md-6">
+                    <div class="detail-box">
+                        <i class="bi bi-person-fill text-primary"></i>
+
+                        <div class="flex-grow-1">
+                            <small>Gestor AL</small>
+
+                            <strong>@Model.GestorNome</strong>
+
+                            @if (!string.IsNullOrWhiteSpace(Model.GestorTelefone))
+                            {
+                                <div class="mt-2 d-flex flex-wrap gap-2">
+                                    <a href="tel:@Model.GestorTelefone"
+                                       class="btn btn-outline-primary btn-sm">
+                                        <i class="bi bi-telephone-fill me-1"></i>
+                                        Ligar
+                                    </a>
+
+                                    <a href="https://wa.me/@Model.GestorTelefone.Replace("+", "").Replace(" ", "")"
+                                       target="_blank"
+                                       rel="noopener noreferrer"
+                                       class="btn btn-outline-success btn-sm">
+                                        <i class="bi bi-whatsapp me-1"></i>
+                                        WhatsApp
+                                    </a>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+                
+            }
+
+            <div class="col-md-6">
+                <div class="detail-box">
+                    <i class="bi bi-clock-fill text-warning"></i>
+                    <div>
+                        <small>Data/Hora</small>
+                        <strong>@Model.ScheduledDate.ToString("dd/MM/yyyy HH:mm")</strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="detail-box">
+                    <i class="bi bi-info-circle-fill text-success"></i>
+                    <div>
+                        <small>Estado</small>
+                        <strong>@Model.Status</strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="detail-box">
+                    <i class="bi bi-flag-fill text-danger"></i>
+                    <div>
+                        <small>Prioridade</small>
+                        <strong>@Model.Prioridade</strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="detail-box">
+                    <i class="bi bi-hourglass-split text-primary"></i>
+                    <div>
+                        <small>Tempo estimado</small>
+                        <strong>@Model.EstimatedMinutes min</strong>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        @if (Model.Latitude != null && Model.Longitude != null)
+        {
+            <a href="https://www.google.com/maps?q=@Model.Latitude?.ToString(CultureInfo.InvariantCulture),@Model.Longitude?.ToString(CultureInfo.InvariantCulture)"
+               target="_blank"
+               class="btn btn-outline-primary mt-4">
+                <i class="bi bi-navigation-fill"></i>
+                Navegar
+            </a>
+        }
+
+    </div>
+</div>
+
+@if (!string.IsNullOrWhiteSpace(Model.Notas))
+{
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <h5 class="fw-bold">
+                <i class="bi bi-card-text text-primary me-2"></i>
+                Notas do gestor
+            </h5>
+
+            <p class="mb-0" style="white-space: pre-line;">
+                @Model.Notas
+            </p>
+        </div>
+    </div>
+}
+
+@if (Model.Status == CleaningStatus.EmProgresso && Model.StartTime != null)
+{
+    <div class="alert alert-primary shadow-sm">
+        <strong>
+            <i class="bi bi-stopwatch-fill me-2"></i>
+            Tempo decorrido
+        </strong>
+
+        <h2 class="timer mt-2"
+            data-start="@Model.StartTime.Value.ToString("o")">
+            00:00:00
+        </h2>
+    </div>
+}
+
+@if (!string.IsNullOrWhiteSpace(Model.CleanerNotes) || Model.Photos.Any())
+{
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+
+            <h5 class="fw-bold mb-3">
+                <i class="bi bi-camera-fill text-primary me-2"></i>
+                Registo do limpador
+            </h5>
+
+            @if (!string.IsNullOrWhiteSpace(Model.CleanerNotes))
+            {
+                <div class="alert alert-light border">
+                    <strong>Notas:</strong><br />
+                    @Model.CleanerNotes
+                </div>
+            }
+
+            @if (Model.Photos.Any())
+            {
+                <div class="cleaning-photo-grid">
+                    @foreach (var photo in Model.Photos)
+                    {
+                        <div class="cleaning-photo-wrapper">
+
+                            <button type="button"
+                                    class="cleaning-photo-button"
+                                    data-photo-url="@photo.FileUrl"
+                                    data-photo-name="@photo.FileName">
+
+                                <img src="@photo.FileUrl"
+                                     class="cleaning-photo-thumbnail"
+                                     alt="Fotografia da limpeza"
+                                     loading="lazy" />
+
+                                <span class="cleaning-photo-overlay">
+                                    <i class="bi bi-arrows-fullscreen"></i>
+                                </span>
+                            </button>
+
+                            <form asp-controller="CleaningTask"
+                                  asp-action="DeletePhoto"
+                                  method="post"
+                                  class="photo-delete-form"
+                                  onsubmit="return confirm('Pretende eliminar esta fotografia?');">
+
+                                @Html.AntiForgeryToken()
+
+                                <input type="hidden"
+                                       name="photoId"
+                                       value="@photo.Id" />
+
+                                <input type="hidden"
+                                       name="taskId"
+                                       value="@Model.Id" />
+                                @if(isCleaner){
+                                    <button type="submit"
+                                        class="photo-delete-button"
+                                        title="Eliminar fotografia"
+                                        aria-label="Eliminar fotografia">
+                                    <i class="bi bi-trash-fill"></i>
+                                </button>
+                                }
+                            </form>
+
+                        </div>
+                    }
+                </div>
+                <div class="modal fade"
+                     id="photoPreviewModal"
+                     tabindex="-1"
+                     aria-hidden="true">
+
+                    <div class="modal-dialog modal-dialog-centered modal-xl">
+                        <div class="modal-content photo-preview-content">
+
+                            <div class="modal-header">
+                                <h5 class="modal-title">
+                                    Fotografias da limpeza
+                                </h5>
+
+                                <div class="d-flex align-items-center gap-3">
+                                    <span id="photoCounter"
+                                          class="text-muted">
+                                    </span>
+
+                                    <button type="button"
+                                            class="btn-close"
+                                            data-bs-dismiss="modal"
+                                            aria-label="Fechar">
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="modal-body photo-preview-body">
+
+                                <button type="button"
+                                        id="photoPreviousButton"
+                                        class="photo-navigation photo-navigation-previous"
+                                        aria-label="Fotografia anterior">
+                                    <i class="bi bi-chevron-left"></i>
+                                </button>
+
+                                <img id="photoPreviewImage"
+                                     src=""
+                                     alt="Fotografia ampliada"
+                                     class="photo-preview-image" />
+
+                                <button type="button"
+                                        id="photoNextButton"
+                                        class="photo-navigation photo-navigation-next"
+                                        aria-label="Fotografia seguinte">
+                                    <i class="bi bi-chevron-right"></i>
+                                </button>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <p class="text-muted mb-0">
+                    Ainda não foram adicionadas fotografias.
+                </p>
+            }
+
+        </div>
+    </div>
+}
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body d-flex flex-wrap gap-2">
+
+        @if (isCleaner)
+        {
+            @if (Model.Status == CleaningStatus.Pendente)
+            {
+                <a asp-action="Start"
+                   asp-route-id="@Model.Id"
+                   class="btn btn-success">
+                    <i class="bi bi-play-fill"></i>
+                    Iniciar
+                </a>
+            }
+
+            @if (Model.Status == CleaningStatus.EmProgresso)
+            {
+                <a asp-controller="Inventory"
+                   asp-action="Check"
+                   asp-route-taskId="@Model.Id"
+                   class="btn btn-warning">
+                    <i class="bi bi-box-seam-fill"></i>
+                    Verificar Inventário
+                </a>
+
+                <a asp-controller="CleaningTask"
+                   asp-action="CleanerUpdate"
+                   asp-route-id="@Model.Id"
+                   class="btn btn-outline-primary">
+                    <i class="bi bi-camera-fill"></i>
+                    Notas/Fotos
+                </a>
+
+                <a asp-action="Finish"
+                   asp-route-id="@Model.Id"
+                   class="btn btn-primary">
+                    <i class="bi bi-check-circle-fill"></i>
+                    Concluir
+                </a>
+            }
+        }
+        else
+        {
+            <a asp-action="Index"
+               class="btn btn-outline-secondary">
+                <i class="bi bi-calendar-event"></i>
+                Voltar ao Calendário
+            </a>
+
+            <a asp-action="Edit"
+               asp-route-id="@Model.Id"
+               class="btn btn-outline-warning">
+                <i class="bi bi-pencil-square"></i>
+                Editar
+            </a>
+        }
+
+    </div>
+</div>
+
+<style>
+    .detail-box {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 16px;
+        background: #f8fafc;
+        border-radius: 14px;
+        height: 100%;
+    }
+
+        .detail-box i {
+            font-size: 1.5rem;
+        }
+
+        .detail-box small {
+            display: block;
+            color: #6b7280;
+        }
+
+        .detail-box strong {
+            display: block;
+            color: #1f2937;
+        }
+
+    .cleaning-photo {
+        width: 100%;
+        height: 140px;
+        object-fit: cover;
+    }
+
+    @@media (max-width: 768px) {
+        .card-body .btn {
+            width: 100%;
+        }
+
+        .cleaning-photo {
+            height: 120px;
+        }
+    }
+
+    .photo-preview-body {
+        position: relative;
+        min-height: 300px;
+        padding: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #111;
+        overflow: hidden;
+    }
+
+    .photo-preview-image {
+        display: block;
+        width: auto;
+        max-width: 100%;
+        max-height: 80vh;
+        margin: auto;
+        object-fit: contain;
+        user-select: none;
+        touch-action: pan-y;
+    }
+
+    .photo-navigation {
+        position: absolute;
+        top: 50%;
+        z-index: 2;
+        width: 48px;
+        height: 48px;
+        padding: 0;
+        border: 0;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0, 0, 0, .6);
+        color: #fff;
+        font-size: 1.6rem;
+        transform: translateY(-50%);
+    }
+
+        .photo-navigation:hover {
+            background: rgba(0, 0, 0, .82);
+        }
+
+    .photo-navigation-previous {
+        left: 16px;
+    }
+
+    .photo-navigation-next {
+        right: 16px;
+    }
+
+    @@media (max-width: 768px) {
+        .photo-preview-body {
+            padding: 6px;
+        }
+
+        .photo-preview-image {
+            max-height: 75vh;
+        }
+
+        .photo-navigation {
+            width: 40px;
+            height: 40px;
+            font-size: 1.25rem;
+        }
+
+        .photo-navigation-previous {
+            left: 7px;
+        }
+
+        .photo-navigation-next {
+            right: 7px;
+        }
+    }
+
+    .cleaning-photo-wrapper {
+        position: relative;
+        width: 100%;
+        min-width: 0;
+    }
+
+    .cleaning-photo-button {
+        position: relative;
+        display: block;
+        width: 100%;
+        height: 190px;
+        padding: 0;
+        border: 1px solid #dee2e6;
+        border-radius: 14px;
+        overflow: hidden;
+        background: #f8f9fa;
+        cursor: pointer;
+    }
+
+    .cleaning-photo-thumbnail {
+        display: block;
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover !important;
+    }
+
+    .photo-delete-form {
+        position: absolute;
+        top: 9px;
+        right: 9px;
+        z-index: 5;
+        margin: 0;
+    }
+
+    .photo-delete-button {
+        width: 36px;
+        height: 36px;
+        padding: 0;
+        border: 0;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(220, 53, 69, .92);
+        color: #fff;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, .25);
+    }
+
+        .photo-delete-button:hover {
+            background: #bb2d3b;
+            transform: scale(1.05);
+        }
+
+    @@media (max-width: 768px) {
+        .cleaning-photo-button {
+            height: 145px;
+        }
+
+        .photo-delete-button {
+            width: 34px;
+            height: 34px;
+        }
+    }
+</style>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            // =====================================================
+            // GALERIA DE FOTOGRAFIAS
+            // =====================================================
+
+            const modalElement =
+                document.getElementById("photoPreviewModal");
+
+            const previewImage =
+                document.getElementById("photoPreviewImage");
+
+            const previousButton =
+                document.getElementById("photoPreviousButton");
+
+            const nextButton =
+                document.getElementById("photoNextButton");
+
+            const counter =
+                document.getElementById("photoCounter");
+
+            const photoButtons =
+                Array.from(
+                    document.querySelectorAll(".cleaning-photo-button")
+                );
+
+            let photoModal = null;
+            let currentPhotoIndex = 0;
+
+            const photos = photoButtons
+                .map(function (button) {
+                    return {
+                        url: button.dataset.photoUrl,
+                        name: button.dataset.photoName || "Fotografia da limpeza"
+                    };
+                })
+                .filter(function (photo) {
+                    return Boolean(photo.url);
+                });
+
+            function showPhoto(index) {
+                if (!previewImage || photos.length === 0) {
+                    return;
+                }
+
+                currentPhotoIndex =
+                    (index + photos.length) % photos.length;
+
+                const photo = photos[currentPhotoIndex];
+
+                previewImage.src = photo.url;
+                previewImage.alt = photo.name;
+
+                if (counter) {
+                    counter.textContent =
+                        `${currentPhotoIndex + 1} / ${photos.length}`;
+                }
+
+                const shouldShowNavigation =
+                    photos.length > 1;
+
+                if (previousButton) {
+                    previousButton.hidden =
+                        !shouldShowNavigation;
+                }
+
+                if (nextButton) {
+                    nextButton.hidden =
+                        !shouldShowNavigation;
+                }
+            }
+
+            function showPreviousPhoto() {
+                showPhoto(currentPhotoIndex - 1);
+            }
+
+            function showNextPhoto() {
+                showPhoto(currentPhotoIndex + 1);
+            }
+
+            if (
+                modalElement &&
+                previewImage &&
+                typeof bootstrap !== "undefined"
+            ) {
+                photoModal =
+                    new bootstrap.Modal(modalElement);
+
+                photoButtons.forEach(function (button, buttonIndex) {
+                    button.addEventListener("click", function (event) {
+                        event.preventDefault();
+
+                        const photoUrl =
+                            button.dataset.photoUrl;
+
+                        if (!photoUrl) {
+                            return;
+                        }
+
+                        const photoIndex =
+                            photos.findIndex(function (photo) {
+                                return photo.url === photoUrl;
+                            });
+
+                        showPhoto(
+                            photoIndex >= 0
+                                ? photoIndex
+                                : buttonIndex
+                        );
+
+                        photoModal.show();
+                    });
+                });
+
+                if (previousButton) {
+                    previousButton.addEventListener(
+                        "click",
+                        showPreviousPhoto
+                    );
+                }
+
+                if (nextButton) {
+                    nextButton.addEventListener(
+                        "click",
+                        showNextPhoto
+                    );
+                }
+
+                document.addEventListener(
+                    "keydown",
+                    function (event) {
+                        if (!modalElement.classList.contains("show")) {
+                            return;
+                        }
+
+                        if (event.key === "ArrowLeft") {
+                            event.preventDefault();
+                            showPreviousPhoto();
+                        }
+
+                        if (event.key === "ArrowRight") {
+                            event.preventDefault();
+                            showNextPhoto();
+                        }
+                    }
+                );
+
+                // Swipe no telemóvel
+                let touchStartX = null;
+                let touchStartY = null;
+
+                previewImage.addEventListener(
+                    "touchstart",
+                    function (event) {
+                        if (event.touches.length !== 1) {
+                            return;
+                        }
+
+                        touchStartX =
+                            event.touches[0].clientX;
+
+                        touchStartY =
+                            event.touches[0].clientY;
+                    },
+                    { passive: true }
+                );
+
+                previewImage.addEventListener(
+                    "touchend",
+                    function (event) {
+                        if (
+                            touchStartX === null ||
+                            touchStartY === null ||
+                            event.changedTouches.length !== 1
+                        ) {
+                            return;
+                        }
+
+                        const touchEndX =
+                            event.changedTouches[0].clientX;
+
+                        const touchEndY =
+                            event.changedTouches[0].clientY;
+
+                        const differenceX =
+                            touchEndX - touchStartX;
+
+                        const differenceY =
+                            touchEndY - touchStartY;
+
+                        touchStartX = null;
+                        touchStartY = null;
+
+                        // Ignora movimentos verticais ou muito pequenos.
+                        if (
+                            Math.abs(differenceX) < 50 ||
+                            Math.abs(differenceX) <=
+                                Math.abs(differenceY)
+                        ) {
+                            return;
+                        }
+
+                        if (differenceX > 0) {
+                            showPreviousPhoto();
+                        } else {
+                            showNextPhoto();
+                        }
+                    },
+                    { passive: true }
+                );
+
+                modalElement.addEventListener(
+                    "hidden.bs.modal",
+                    function () {
+                        previewImage.src = "";
+                        currentPhotoIndex = 0;
+                    }
+                );
+            }
+
+            // =====================================================
+            // TEMPORIZADORES
+            // =====================================================
+
+            function updateTimers() {
+                document
+                    .querySelectorAll(".timer")
+                    .forEach(function (timer) {
+                        const start =
+                            new Date(timer.dataset.start);
+
+                        if (Number.isNaN(start.getTime())) {
+                            return;
+                        }
+
+                        const difference =
+                            Date.now() - start.getTime();
+
+                        if (difference < 0) {
+                            timer.textContent = "00:00:00";
+                            return;
+                        }
+
+                        const hours =
+                            Math.floor(
+                                difference / 3600000
+                            );
+
+                        const minutes =
+                            Math.floor(
+                                (difference % 3600000) /
+                                60000
+                            );
+
+                        const seconds =
+                            Math.floor(
+                                (difference % 60000) /
+                                1000
+                            );
+
+                        timer.textContent =
+                            String(hours).padStart(2, "0") +
+                            ":" +
+                            String(minutes).padStart(2, "0") +
+                            ":" +
+                            String(seconds).padStart(2, "0");
+                    });
+            }
+
+            updateTimers();
+            setInterval(updateTimers, 1000);
+        });
+    </script>
+}
+
+

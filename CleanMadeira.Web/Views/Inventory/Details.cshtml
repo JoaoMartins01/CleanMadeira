@@ -1,0 +1,45 @@
+﻿@using CleanMadeira.Web.ViewModels.Inventory
+@model InventoryItemVM
+
+@{
+    ViewData["Title"] = "Detalhes do Produto";
+}
+
+<div class="card">
+    <div class="card-header">
+        <h3>@Model.Nome</h3>
+    </div>
+
+    <div class="card-body">
+
+        <p><strong>Propriedade:</strong> @Model.PropriedadeNome</p>
+        <p><strong>Quantidade:</strong> @Model.Quantidade</p>
+        <p><strong>Mínimo:</strong> @Model.QuantidadeMinima</p>
+        <p><strong>Unidade:</strong> @Model.Unidade</p>
+
+        <p>
+            <strong>Estado:</strong>
+
+            @if (Model.IsLowStock)
+            {
+                <span class="badge bg-danger">Stock Baixo</span>
+            }
+            else
+            {
+                <span class="badge bg-success">OK</span>
+            }
+        </p>
+
+        <a asp-action="Edit"
+           asp-route-id="@Model.Id"
+           class="btn btn-warning">
+            Editar
+        </a>
+
+        <a asp-action="Index"
+           class="btn btn-secondary">
+            Voltar
+        </a>
+
+    </div>
+</div>

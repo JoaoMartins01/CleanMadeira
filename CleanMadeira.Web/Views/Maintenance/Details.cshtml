@@ -1,0 +1,223 @@
+﻿@using CleanMadeira.Domain.Entities.Enums
+@model CleanMadeira.Web.ViewModels.Maintenance.MaintenanceDetailsVM
+
+@{
+    ViewData["Title"] = "Detalhes da Manutenção";
+}
+
+<div class="container">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <h2>Detalhes da Manutenção</h2>
+            <p class="text-muted mb-0">
+                Informação completa da manutenção.
+            </p>
+        </div>
+
+        <div>
+            <a asp-action="Edit"
+               asp-route-id="@Model.Id"
+               class="btn btn-warning">
+                Editar
+            </a>
+
+            <a asp-action="Index"
+               class="btn btn-secondary">
+                Voltar
+            </a>
+        </div>
+
+    </div>
+
+    <div class="card shadow-sm">
+
+        <div class="card-header">
+            <h4 class="mb-0">@Model.Title</h4>
+        </div>
+
+        <div class="card-body">
+
+            <div class="row mb-3">
+
+                <div class="col-md-6">
+
+                    <label class="fw-bold">
+                        Propriedade
+                    </label>
+
+                    <p>
+                        @Model.PropertyName
+                    </p>
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <label class="fw-bold">
+                        Responsável
+                    </label>
+
+                    <p>
+                        @(string.IsNullOrWhiteSpace(Model.AssignedUserName)
+                            ? "Não atribuído"
+                            : Model.AssignedUserName)
+                    </p>
+
+                </div>
+
+            </div>
+
+            <div class="row mb-3">
+
+                <div class="col-md-6">
+
+                    <label class="fw-bold">
+                        Prioridade
+                    </label>
+
+                    <p>
+
+                        @switch (Model.Priority)
+                        {
+                            case MaintenancePriority.Baixa:
+                                <span class="badge bg-success">Baixa</span>
+                                break;
+
+                            case MaintenancePriority.Media:
+                                <span class="badge bg-warning text-dark">Média</span>
+                                break;
+
+                            case MaintenancePriority.Alta:
+                                <span class="badge bg-danger">Alta</span>
+                                break;
+
+                            case MaintenancePriority.Urgente:
+                                <span class="badge bg-dark">Urgente</span>
+                                break;
+                        }
+
+                    </p>
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <label class="fw-bold">
+                        Estado
+                    </label>
+
+                    <p>
+
+                        @switch (Model.Status)
+                        {
+                            case MaintenanceStatus.Pendente:
+                                <span class="badge bg-secondary">Pendente</span>
+                                break;
+
+                            case MaintenanceStatus.Aceite:
+                                <span class="badge bg-success">Aceite</span>
+                                break;
+
+                            case MaintenanceStatus.EmProgresso:
+                                <span class="badge bg-primary">Em progresso</span>
+                                break;
+
+                            case MaintenanceStatus.Completo:
+                                <span class="badge bg-success">Concluída</span>
+                                break;
+
+                            case MaintenanceStatus.Cancelado:
+                                <span class="badge bg-danger">Cancelado</span>
+                                break;
+
+                            case MaintenanceStatus.Rejeitada:
+                                <span class="badge bg-danger">Rejeitada</span>
+                                break;
+
+                        }
+
+                    </p>
+
+                </div>
+
+            </div>
+
+            <div class="row mb-3">
+
+                <div class="col-md-6">
+
+                    <label class="fw-bold">
+                        Data Prevista
+                    </label>
+
+                    <p>
+                        @Model.ScheduledDate.ToString("dd/MM/yyyy HH:mm")
+                    </p>
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <label class="fw-bold">
+                        Criado em
+                    </label>
+
+                    <p>
+                        @Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")
+                    </p>
+
+                </div>
+
+            </div>
+
+            <hr />
+
+            <div>
+
+                <label class="fw-bold">
+                    Descrição
+                </label>
+
+                @if (string.IsNullOrWhiteSpace(Model.Description))
+                {
+                    <p class="text-muted">
+                        Sem descrição.
+                    </p>
+                }
+                else
+                {
+                    <div class="border rounded p-3 bg-light">
+                        @Model.Description
+                    </div>
+                }
+
+            </div>
+
+            <div>
+
+                <label class="fw-bold">
+                    Motivo
+                </label>
+
+                @if (string.IsNullOrWhiteSpace(Model.Description))
+                {
+                    <p class="text-muted">
+                        Sem descrição.
+                    </p>
+                }
+                else
+                {
+                    <div class="border rounded p-3 bg-light">
+                        @Model.
+                    </div>
+                }
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

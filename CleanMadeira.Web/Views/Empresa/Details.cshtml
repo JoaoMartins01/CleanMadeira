@@ -1,0 +1,56 @@
+﻿@using CleanMadeira.Web.ViewModels.Empresa
+@model EmpresaVM
+
+@{
+    ViewData["Title"] = "Detalhes";
+}
+
+<div class="card">
+
+    <div class="card-header">
+        <h3>@Model.Nome</h3>
+    </div>
+
+    <div class="card-body">
+
+        <p>
+            <strong>NIF:</strong>
+            @Model.Nif
+        </p>
+
+        <p>
+            <strong>Email:</strong>
+            @Model.Email
+        </p>
+
+        <p>
+            <strong>Telefone:</strong>
+            @Model.Telefone
+        </p>
+
+        <p>
+            <strong>Morada:</strong>
+            @Model.Endereço
+        </p>
+
+        <p>
+            <strong>Estado:</strong>
+
+            @if (Model.Active)
+            {
+                <span class="badge bg-success">
+                    Ativa
+                </span>
+            }
+            else
+            {
+                <span class="badge bg-danger">
+                    Inativa
+                </span>
+            }
+
+        </p>
+
+    </div>
+
+</div>

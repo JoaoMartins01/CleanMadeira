@@ -1,0 +1,77 @@
+﻿@using CleanMadeira.Web.ViewModels.Inventory
+@model InventoryItemVM
+
+@{
+    ViewData["Title"] = "Editar Produto";
+}
+
+<div class="card">
+    <div class="card-header">
+        <h3>Editar Produto</h3>
+    </div>
+
+    <div class="card-body">
+
+        <form asp-action="Edit" method="post">
+            @Html.AntiForgeryToken()
+
+            <input asp-for="Id" type="hidden" />
+
+            <div class="mb-3">
+                <label asp-for="PropriedadeNome" class="form-label"></label>
+
+                <input asp-for="PropriedadeNome"
+                       class="form-control" readonly/>
+
+                <span asp-validation-for="PropriedadeNome" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Nome" class="form-label"></label>
+
+                <input asp-for="Nome"
+                       class="form-control" />
+
+                <span asp-validation-for="Nome" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Unidade" class="form-label"></label>
+
+                <input asp-for="Unidade"
+                       class="form-control" />
+
+                <span asp-validation-for="Unidade" class="text-danger"></span>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Quantidade" class="form-label"></label>
+
+                    <input asp-for="Quantidade"
+                           class="form-control" />
+
+                    <span asp-validation-for="Quantidade" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label asp-for="QuantidadeMinima" class="form-label"></label>
+
+                    <input asp-for="QuantidadeMinima"
+                           class="form-control" />
+
+                    <span asp-validation-for="QuantidadeMinima" class="text-danger"></span>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-success">
+                Atualizar
+            </button>
+
+            <a asp-action="Index" class="btn btn-secondary">
+                Cancelar
+            </a>
+        </form>
+
+    </div>
+</div>

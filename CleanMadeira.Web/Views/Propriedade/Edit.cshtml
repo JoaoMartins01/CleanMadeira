@@ -1,0 +1,833 @@
+﻿@model CleanMadeira.Web.ViewModels.Propriedade.PropriedadeVM
+
+@{
+    ViewData["Title"] = "Editar Propriedade";
+}
+
+
+
+<div class="property-edit-page">
+
+    <link rel="stylesheet"
+          href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+
+    <div class="property-edit-header mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">
+                <i class="bi bi-pencil-square text-primary me-2"></i>
+                Editar Propriedade
+            </h2>
+
+            <p class="text-muted mb-0">
+                Atualize os dados da propriedade.
+            </p>
+        </div>
+
+        <a asp-action="Index"
+           class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i>
+            Voltar
+        </a>
+    </div>
+
+    <form asp-action="Edit"
+          method="post"
+          id="propertyEditForm">
+
+        @Html.AntiForgeryToken()
+
+        <input asp-for="Id" type="hidden" />
+
+        <input asp-for="Latitude"
+               id="propertyLatitude"
+               type="hidden" />
+
+        <input asp-for="Longitude"
+               id="propertyLongitude"
+               type="hidden" />
+
+        <div asp-validation-summary="ModelOnly"
+             class="alert alert-danger"
+             role="alert">
+        </div>
+
+        <div class="row g-4">
+
+            <div class="col-12 col-xl-7">
+                <div class="card border-0 shadow-sm property-form-card">
+                    <div class="card-header bg-white">
+                        <h5 class="fw-bold mb-0">
+                            <i class="bi bi-house-door-fill text-primary me-2"></i>
+                            Dados da propriedade
+                        </h5>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="mb-4">
+                            <label asp-for="Nome"
+                                   class="form-label fw-semibold">
+                                Nome da propriedade
+                            </label>
+
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-house-door"></i>
+                                </span>
+
+                                <input asp-for="Nome"
+                                       class="form-control"
+                                       placeholder="Ex.: Casa do Mar" />
+
+                                <span asp-validation-for="Nome"
+                                      class="text-danger">
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label asp-for="Quartos"
+                                       class="form-label fw-semibold">
+                                    Quartos
+                                </label>
+
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-door-open"></i>
+                                    </span>
+
+                                    <input asp-for="Quartos"
+                                           class="form-control"/>
+                                </div>
+
+                                <span asp-validation-for="Quartos"
+                                      class="text-danger">
+                                </span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="CasasBanho"
+                                       class="form-label fw-semibold">
+                                    Casas de Banho
+                                </label>
+
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-droplet"></i>
+                                    </span>
+
+                                    <input asp-for="CasasBanho"
+                                           class="form-control"/>
+                                </div>
+
+                                <span asp-validation-for="CasasBanho"
+                                      class="text-danger">
+                                </span>
+                            </div>
+                        </div>
+
+
+                        <div class="mb-4">
+                            <label asp-for="Endereco"
+                                   class="form-label fw-semibold">
+                                Morada
+                            </label>
+
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-geo-alt-fill"></i>
+                                </span>
+
+                                <input asp-for="Endereco"
+                                       class="form-control"
+                                       placeholder="Rua, número e localidade" />
+                            </div>
+
+                            <span asp-validation-for="Endereco"
+                                  class="text-danger">
+                            </span>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label asp-for="Freguesia"
+                                       class="form-label fw-semibold">
+                                    Freguesia
+                                </label>
+
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-map-fill"></i>
+                                    </span>
+
+                                    <input asp-for="Freguesia"
+                                           class="form-control"
+                                           placeholder="Ex.: Calheta" />
+                                </div>
+
+                                <span asp-validation-for="Freguesia"
+                                      class="text-danger">
+                                </span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="CodigoPostal"
+                                       class="form-label fw-semibold">
+                                    Código postal
+                                </label>
+
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-mailbox"></i>
+                                    </span>
+
+                                    <input asp-for="CodigoPostal"
+                                           class="form-control"
+                                           placeholder="0000-000" />
+                                </div>
+
+                                <span asp-validation-for="CodigoPostal"
+                                      class="text-danger">
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm property-form-card mt-4">
+                    <div class="card border-0 shadow-sm property-form-card mt-4">
+                        <div class="card-header bg-white">
+                            <h5 class="fw-bold mb-0">
+                                <i class="bi bi-pin-map-fill text-danger me-2"></i>
+                                Localização da propriedade
+                            </h5>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="alert alert-light border">
+                                <i class="bi bi-info-circle-fill text-primary me-2"></i>
+                                Clique no mapa ou arraste o marcador para indicar a localização exata.
+                            </div>
+
+                            <div id="propertyMap"></div>
+
+                            <div class="row g-3 mt-2">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">
+                                        Latitude
+                                    </label>
+
+                                    <input id="latitudeDisplay"
+                                           class="form-control"
+                                           value="@Model.Latitude"
+                                           readonly />
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">
+                                        Longitude
+                                    </label>
+
+                                    <input id="longitudeDisplay"
+                                           class="form-control"
+                                           value="@Model.Longitude"
+                                           readonly />
+                                </div>
+                            </div>
+
+                            <span asp-validation-for="Latitude"
+                                  class="text-danger"></span>
+
+                            <span asp-validation-for="Longitude"
+                                  class="text-danger"></span>
+                        </div>
+
+                        <!-- Informações adicionais -->
+                        <div class="card property-form-card mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0">
+                                    <i class="bi bi-journal-text text-primary me-2"></i>
+                                    Informações adicionais
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="col-md-4">
+                                    <label asp-for="NumeroHospedes"
+                                           class="form-label">
+                                        Nº máximo de Hospedes
+                                    </label>
+
+                                    <input asp-for="NumeroHospedes"
+                                           class="form-control"
+                                           id="propertyNumeroHospedes" />
+
+                                    <span asp-validation-for="Descricao"
+                                          class="text-danger"></span>
+
+                                    <label asp-for="Descricao"
+                                           class="form-label">
+                                        Descrição
+                                    </label>
+
+                                    <textarea asp-for="Descricao"
+                                              class="form-control"
+                                              rows="3">
+                        </textarea>
+
+                                    <span asp-validation-for="Descricao"
+                                          class="text-danger"></span>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-xl-5">
+                <div class="card border-0 shadow-sm property-summary-card">
+                    <div class="card-body">
+
+                        <div class="summary-icon mb-3">
+                            <i class="bi bi-house-check-fill"></i>
+                        </div>
+
+                        <h5 class="fw-bold">
+                            Confirme os dados
+                        </h5>
+
+                        <p class="text-muted">
+                            Antes de guardar, verifique especialmente a morada e as coordenadas.
+                        </p>
+
+                        <div class="property-preview">
+                            <div>
+                                <small>Nome</small>
+                                <strong id="previewName">
+                                    @Model.Nome
+                                </strong>
+                            </div>
+
+                            <div>
+                                <small>Morada</small>
+                                <strong id="previewAddress">
+                                    @Model.Endereco
+                                </strong>
+                            </div>
+
+                            <div>
+                                <small>Freguesia</small>
+                                <strong id="previewParish">
+                                    @Model.Freguesia
+                                </strong>
+                            </div>
+                        </div>
+
+                        <hr />
+
+                        <div class="d-grid gap-2">
+                            <button type="submit"
+                                    class="btn btn-primary btn-lg">
+                                <i class="bi bi-check-circle-fill me-1"></i>
+                                Guardar alterações
+                            </button>
+
+                            <a asp-action="Details"
+                               asp-route-id="@Model.Id"
+                               class="btn btn-outline-secondary">
+                                <i class="bi bi-eye-fill me-1"></i>
+                                Ver detalhes
+                            </a>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </form>
+</div>
+
+<style>
+    .property-edit-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+    }
+
+    .property-form-card,
+    .property-summary-card {
+        border-radius: 18px;
+        overflow: hidden;
+    }
+
+        .property-form-card .card-header {
+            padding: 18px 22px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .property-form-card .card-body,
+        .property-summary-card .card-body {
+            padding: 24px;
+        }
+
+    .summary-icon {
+        width: 58px;
+        height: 58px;
+        border-radius: 16px;
+        background: #eaf2ff;
+        color: #0d6efd;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.65rem;
+    }
+
+    .property-preview {
+        display: grid;
+        gap: 16px;
+    }
+
+        .property-preview div {
+            padding: 14px;
+            background: #f8fafc;
+            border-radius: 12px;
+        }
+
+        .property-preview small {
+            display: block;
+            color: #6c757d;
+            margin-bottom: 3px;
+        }
+
+        .property-preview strong {
+            display: block;
+            overflow-wrap: anywhere;
+        }
+
+    .input-group-text {
+        min-width: 46px;
+        justify-content: center;
+    }
+
+    
+    .property-edit-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+    }
+
+    .property-form-card,
+    .property-summary-card {
+        border-radius: 18px;
+        overflow: hidden;
+    }
+
+        .property-form-card .card-header {
+            padding: 18px 22px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .property-form-card .card-body,
+        .property-summary-card .card-body {
+            padding: 24px;
+        }
+
+    .summary-icon {
+        width: 58px;
+        height: 58px;
+        border-radius: 16px;
+        background: #eaf2ff;
+        color: #0d6efd;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.65rem;
+    }
+
+    .property-preview {
+        display: grid;
+        gap: 16px;
+    }
+
+        .property-preview div {
+            padding: 14px;
+            background: #f8fafc;
+            border-radius: 12px;
+        }
+
+        .property-preview small {
+            display: block;
+            color: #6c757d;
+            margin-bottom: 3px;
+        }
+
+        .property-preview strong {
+            display: block;
+            overflow-wrap: anywhere;
+        }
+
+    .input-group-text {
+        min-width: 46px;
+        justify-content: center;
+    }
+
+    /* Tem de ficar fora do media query */
+    #propertyMap {
+        width: 100%;
+        height: 420px;
+        min-height: 420px;
+        border-radius: 16px;
+        overflow: hidden;
+        border: 1px solid #dee2e6;
+    }
+
+    @@media (max-width: 768px) {
+        .property-edit-header {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+            .property-edit-header .btn {
+                width: 100%;
+            }
+
+        .property-form-card .card-body,
+        .property-summary-card .card-body {
+            padding: 18px;
+        }
+
+        .property-summary-card {
+            margin-bottom: 20px;
+        }
+
+        #propertyMap {
+            height: 320px;
+            min-height: 320px;
+        }
+    }
+</style>
+
+
+
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+        // =====================================================
+        // ELEMENTOS DO FORMULÁRIO
+        // =====================================================
+
+        const nameInput =
+        document.getElementById("Nome");
+
+        const addressInput =
+        document.getElementById("Endereco");
+
+        const parishInput =
+        document.getElementById("Freguesia");
+
+        const latitudeInput =
+        document.getElementById("propertyLatitude");
+
+        const longitudeInput =
+        document.getElementById("propertyLongitude");
+
+        const latitudeDisplay =
+        document.getElementById("latitudeDisplay");
+
+        const longitudeDisplay =
+        document.getElementById("longitudeDisplay");
+
+        const previewName =
+        document.getElementById("previewName");
+
+        const previewAddress =
+        document.getElementById("previewAddress");
+
+        const previewParish =
+        document.getElementById("previewParish");
+
+        const mapElement =
+        document.getElementById("propertyMap");
+
+        // =====================================================
+        // RESUMO EM TEMPO REAL
+        // =====================================================
+
+        function updatePreview() {
+        if (previewName) {
+        previewName.textContent =
+        nameInput?.value.trim() || "Sem nome";
+        }
+
+        if (previewAddress) {
+        previewAddress.textContent =
+        addressInput?.value.trim() || "Sem morada";
+        }
+
+        if (previewParish) {
+        previewParish.textContent =
+        parishInput?.value.trim() || "Sem freguesia";
+        }
+        }
+
+        nameInput?.addEventListener("input", updatePreview);
+        addressInput?.addEventListener("input", updatePreview);
+        parishInput?.addEventListener("input", updatePreview);
+
+        updatePreview();
+
+        // =====================================================
+        // VALIDAR MAPA E LEAFLET
+        // =====================================================
+
+        if (!mapElement) {
+        console.error(
+        "Não foi encontrado o elemento #propertyMap."
+        );
+
+        return;
+        }
+
+        if (typeof L === "undefined") {
+        console.error(
+        "O Leaflet não foi carregado."
+        );
+
+        return;
+        }
+
+        // =====================================================
+        // CONVERSÃO DAS COORDENADAS
+        // =====================================================
+
+        function parseCoordinate(value) {
+        if (
+        value === null ||
+        value === undefined ||
+        value.toString().trim() === ""
+        ) {
+        return null;
+        }
+
+        const normalized =
+        value
+        .toString()
+        .trim()
+        .replace(",", ".");
+
+        const parsed =
+        Number.parseFloat(normalized);
+
+        return Number.isFinite(parsed)
+        ? parsed
+        : null;
+        }
+
+        const storedLatitude =
+        parseCoordinate(latitudeInput?.value);
+
+        const storedLongitude =
+        parseCoordinate(longitudeInput?.value);
+
+        const hasCoordinates =
+        storedLatitude !== null &&
+        storedLongitude !== null;
+
+        console.log(
+        "Coordenadas guardadas:",
+        storedLatitude,
+        storedLongitude
+        );
+
+        // Coordenadas padrão: centro da Madeira.
+        // Só são usadas se a propriedade não tiver localização guardada.
+        const defaultLatitude = 32.7607;
+        const defaultLongitude = -16.9595;
+
+        const initialLatitude =
+        hasCoordinates
+        ? storedLatitude
+        : defaultLatitude;
+
+        const initialLongitude =
+        hasCoordinates
+        ? storedLongitude
+        : defaultLongitude;
+
+        const initialZoom =
+        hasCoordinates ? 17 : 10;
+
+        // =====================================================
+        // CRIAR MAPA
+        // =====================================================
+
+        const map = L.map("propertyMap").setView(
+        [initialLatitude, initialLongitude],
+        initialZoom
+        );
+
+        L.tileLayer(
+        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        {
+        maxZoom: 19,
+        attribution:
+        "&copy; OpenStreetMap contributors"
+        }
+        ).addTo(map);
+
+        // =====================================================
+        // MARCADOR
+        // =====================================================
+
+        let marker = null;
+
+        function updateCoordinates(latitude, longitude) {
+        const latitudeValue =
+        Number(latitude).toFixed(7).replace(".", ",");
+
+        const longitudeValue =
+        Number(longitude).toFixed(7).replace(".", ",");
+
+        /*
+        * Os hidden ficam com ponto para o JavaScript.
+        * Caso o teu ASP.NET exija vírgula no POST,
+        * troca para .replace(".", ",").
+        */
+        if (latitudeInput) {
+        latitudeInput.value =
+        latitudeValue;
+        }
+
+        if (longitudeInput) {
+        longitudeInput.value =
+        longitudeValue;
+        }
+
+        if (latitudeDisplay) {
+        latitudeDisplay.value =
+        latitudeValue.replace(".", ",");
+        }
+
+        if (longitudeDisplay) {
+        longitudeDisplay.value =
+        longitudeValue.replace(".", ",");
+        }
+        }
+
+        function attachMarkerDragEvent() {
+        if (!marker) {
+        return;
+        }
+
+        marker.on("dragend", function () {
+        const position =
+        marker.getLatLng();
+
+        updateCoordinates(
+        position.lat,
+        position.lng
+        );
+        });
+        }
+
+        function createMarker(latitude, longitude) {
+        marker = L.marker(
+        [latitude, longitude],
+        {
+        draggable: true
+        }
+        ).addTo(map);
+
+        attachMarkerDragEvent();
+        }
+
+        function setLocation(latitude, longitude) {
+        const coordinates = [
+        latitude,
+        longitude
+        ];
+
+        if (marker) {
+        marker.setLatLng(coordinates);
+        } else {
+        createMarker(
+        latitude,
+        longitude
+        );
+        }
+
+        map.setView(
+        coordinates,
+        17
+        );
+
+        updateCoordinates(
+        latitude,
+        longitude
+        );
+        }
+
+        /*
+        * Se existirem coordenadas guardadas,
+        * cria o marcador exatamente nesse ponto.
+        *
+        * Não chama updateCoordinates aqui,
+        * para não substituir os valores recebidos da BD.
+        */
+        if (hasCoordinates) {
+        createMarker(
+        storedLatitude,
+        storedLongitude
+        );
+        }
+
+        // Se não houver coordenadas guardadas,
+        // o mapa abre na Madeira sem marcador.
+        // O marcador só aparece quando o utilizador clicar.
+
+        map.on("click", function (event) {
+        setLocation(
+        event.latlng.lat,
+        event.latlng.lng
+        );
+        });
+
+        // =====================================================
+        // CORRIGIR TAMANHO DO MAPA
+        // =====================================================
+
+        setTimeout(function () {
+        map.invalidateSize(true);
+
+        map.setView(
+        [
+        initialLatitude,
+        initialLongitude
+        ],
+        initialZoom,
+        {
+        animate: false
+        }
+        );
+        }, 300);
+
+        window.addEventListener(
+        "resize",
+        function () {
+        map.invalidateSize();
+        }
+        );
+        });
+    </script>
+}
+

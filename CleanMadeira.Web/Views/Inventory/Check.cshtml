@@ -1,0 +1,297 @@
+﻿@model CleanMadeira.Web.ViewModels.Inventory.InventoryCheckVM
+
+@{
+    ViewData["Title"] = "Verificação de Inventário";
+}
+
+<div class="container">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <h2 class="fw-bold">
+                <i class="bi bi-box-seam-fill text-primary me-2"></i>
+                Verificação de Inventário
+            </h2>
+
+            <p class="text-muted mb-0">
+                @Model.PropriedadeNome
+            </p>
+        </div>
+
+    </div>
+
+    <form asp-action="Check" method="post">
+        @Html.AntiForgeryToken()
+
+        <input asp-for="CleaningTaskId" type="hidden" />
+        <input asp-for="PropriedadeId" type="hidden" />
+
+        @for (var i = 0; i < Model.Items.Count; i++)
+        {
+            <input asp-for="Items[i].InventoryItemId"
+                   type="hidden" />
+
+            <input asp-for="Items[i].Nome"
+                   type="hidden" />
+
+            <input asp-for="Items[i].QuantidadeMinima"
+                   type="hidden" />
+
+            <div class="card inventory-check-card mb-3"
+                 data-minimum="@Model.Items[i].QuantidadeMinima">
+
+                <div class="card-body">
+
+                    <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+                        <div>
+                            <h5 class="fw-bold mb-1">
+                                @Model.Items[i].Nome
+                            </h5>
+
+                            <small class="text-muted">
+                                Stock mínimo:
+                                @Model.Items[i].QuantidadeMinima
+                                @Model.Items[i].Unidade
+                            </small>
+                        </div>
+
+                        <span class="badge stock-status-badge">
+                            A verificar
+                        </span>
+                    </div>
+
+                    <label asp-for="Items[i].QuantidadeAtual"
+                           class="form-label">
+                        Quantidade encontrada
+                    </label>
+
+                    <div class="input-group quantity-control">
+
+                        <button type="button"
+                                class="btn btn-outline-secondary quantity-minus">
+                            <i class="bi bi-dash-lg"></i>
+                        </button>
+
+                        <input asp-for="Items[i].QuantidadeAtual"
+                               type="number"
+                               min="0"
+                               step="1"
+                               class="form-control text-center quantity-input" />
+
+                        <span class="input-group-text">
+                            @Model.Items[i].Unidade
+                        </span>
+
+                        <button type="button"
+                                class="btn btn-outline-secondary quantity-plus">
+                            <i class="bi bi-plus-lg"></i>
+                        </button>
+
+                    </div>
+
+                    <span asp-validation-for="Items[i].QuantidadeAtual"
+                          class="text-danger"></span>
+
+                    <div class="stock-status-message mt-3"></div>
+
+                </div>
+            </div>
+        }
+
+        <button type="submit" class="btn btn-primary">
+            Guardar verificação
+        </button>
+    </form>
+
+</div>
+
+
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            document
+                .querySelectorAll(".inventory-check-card")
+                .forEach(function (card) {
+
+                    const quantityInput =
+                        card.querySelector(".quantity-input");
+
+                    const minusButton =
+                        card.querySelector(".quantity-minus");
+
+                    const plusButton =
+                        card.querySelector(".quantity-plus");
+
+                    const badge =
+                        card.querySelector(".stock-status-badge");
+
+                    const message =
+                        card.querySelector(".stock-status-message");
+
+                    const minimum = parseNumber(
+                        card.dataset.minimum
+                    );
+
+                    function parseNumber(value) {
+                        if (value === null ||
+                            value === undefined ||
+                            value.toString().trim() === "") {
+                            return 0;
+                        }
+
+                        const normalized =
+                            value.toString().replace(",", ".");
+
+                        const parsed =
+                            Number.parseFloat(normalized);
+
+                        return Number.isFinite(parsed)
+                            ? parsed
+                            : 0;
+                    }
+
+                    function updateStockStatus() {
+                        const quantity =
+                            parseNumber(quantityInput?.value);
+
+                        if (!badge || !message) {
+                            return;
+                        }
+
+                        badge.classList.remove(
+                            "bg-success",
+                            "bg-warning",
+                            "bg-danger",
+                            "text-dark"
+                        );
+
+                        message.classList.remove(
+                            "alert",
+                            "alert-success",
+                            "alert-warning",
+                            "alert-danger"
+                        );
+
+                        /*
+                         * Se quiseres considerar igual ao mínimo
+                         * como stock baixo, mantém <=.
+                         */
+                        if (quantity <= 0) {
+                            badge.classList.add("bg-danger");
+                            badge.textContent = "Sem stock";
+
+                            message.classList.add(
+                                "alert",
+                                "alert-danger"
+                            );
+
+                            message.innerHTML = `
+                                <i class="bi bi-x-circle-fill me-2"></i>
+                                Este produto está sem stock.
+                            `;
+                        }
+                        else if (quantity <= minimum) {
+                            badge.classList.add(
+                                "bg-warning",
+                                "text-dark"
+                            );
+
+                            badge.textContent = "Stock baixo";
+
+                            message.classList.add(
+                                "alert",
+                                "alert-warning"
+                            );
+
+                            message.innerHTML = `
+                                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                                Quantidade igual ou inferior ao mínimo
+                                de ${minimum}.
+                            `;
+                        }
+                        else {
+                            badge.classList.add("bg-success");
+                            badge.textContent = "Stock normal";
+
+                            message.classList.add(
+                                "alert",
+                                "alert-success"
+                            );
+
+                            message.innerHTML = `
+                                <i class="bi bi-check-circle-fill me-2"></i>
+                                A quantidade está acima do stock mínimo.
+                            `;
+                        }
+                    }
+
+                    if (minusButton && quantityInput) {
+                        minusButton.addEventListener(
+                            "click",
+                            function () {
+                                const current =
+                                    parseNumber(quantityInput.value);
+
+                                const step =
+                                    parseNumber(
+                                        quantityInput.step
+                                    ) || 1;
+
+                                quantityInput.value =
+                                    Math.max(0, current - step);
+
+                                quantityInput.dispatchEvent(
+                                    new Event("input", {
+                                        bubbles: true
+                                    })
+                                );
+                            }
+                        );
+                    }
+
+                    if (plusButton && quantityInput) {
+                        plusButton.addEventListener(
+                            "click",
+                            function () {
+                                const current =
+                                    parseNumber(quantityInput.value);
+
+                                const step =
+                                    parseNumber(
+                                        quantityInput.step
+                                    ) || 1;
+
+                                quantityInput.value =
+                                    current + step;
+
+                                quantityInput.dispatchEvent(
+                                    new Event("input", {
+                                        bubbles: true
+                                    })
+                                );
+                            }
+                        );
+                    }
+
+                    if (quantityInput) {
+                        quantityInput.addEventListener(
+                            "input",
+                            updateStockStatus
+                        );
+
+                        quantityInput.addEventListener(
+                            "change",
+                            updateStockStatus
+                        );
+                    }
+
+                    updateStockStatus();
+                });
+        });
+    </script>
+}

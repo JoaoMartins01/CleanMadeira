@@ -1,0 +1,82 @@
+﻿@using CleanMadeira.Web.ViewModels.Inventory
+@model CreateInventoryItemVM
+
+@{
+    ViewData["Title"] = "Novo Produto";
+}
+
+<div class="card">
+    <div class="card-header">
+        <h3>Novo Produto</h3>
+    </div>
+
+    <div class="card-body">
+
+        <form asp-action="Create" method="post">
+            @Html.AntiForgeryToken()
+
+            <div class="mb-3">
+                <label asp-for="PropriedadeId" class="form-label">
+                    Propriedade
+                </label>
+
+                <select asp-for="PropriedadeId"
+                        asp-items="ViewBag.Propriedades"
+                        class="form-select">
+                    <option value="">Selecionar propriedade</option>
+                </select>
+
+                <span asp-validation-for="PropriedadeId" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Nome" class="form-label"></label>
+
+                <input asp-for="Nome"
+                       class="form-control" />
+
+                <span asp-validation-for="Nome" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Unidade" class="form-label"></label>
+
+                <input asp-for="Unidade"
+                       class="form-control"
+                       placeholder="Ex: unidades, rolos, litros" />
+
+                <span asp-validation-for="Unidade" class="text-danger"></span>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Quantidade" class="form-label"></label>
+
+                    <input asp-for="Quantidade"
+                           class="form-control" />
+
+                    <span asp-validation-for="Quantidade" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label asp-for="QuantidadeMinima" class="form-label"></label>
+
+                    <input asp-for="QuantidadeMinima"
+                           class="form-control" />
+
+                    <span asp-validation-for="QuantidadeMinima" class="text-danger"></span>
+
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                Guardar
+            </button>
+
+            <a asp-action="Index" class="btn btn-secondary">
+                Cancelar
+            </a>
+        </form>
+
+    </div>
+</div>

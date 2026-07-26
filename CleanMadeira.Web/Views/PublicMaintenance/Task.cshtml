@@ -1,0 +1,411 @@
+﻿@using CleanMadeira.Domain.Entities.Enums
+@model CleanMadeira.Web.ViewModels.PublicMaintenance.PublicMaintenanceVM
+
+@{
+    Layout = null;
+
+    var statusClass = Model.Status switch
+    {
+        MaintenanceStatus.Pendente => "bg-warning text-dark",
+        MaintenanceStatus.Aceite => "bg-info text-dark",
+        MaintenanceStatus.EmProgresso => "bg-primary",
+        MaintenanceStatus.Completo => "bg-success",
+        MaintenanceStatus.Rejeitada => "bg-danger",
+        _ => "bg-secondary"
+    };
+
+    var priorityClass = Model.Priority switch
+    {
+        MaintenancePriority.Baixa => "bg-success",
+        MaintenancePriority.Media => "bg-warning text-dark",
+        MaintenancePriority.Alta => "bg-danger",
+        MaintenancePriority.Urgente => "bg-dark",
+        _ => "bg-secondary"
+    };
+}
+
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="utf-8" />
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0" />
+
+    <title>@Model.Title - CleanMadeira</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet" />
+
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+
+    <style>
+            body {
+                background-color: #f5f7fa;
+                min-height: 100vh;
+            }
+
+            .task-container {
+                max-width: 720px;
+            }
+
+            .task-card {
+                border-radius: 18px;
+                overflow: hidden;
+            }
+
+            .task-header {
+                background: #ffffff;
+                border-bottom: 1px solid #e9ecef;
+            }
+
+            .information-box {
+                background-color: #f8f9fa;
+                border-radius: 12px;
+                padding: 14px;
+                height: 100%;
+            }
+
+            .information-label {
+                display: block;
+                color: #6c757d;
+                font-size: 0.82rem;
+                margin-bottom: 4px;
+            }
+
+            .information-value {
+                font-weight: 600;
+                overflow-wrap: anywhere;
+            }
+
+            .action-button {
+                min-height: 52px;
+                font-weight: 600;
+            }
+
+            @@media (max-width: 575.98px) {
+                .task-card {
+                    border-radius: 0;
+                    box-shadow: none !important;
+                }
+
+                .page-wrapper {
+                    padding: 0 !important;
+                }
+
+                .task-header,
+                .task-content {
+                    padding-left: 18px !important;
+                    padding-right: 18px !important;
+                }
+
+                body {
+                    background-color: #ffffff;
+                }
+            }
+    </style>
+</head>
+
+<body>
+
+    <main class="page-wrapper container-fluid py-3 py-md-5">
+
+        <div class="task-container mx-auto">
+
+            <div class="card task-card border-0 shadow-sm">
+
+                <div class="task-header p-3 p-md-4">
+
+                    <div class="d-flex justify-content-between align-items-start gap-3">
+
+                        <div>
+                            <div class="text-primary fw-semibold mb-2">
+                                CleanMadeira
+                            </div>
+
+                            <h1 class="h4 h3-md mb-2">
+                                @Model.Title
+                            </h1>
+
+                            <p class="text-muted mb-0">
+                                Pedido de manutenção
+                            </p>
+                        </div>
+
+                        <span class="badge rounded-pill @statusClass">
+                            @Model.Status
+                        </span>
+
+                    </div>
+
+                </div>
+
+                <div class="task-content card-body p-3 p-md-4">
+
+                    <div class="row g-3 mb-4">
+
+                        <div class="col-12 col-sm-6">
+                            <div class="information-box">
+                                <span class="information-label">
+                                    <i class="bi bi-house-door me-1"></i>
+                                    Propriedade
+                                </span>
+
+                                <div class="information-value">
+                                    @Model.PropertyName
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-sm-6">
+                            <div class="information-box">
+                                <span class="information-label">
+                                    <i class="bi bi-person-gear me-1"></i>
+                                    Prestador
+                                </span>
+
+                                <div class="information-value">
+                                    @Model.ProviderName
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="information-box">
+                                <span class="information-label">
+                                    <i class="bi bi-geo-alt me-1"></i>
+                                    Morada
+                                </span>
+
+                                <div class="information-value">
+                                    @Model.PropertyAddress
+                                </div>
+
+                                @if (!string.IsNullOrWhiteSpace(Model.PropertyAddress))
+                                {
+                                    <a href="https://www.google.com/maps/search/?api=1&query=@Uri.EscapeDataString(Model.PropertyAddress)"
+                                       target="_blank"
+                                       rel="noopener noreferrer"
+                                       class="btn btn-sm btn-outline-primary mt-3">
+                                        <i class="bi bi-map me-1"></i>
+                                        Abrir no mapa
+                                    </a>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-sm-6">
+                            <div class="information-box">
+                                <span class="information-label">
+                                    <i class="bi bi-calendar-event me-1"></i>
+                                    Data agendada
+                                </span>
+
+                                <div class="information-value">
+                                    @Model.ScheduledDate.ToString("dd/MM/yyyy")
+                                </div>
+
+                                <div class="text-muted">
+                                    @Model.ScheduledDate.ToString("HH:mm")
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-sm-6">
+                            <div class="information-box">
+                                <span class="information-label">
+                                    <i class="bi bi-exclamation-triangle me-1"></i>
+                                    Prioridade
+                                </span>
+
+                                <span class="badge @priorityClass">
+                                    @Model.Priority
+                                </span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <section class="mb-4">
+                        <h2 class="h6 mb-2">
+                            Descrição do problema
+                        </h2>
+
+                        <div class="information-box">
+                            <p class="mb-0 text-break"
+                               style="white-space: pre-line;">
+                                @Model.Description
+                            </p>
+                        </div>
+                    </section>
+
+                    @if (!string.IsNullOrWhiteSpace(Model.ProviderNotes))
+                    {
+                        <section class="mb-4">
+                            <h2 class="h6 mb-2">
+                                Notas do prestador
+                            </h2>
+
+                            <div class="information-box">
+                                <p class="mb-0 text-break"
+                                   style="white-space: pre-line;">
+                                    @Model.ProviderNotes
+                                </p>
+                            </div>
+                        </section>
+                    }
+
+                    <section class="border-top pt-4">
+
+                        @if (Model.Status == MaintenanceStatus.Pendente)
+                        {
+                            <div class="d-grid gap-2">
+
+                                <form asp-action="Accept"
+                                      method="post">
+
+                                    @Html.AntiForgeryToken()
+
+                                    <input type="hidden"
+                                           name="token"
+                                           value="@Model.AccessToken" />
+
+                                    <button type="submit"
+                                            class="btn btn-success btn-lg w-100 action-button">
+                                        <i class="bi bi-check-circle me-2"></i>
+                                        Aceitar manutenção
+                                    </button>
+
+                                </form>
+
+                                <button type="button"
+                                        class="btn btn-outline-danger btn-lg action-button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#rejectArea"
+                                        aria-expanded="false"
+                                        aria-controls="rejectArea">
+                                    <i class="bi bi-x-circle me-2"></i>
+                                    Rejeitar manutenção
+                                </button>
+
+                                <div class="collapse mt-2"
+                                     id="rejectArea">
+
+                                    <form asp-action="Reject"
+                                          method="post"
+                                          class="border rounded-3 p-3">
+
+                                        @Html.AntiForgeryToken()
+
+                                        <input type="hidden"
+                                               name="token"
+                                               value="@Model.AccessToken" />
+
+                                        <label for="rejectionReason"
+                                               class="form-label">
+                                            Motivo da rejeição
+                                        </label>
+
+                                        <textarea id="rejectionReason"
+                                                  name="notes"
+                                                  class="form-control mb-3"
+                                                  rows="3"
+                                                  placeholder="Indique, se necessário, o motivo da rejeição."></textarea>
+
+                                        <button type="submit"
+                                                class="btn btn-danger w-100 action-button">
+                                            Confirmar rejeição
+                                        </button>
+
+                                    </form>
+
+                                </div>
+
+                            </div>
+                        }
+                        else if (Model.Status == MaintenanceStatus.Aceite)
+                        {
+                            <form asp-action="Start"
+                                  method="post">
+
+                                @Html.AntiForgeryToken()
+
+                                <input type="hidden"
+                                       name="token"
+                                       value="@Model.AccessToken" />
+
+                                <button type="submit"
+                                        class="btn btn-primary btn-lg w-100 action-button">
+                                    <i class="bi bi-play-circle me-2"></i>
+                                    Iniciar manutenção
+                                </button>
+
+                            </form>
+                        }
+                        else if (Model.Status == MaintenanceStatus.EmProgresso)
+                        {
+                            <form asp-action="Complete"
+                                  method="post">
+
+                                @Html.AntiForgeryToken()
+
+                                <input type="hidden"
+                                       name="token"
+                                       value="@Model.AccessToken" />
+
+                                <div class="mb-3">
+                                    <label for="providerNotes"
+                                           class="form-label">
+                                        Notas da conclusão
+                                    </label>
+
+                                    <textarea id="providerNotes"
+                                              name="notes"
+                                              class="form-control"
+                                              rows="4"
+                                              placeholder="Descreva o trabalho realizado."></textarea>
+                                </div>
+
+                                <button type="submit"
+                                        class="btn btn-success btn-lg w-100 action-button">
+                                    <i class="bi bi-check2-circle me-2"></i>
+                                    Concluir manutenção
+                                </button>
+
+                            </form>
+                        }
+                        else if (Model.Status == MaintenanceStatus.Completo)
+                        {
+                            <div class="alert alert-success mb-0 text-center">
+                                <i class="bi bi-check-circle-fill me-1"></i>
+                                Esta manutenção já foi concluída.
+                            </div>
+                        }
+                        else if (Model.Status == MaintenanceStatus.Rejeitada)
+                        {
+                            <div class="alert alert-danger mb-0 text-center">
+                                <i class="bi bi-x-circle-fill me-1"></i>
+                                Esta manutenção foi rejeitada.
+                            </div>
+                        }
+
+                    </section>
+
+                </div>
+
+            </div>
+
+            <p class="text-center text-muted small mt-3 px-3">
+                Esta página está associada exclusivamente a este pedido de manutenção.
+            </p>
+
+        </div>
+
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,300 @@
+﻿@model CleanMadeira.Web.ViewModels.Dashboard.DashboardVM
+
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="mb-4">
+    <h2 class="fw-bold mb-1">Dashboard</h2>
+    <p class="text-muted mb-0">
+        Visão geral das limpezas, propriedades e inventário.
+    </p>
+</div>
+
+<div class="row g-4 mb-4">
+
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="dashboard-icon bg-primary-subtle text-primary">
+                        <i class="bi bi-calendar-day-fill"></i>
+                    </div>
+
+                    <div>
+                        <p class="text-muted mb-1">Limpezas Hoje</p>
+                        <h3 class="mb-0">@Model.TotalTasksToday</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="dashboard-icon bg-warning-subtle text-warning">
+                        <i class="bi bi-hourglass-split"></i>
+                    </div>
+
+                    <div>
+                        <p class="text-muted mb-1">Pendentes</p>
+                        <h3 class="mb-0">@Model.PendingTasks</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="dashboard-icon bg-info-subtle text-info">
+                        <i class="bi bi-arrow-repeat"></i>
+                    </div>
+
+                    <div>
+                        <p class="text-muted mb-1">Em Progresso</p>
+                        <h3 class="mb-0">@Model.InProgressTasks</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="dashboard-icon bg-success-subtle text-success">
+                        <i class="bi bi-check-circle-fill"></i>
+                    </div>
+
+                    <div>
+                        <p class="text-muted mb-1">Concluídas</p>
+                        <h3 class="mb-0">@Model.CompletedTasks</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="row g-4">
+
+    <div class="col-lg-6">
+
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+
+                <h5 class="fw-bold mb-3">
+                    <i class="bi bi-calendar-check-fill text-primary me-2"></i>
+                    Limpezas de Hoje
+                </h5>
+
+                @if (!Model.TodayTasks.Any())
+                {
+                    <p class="text-muted mb-0">
+                        Não existem limpezas marcadas para hoje.
+                    </p>
+                }
+                else
+                {
+                    @foreach (var task in Model.TodayTasks)
+                    {
+                        <div class="dashboard-list-item">
+                            <div>
+                                <h6 class="mb-1">
+                                    <i class="bi bi-house-door-fill text-primary me-2"></i>
+                                    @task.PropriedadeNome
+                                </h6>
+
+                                <div class="small text-muted">
+                                    <i class="bi bi-person-fill me-1"></i>
+                                    @task.AssignedUserName
+                                </div>
+
+                                <div class="small text-muted">
+                                    <i class="bi bi-clock-fill me-1"></i>
+                                    @task.ScheduledDate.ToString("HH:mm")
+                                </div>
+                            </div>
+
+                            <span class="badge bg-primary">
+                                @task.Status
+                            </span>
+                        </div>
+                    }
+                }
+
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+
+                <h5 class="fw-bold mb-3">
+                    <i class="bi bi-calendar-event-fill text-primary me-2"></i>
+                    Próximas Limpezas
+                </h5>
+
+                @if (!Model.UpcomingTasks.Any())
+                {
+                    <p class="text-muted mb-0">
+                        Não existem próximas limpezas agendadas.
+                    </p>
+                }
+                else
+                {
+                    @foreach (var task in Model.UpcomingTasks)
+                    {
+                        <div class="dashboard-list-item">
+                            <div>
+                                <h6 class="mb-1">
+                                    <i class="bi bi-house-door-fill text-primary me-2"></i>
+                                    @task.PropriedadeNome
+                                </h6>
+
+                                <div class="small text-muted">
+                                    <i class="bi bi-person-fill me-1"></i>
+                                    @task.AssignedUserName
+                                </div>
+
+                                <div class="small text-muted">
+                                    <i class="bi bi-clock-fill me-1"></i>
+                                    @task.ScheduledDate.ToString("dd/MM/yyyy HH:mm")
+                                </div>
+                            </div>
+
+                            <span class="badge bg-secondary">
+                                @task.Status
+                            </span>
+                        </div>
+                    }
+                }
+
+            </div>
+        </div>
+
+    </div>
+
+    <div class="col-lg-6">
+
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+
+                <h5 class="fw-bold mb-3">
+                    <i class="bi bi-box-seam-fill text-danger me-2"></i>
+                    Produtos em Baixo Stock
+                </h5>
+
+                @if (!Model.LowStockItems.Any())
+                {
+                    <p class="text-muted mb-0">
+                        <i class="bi bi-check-circle-fill text-success me-2"></i>
+                        Não existem produtos em baixo stock.
+                    </p>
+                }
+                else
+                {
+                    @foreach (var item in Model.LowStockItems)
+                    {
+                        <div class="dashboard-list-item bg-danger-subtle">
+
+                            <div>
+                                <h6 class="mb-1">
+                                    <i class="bi bi-box-seam-fill text-danger me-2"></i>
+                                    @item.Name
+                                </h6>
+
+                                <div class="small text-muted">
+                                    <i class="bi bi-house-door-fill me-1"></i>
+                                    @item.Property.Name
+                                </div>
+
+                                <div class="small text-muted">
+                                    <i class="bi bi-box-fill me-1"></i>
+                                    Quantidade: <strong>@item.Quantity</strong>
+                                </div>
+
+                                <div class="small text-muted">
+                                    <i class="bi bi-flag-fill me-1"></i>
+                                    Mínimo: <strong>@item.MinimumQuantity</strong>
+                                </div>
+                            </div>
+
+                            <span class="badge bg-danger">
+                                Baixo
+                            </span>
+
+                        </div>
+                    }
+                }
+
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+
+                <h5 class="fw-bold mb-3">
+                    <i class="bi bi-building-fill text-primary me-2"></i>
+                    Resumo
+                </h5>
+
+                <div class="dashboard-summary-row">
+                    <span>
+                        <i class="bi bi-buildings text-primary me-2"></i>
+                        Total de Propriedades
+                    </span>
+
+                    <strong>@Model.TotalProperties</strong>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<style>
+    .dashboard-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+
+    .dashboard-list-item {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: center;
+        padding: 14px 16px;
+        border-radius: 14px;
+        background: #f8fafc;
+        margin-bottom: 12px;
+    }
+
+        .dashboard-list-item:last-child {
+            margin-bottom: 0;
+        }
+
+    .dashboard-summary-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 14px 0;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+        .dashboard-summary-row:last-child {
+            border-bottom: 0;
+        }
+</style>

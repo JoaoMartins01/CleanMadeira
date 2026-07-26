@@ -1,0 +1,253 @@
+﻿@using CleanMadeira.Domain.Entities.Enums;
+@model CalendarIntegrationsPageVM
+
+@{
+    ViewData["Title"] = "Integrações de calendário";
+}
+
+<div class="container py-4">
+    <div class="d-flex flex-column flex-md-row
+        justify-content-between align-items-md-center
+        gap-3 mb-4">
+
+        <div>
+            <h1 class="h3 mb-1">
+                Integrações de calendário
+            </h1>
+
+            <p class="text-muted mb-0">
+                @Model.PropriedadeNome
+            </p>
+        </div>
+
+        <a asp-controller="Propriedade"
+           asp-action="Details"
+           asp-route-id="@Model.PropriedadeId"
+           class="btn btn-outline-secondary">
+            Voltar à propriedade
+        </a>
+    </div>
+
+    @if (TempData["Success"] is not null)
+    {
+        <div class="alert alert-success alert-dismissible fade show">
+            @TempData["Success"]
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert">
+            </button>
+        </div>
+    }
+
+    @if (TempData["Error"] is not null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show">
+            @TempData["Error"]
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert">
+            </button>
+        </div>
+    }
+
+    <div class="row g-4">
+        <div class="col-lg-5">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="h5 mb-3">
+                        Adicionar calendário
+                    </h2>
+
+                    <p class="text-muted small">
+                        Cole o endereço iCal disponibilizado pela
+                        plataforma de reservas.
+                    </p>
+
+                    <form asp-controller="CalendarIntegration"
+                          asp-action="Create"
+                          method="post">
+
+                        @Html.AntiForgeryToken()
+
+                        <input asp-for="PropriedadeId"
+                               type="hidden" />
+
+                        <div asp-validation-summary="ModelOnly"
+                             class="text-danger mb-3">
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="NovaIntegracao.Provider"
+                                   class="form-label">
+                            </label>
+
+                            <select asp-for="NovaIntegracao.Provider"
+                                    asp-items="Html.GetEnumSelectList<CalendarProvider>()"
+                                    class="form-select">
+
+                                <option value="">
+                                    Selecione uma plataforma
+                                </option>
+                            </select>
+
+                            <span asp-validation-for="NovaIntegracao.Provider"
+                                  class="text-danger">
+                            </span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="NovaIntegracao.CalendarUrl"
+                                   class="form-label">
+                            </label>
+
+                            <input asp-for="NovaIntegracao.CalendarUrl"
+                                   class="form-control"
+                                   placeholder="https://.../calendar.ics" />
+
+                            <span asp-validation-for="NovaIntegracao.CalendarUrl"
+                                  class="text-danger">
+                            </span>
+
+                            <div class="form-text">
+                                O endereço deve começar por
+                                http:// ou https://.
+                            </div>
+                        </div>
+
+                        <div class="form-check form-switch mb-4">
+                            <input asp-for="NovaIntegracao.IsEnabled"
+                                   class="form-check-input" />
+
+                            <label asp-for="NovaIntegracao.IsEnabled"
+                                   class="form-check-label">
+                            </label>
+                        </div>
+
+                        <button type="submit"
+                                class="btn btn-primary w-100">
+                            Guardar integração
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="h5 mb-3">
+                        Calendários adicionados
+                    </h2>
+
+                    @if (!Model.Integracoes.Any())
+                    {
+                        <div class="text-center py-5">
+                            <div class="fs-1 mb-3">📅</div>
+
+                            <h3 class="h6">
+                                Ainda não existem integrações
+                            </h3>
+
+                            <p class="text-muted mb-0">
+                                Adicione o primeiro calendário
+                                desta propriedade.
+                            </p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="d-flex flex-column gap-3">
+                            @foreach (var integration
+                                      in Model.Integracoes)
+                            {
+                                <div class="border rounded-3 p-3">
+                                    <div class="d-flex
+                                        justify-content-between
+                                        align-items-start gap-3">
+
+                                        <div class="overflow-hidden">
+                                            <div class="d-flex
+                                                align-items-center
+                                                gap-2 mb-2">
+
+                                                <strong>
+                                                    @integration.Provider
+                                                </strong>
+
+                                                @if (integration.IsEnabled)
+                                                {
+                                                    <span class="badge
+                                                        text-bg-success">
+                                                        Ativo
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge
+                                                        text-bg-secondary">
+                                                        Inativo
+                                                    </span>
+                                                }
+                                            </div>
+
+                                            <div class="small text-muted
+                                                text-truncate"
+                                                 title="@integration.CalendarUrl">
+                                                @integration.CalendarUrl
+                                            </div>
+
+                                            <div class="small mt-2">
+                                                Última sincronização:
+
+                                                @if (integration.LastSync.HasValue)
+                                                {
+                                                    @integration.LastSync.Value.ToString("dd/MM/yyyy HH:mm")
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">
+                                                        Nunca
+                                                    </span>
+                                                }
+                                            </div>
+                                        </div>
+
+                                        <form asp-controller="CalendarIntegration"
+                                              asp-action="Delete"
+                                              method="post"
+                                              onsubmit="return confirm(
+                                            'Pretende remover esta integração?');">
+
+                                            @Html.AntiForgeryToken()
+
+                                            <input type="hidden"
+                                                   name="id"
+                                                   value="@integration.Id" />
+
+                                            <input type="hidden"
+                                                   name="propriedadeId"
+                                                   value="@Model.PropriedadeId" />
+
+                                            <button type="submit"
+                                                    class="btn
+                                                btn-sm
+                                                btn-outline-danger">
+                                                Remover
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
