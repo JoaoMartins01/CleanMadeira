@@ -3,11 +3,13 @@ using CleanMadeira.Application.Services.Interface;
 using CleanMadeira.Domain.Entities;
 using CleanMadeira.Domain.Entities.Enums;
 using CleanMadeira.Web.ViewModels.CleaningTask;
+using ImageMagick;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SkiaSharp;
+using System.Diagnostics.Metrics;
 using System.Net.NetworkInformation;
 using System.Security.Claims;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
@@ -498,9 +500,9 @@ public class CleaningTaskController : Controller
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> AddCleanerUpdate(
-        Guid taskId,
-        string? cleanerNotes,
-        List<IFormFile>? photos)
+     Guid taskId,
+     string? cleanerNotes,
+     List<IFormFile>? photos)
     {
         var task = await _cleaningTaskService.GetByIdAsync(taskId);
 
@@ -510,9 +512,16 @@ public class CleaningTaskController : Controller
         photos ??= new List<IFormFile>();
 
         const int maxPhotoCount = 10;
-        const long maxPhotoSize = 10 * 1024 * 1024;
-        const int maxDimension = 1920;
-        const int jpegQuality = 82;
+
+        // Tamanho máximo permitido no upload original.
+        const long maxUploadSize = 30 * 1024 * 1024;
+
+        // Tamanho máximo do ficheiro guardado.
+        const long maxFinalSize = 10 * 1024 * 1024;
+
+        const uint maxDimension = 1920;
+        const uint initialJpegQuality = 82;
+        const uint minimumJpegQuality = 45;
 
         var allowedExtensions = new HashSet<string>(
             StringComparer.OrdinalIgnoreCase)
@@ -520,7 +529,9 @@ public class CleaningTaskController : Controller
         ".jpg",
         ".jpeg",
         ".png",
-        ".webp"
+        ".webp",
+        ".heic",
+        ".heif"
     };
 
         var allowedContentTypes = new HashSet<string>(
@@ -528,7 +539,11 @@ public class CleaningTaskController : Controller
     {
         "image/jpeg",
         "image/png",
-        "image/webp"
+        "image/webp",
+        "image/heic",
+        "image/heif",
+        "image/heic-sequence",
+        "image/heif-sequence"
     };
 
         if (photos.Count > maxPhotoCount)
@@ -546,10 +561,10 @@ public class CleaningTaskController : Controller
             if (photo == null || photo.Length == 0)
                 continue;
 
-            if (photo.Length > maxPhotoSize)
+            if (photo.Length > maxUploadSize)
             {
                 TempData["Error"] =
-                    $"A fotografia \"{photo.FileName}\" excede o limite de 10 MB.";
+                    $"A fotografia \"{photo.FileName}\" excede o limite de 30 MB.";
 
                 return RedirectToAction(
                     nameof(CleanerUpdate),
@@ -569,7 +584,8 @@ public class CleaningTaskController : Controller
                     new { id = taskId });
             }
 
-            if (!allowedContentTypes.Contains(photo.ContentType))
+            if (!string.IsNullOrWhiteSpace(photo.ContentType) &&
+                !allowedContentTypes.Contains(photo.ContentType))
             {
                 TempData["Error"] =
                     $"O tipo do ficheiro \"{photo.FileName}\" não é válido.";
@@ -588,7 +604,7 @@ public class CleaningTaskController : Controller
         Directory.CreateDirectory(uploadsFolder);
 
         var newPhotos = new List<TaskPhoto>();
-        var savedFiles = new List<string>();
+        var savedFiles = new List<string>(); 
 
         try
         {
@@ -599,13 +615,95 @@ public class CleaningTaskController : Controller
 
                 await using var inputStream = photo.OpenReadStream();
 
-                using var managedStream = new SKManagedStream(inputStream);
-                using var codec = SKCodec.Create(managedStream);
+                using var image = new MagickImage(inputStream);
 
-                if (codec == null)
+                // Corrige orientação EXIF de fotos tiradas no telemóvel.
+                image.AutoOrient();
+
+                // Remove metadata desnecessária.
+                image.Strip();
+
+                // Redimensionar mantendo proporção.
+                if (image.Width > maxDimension ||
+                    image.Height > maxDimension)
+                {
+                    var geometry = new MagickGeometry(
+                        maxDimension,
+                        maxDimension)
+                    {
+                        IgnoreAspectRatio = false
+                    };
+
+                    image.Resize(geometry);
+                }
+
+                // Tudo é guardado em JPEG.
+                image.Format = MagickFormat.Jpeg;
+
+                uint quality = initialJpegQuality;
+
+                byte[]? finalBytes = null;
+
+                while (quality >= minimumJpegQuality)
+                {
+                    image.Quality = quality;
+
+                    await using var output = new MemoryStream();
+
+                    await image.WriteAsync(output);
+
+                    if (output.Length <= maxFinalSize)
+                    {
+                        finalBytes = output.ToArray();
+                        break;
+                    }
+
+                    if (quality < 5)
+                        break;
+
+                    quality -= 5;
+                }
+
+                // Se baixar qualidade não chegar, reduzimos resolução.
+                while (finalBytes == null &&
+                       (image.Width > 800 || image.Height > 800))
+                {
+                    var newWidth =
+                        (uint)Math.Max(
+                            800,
+                            (int)(image.Width * 0.85));
+
+                    var newHeight =
+                        (uint)Math.Max(
+                            800,
+                            (int)(image.Height * 0.85));
+
+                    image.Resize(
+                        new MagickGeometry(
+                            newWidth,
+                            newHeight)
+                        {
+                            IgnoreAspectRatio = false
+                        });
+
+                    image.Quality = minimumJpegQuality;
+
+                    await using var output =
+                        new MemoryStream();
+
+                    await image.WriteAsync(output);
+
+                    if (output.Length <= maxFinalSize)
+                    {
+                        finalBytes = output.ToArray();
+                        break;
+                    }
+                }
+
+                if (finalBytes == null)
                 {
                     TempData["Error"] =
-                        $"O ficheiro \"{photo.FileName}\" não é uma imagem válida.";
+                        $"Não foi possível reduzir \"{photo.FileName}\" para menos de 10 MB.";
 
                     DeleteSavedFiles(savedFiles);
 
@@ -614,89 +712,17 @@ public class CleaningTaskController : Controller
                         new { id = taskId });
                 }
 
-                var sourceInfo = codec.Info;
+                var fileName =
+                    $"{Guid.NewGuid():N}.jpg";
 
-                using var sourceBitmap = new SKBitmap(
-                    sourceInfo.Width,
-                    sourceInfo.Height,
-                    sourceInfo.ColorType,
-                    sourceInfo.AlphaType);
+                var physicalPath =
+                    Path.Combine(
+                        uploadsFolder,
+                        fileName);
 
-                var decodeResult = codec.GetPixels(
-                    sourceBitmap.Info,
-                    sourceBitmap.GetPixels());
-
-                if (decodeResult != SKCodecResult.Success &&
-                    decodeResult != SKCodecResult.IncompleteInput)
-                {
-                    TempData["Error"] =
-                        $"Não foi possível processar \"{photo.FileName}\".";
-
-                    DeleteSavedFiles(savedFiles);
-
-                    return RedirectToAction(
-                        nameof(CleanerUpdate),
-                        new { id = taskId });
-                }
-
-                using var orientedBitmap = sourceBitmap.Copy();
-
-                var targetSize = CalculateTargetSize(
-                    orientedBitmap.Width,
-                    orientedBitmap.Height,
-                    maxDimension);
-
-                using var resizedBitmap =
-                    targetSize.Width == orientedBitmap.Width &&
-                    targetSize.Height == orientedBitmap.Height
-                    ? orientedBitmap.Copy()
-                    : orientedBitmap.Resize(
-                        new SKImageInfo(
-                        targetSize.Width,
-                        targetSize.Height),
-                        SKFilterQuality.Medium);
-
-                if (resizedBitmap == null)
-                {
-                    TempData["Error"] =
-                        $"Não foi possível redimensionar \"{photo.FileName}\".";
-
-                    DeleteSavedFiles(savedFiles);
-
-                    return RedirectToAction(
-                        nameof(CleanerUpdate),
-                        new { id = taskId });
-                }
-
-                var fileName = $"{Guid.NewGuid():N}.jpg";
-
-                var physicalPath = Path.Combine(
-                    uploadsFolder,
-                    fileName);
-
-                using var image = SKImage.FromBitmap(resizedBitmap);
-
-                using var encodedData = image.Encode(
-                    SKEncodedImageFormat.Jpeg,
-                    jpegQuality);
-
-                if (encodedData == null)
-                {
-                    TempData["Error"] =
-                        $"Não foi possível guardar \"{photo.FileName}\".";
-
-                    DeleteSavedFiles(savedFiles);
-
-                    return RedirectToAction(
-                        nameof(CleanerUpdate),
-                        new { id = taskId });
-                }
-
-                await using (var outputStream =
-                             System.IO.File.Create(physicalPath))
-                {
-                    encodedData.SaveTo(outputStream);
-                }
+                await System.IO.File.WriteAllBytesAsync(
+                    physicalPath,
+                    finalBytes);
 
                 savedFiles.Add(physicalPath);
 
@@ -705,22 +731,35 @@ public class CleaningTaskController : Controller
                     Id = Guid.NewGuid(),
                     CleaningTaskId = taskId,
                     FileName = fileName,
-                    FileUrl = $"/uploads/cleaningtasks/{fileName}",
+                    FileUrl =
+                        $"/uploads/cleaningtasks/{fileName}",
                     Type = PhotoType.Depois,
                     UploadedAt = DateTime.UtcNow
                 });
             }
 
-            await _cleaningTaskService.AddCleanerUpdateAsync(
-                taskId,
-                cleanerNotes,
-                newPhotos);
+            await _cleaningTaskService
+                .AddCleanerUpdateAsync(
+                    taskId,
+                    cleanerNotes,
+                    newPhotos);
 
             TempData["Success"] =
                 "Notas e fotografias guardadas com sucesso.";
 
             return RedirectToAction(
                 nameof(Details),
+                new { id = taskId });
+        }
+        catch (MagickException)
+        {
+            DeleteSavedFiles(savedFiles);
+
+            TempData["Error"] =
+                "Uma das fotografias não pôde ser processada.";
+
+            return RedirectToAction(
+                nameof(CleanerUpdate),
                 new { id = taskId });
         }
         catch (Exception)

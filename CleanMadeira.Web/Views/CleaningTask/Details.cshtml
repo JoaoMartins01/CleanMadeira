@@ -12,6 +12,7 @@
 
     var currentUser = await UserManager.GetUserAsync(User);
     var isCleaner = currentUser?.Role == UserRole.Limpador;
+    var isCleanerAndManager = currentUser?.Role == UserRole.GestorELimpador;
 }
 
 <a asp-action="MyTasks" class="btn btn-outline-secondary btn-sm mb-4">
@@ -331,7 +332,7 @@
 <div class="card border-0 shadow-sm">
     <div class="card-body d-flex flex-wrap gap-2">
 
-        @if (isCleaner)
+        @if (isCleaner || isCleanerAndManager)
         {
             @if (Model.Status == CleaningStatus.Pendente)
             {
