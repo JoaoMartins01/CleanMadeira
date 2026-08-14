@@ -1,15 +1,5 @@
 ﻿using CheckListItem.Domain.Entities;
 using CleanMadeira.Domain.Entities.Enums;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using WhiteLagoon.Domain.Entities;
 
 namespace CleanMadeira.Domain.Entities
 {
@@ -22,6 +12,9 @@ namespace CleanMadeira.Domain.Entities
         public Guid? AssignedUserId { get; set; }
 
         public ApplicationUser? AssignedUser { get; set; }
+        public Guid? CleaningCompanyId { get; set; }
+
+        public Company? CleaningCompany { get; set; }
 
         public DateTime ScheduledDate { get; set; }
 
@@ -53,6 +46,6 @@ namespace CleanMadeira.Domain.Entities
 
         public Property? Property { get; set; }
 
-
+        public CleaningType? CleaningType { get; set; }
     }
 }

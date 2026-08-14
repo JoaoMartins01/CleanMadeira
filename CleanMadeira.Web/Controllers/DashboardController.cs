@@ -72,15 +72,15 @@ public class DashboardController : Controller
             }).ToList(),
 
 
-            LowStockItems = dto.LowStockItems.Select(i => new InventoryItem
+            LowStockItems = dto.LowStockItems.Select(i => new InventoryItemVM
             {
                 Id = i.Id,
-                PropertyId = i.PropertyId,
-                Property = i.Property,
-                Name = i.Name,
-                Quantity = i.Quantity,
-                MinimumQuantity = i.MinimumQuantity,
-                Unity = i.Unity,
+                PropriedadeId = i.PropertyId,
+                PropriedadeNome = i.Property.Name,
+                Nome = i.Name,
+                Quantidade = i.Quantity,
+                QuantidadeMinima = i.MinimumQuantity,
+                Unidade = i.Unity,
                 Active = i.Active
             }).ToList()
         };

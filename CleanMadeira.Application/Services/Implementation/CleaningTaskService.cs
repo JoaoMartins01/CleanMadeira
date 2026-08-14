@@ -2,8 +2,6 @@
 using CleanMadeira.Application.Services.Interface;
 using CleanMadeira.Domain.Entities;
 using CleanMadeira.Domain.Entities.Enums;
-using Microsoft.AspNetCore.Hosting;
-using WhiteLagoon.Domain.Entities;
 
 namespace CleanMadeira.Application.Services.Implementation
 {
@@ -23,7 +21,12 @@ namespace CleanMadeira.Application.Services.Implementation
             return await _taskRepository.GetAllAsync();
         }
 
-        public async Task<CleaningTask?> GetByIdAsync(Guid id)
+        public async Task<CleaningTask?> GetByLimpadorIdAsync(Guid id)
+        {
+            return await _taskRepository.GetByLimpadorIdAsync(id);
+        }
+
+        public async Task<CleaningTask?> GetByIdAsync(Guid? id)
         {
             return await _taskRepository.GetByIdAsync(id);
         }
@@ -95,6 +98,11 @@ namespace CleanMadeira.Application.Services.Implementation
         public async Task<IEnumerable<CleaningTask>> GetByOwnerIdAsync(Guid ownerId)
         {
             return await _taskRepository.GetByOwnerIdAsync(ownerId);
+        }
+
+        public async Task<IEnumerable<CleaningTask>> GetByCompanyIdAsync(Guid companyId)
+        {
+            return await _taskRepository.GetByCompanyIdAsync(companyId);
         }
 
         public async Task<CleaningTask?> GetByIdAndOwnerAsync(Guid id, Guid ownerId)

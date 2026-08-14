@@ -1,0 +1,396 @@
+﻿@using CleanMadeira.Domain.Entities.Enums
+@model CleanMadeira.Domain.Entities.MaintenanceReport
+
+@{
+    ViewData["Title"] = "Detalhes do reporte";
+}
+
+<div class="container-fluid py-4">
+
+    <div class="d-flex flex-column flex-md-row
+        justify-content-between align-items-md-center
+        gap-3 mb-4">
+
+        <div>
+            <a asp-controller="MaintenanceReport"
+               asp-action="Index"
+               class="text-decoration-none">
+
+                <i class="bi bi-arrow-left me-1"></i>
+                Voltar aos reportes
+            </a>
+
+            <h1 class="h3 fw-bold mt-3 mb-1">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                Detalhes do reporte
+            </h1>
+
+            <p class="text-muted mb-0">
+                Consulta o problema reportado e decide como deve ser tratado.
+            </p>
+        </div>
+
+        <div>
+            @switch (Model.Status)
+            {
+                case MaintenanceReportStatus.PendingReview:
+                    <span class="badge bg-warning text-dark fs-6 px-3 py-2">
+                        <i class="bi bi-hourglass-split me-1"></i>
+                        Pendente de análise
+                    </span>
+                    break;
+
+                case MaintenanceReportStatus.ConvertedToMaintenance:
+                    <span class="badge bg-success fs-6 px-3 py-2">
+                        <i class="bi bi-tools me-1"></i>
+                        Convertido em manutenção
+                    </span>
+                    break;
+
+                case MaintenanceReportStatus.ResolvedWithoutMaintenance:
+                    <span class="badge bg-info text-dark fs-6 px-3 py-2">
+                        <i class="bi bi-check-circle me-1"></i>
+                        Resolvido sem manutenção
+                    </span>
+                    break;
+
+                case MaintenanceReportStatus.Rejected:
+                    <span class="badge bg-secondary fs-6 px-3 py-2">
+                        <i class="bi bi-x-circle me-1"></i>
+                        Rejeitado
+                    </span>
+                    break;
+            }
+        </div>
+
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show"
+             role="alert">
+
+            <i class="bi bi-check-circle me-2"></i>
+            @TempData["Success"]
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert">
+            </button>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show"
+             role="alert">
+
+            <i class="bi bi-exclamation-circle me-2"></i>
+            @TempData["Error"]
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert">
+            </button>
+        </div>
+    }
+
+    <div class="row g-4">
+
+        <div class="col-12 col-lg-8">
+
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+
+                    <div class="d-flex flex-column flex-sm-row
+                        justify-content-between align-items-sm-start
+                        gap-3 mb-4">
+
+                        <div>
+                            <div class="text-muted small mb-1">
+                                Problema reportado
+                            </div>
+
+                            <h2 class="h4 fw-bold mb-0">
+                                @Model.Title
+                            </h2>
+                        </div>
+
+                        <div>
+                            @switch (Model.Priority)
+                            {
+                                case MaintenancePriority.Baixa:
+                                    <span class="badge bg-success px-3 py-2">
+                                        <i class="bi bi-flag me-1"></i>
+                                        Prioridade baixa
+                                    </span>
+                                    break;
+
+                                case MaintenancePriority.Media:
+                                    <span class="badge bg-primary px-3 py-2">
+                                        <i class="bi bi-flag me-1"></i>
+                                        Prioridade normal
+                                    </span>
+                                    break;
+
+                                case MaintenancePriority.Alta:
+                                    <span class="badge bg-warning text-dark px-3 py-2">
+                                        <i class="bi bi-flag me-1"></i>
+                                        Prioridade alta
+                                    </span>
+                                    break;
+
+                                case MaintenancePriority.Urgente:
+                                    <span class="badge bg-danger px-3 py-2">
+                                        <i class="bi bi-exclamation-octagon me-1"></i>
+                                        Urgente
+                                    </span>
+                                    break;
+                            }
+                        </div>
+
+                    </div>
+
+                    <div>
+                        <div class="text-muted small mb-2">
+                            <i class="bi bi-text-paragraph me-1"></i>
+                            Descrição
+                        </div>
+
+                        <div class="bg-light rounded p-3"
+                             style="white-space: pre-line;">
+
+                            @(string.IsNullOrWhiteSpace(Model.Description)
+                                ? "Sem descrição."
+                                : Model.Description)
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            @if (Model.CleaningTask != null)
+            {
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body p-4">
+
+                        <h3 class="h5 fw-bold mb-3">
+                            <i class="bi bi-calendar-check me-2"></i>
+                            Tarefa de limpeza associada
+                        </h3>
+
+                        <div class="row g-3">
+
+                            <div class="col-12 col-md-6">
+                                <div class="text-muted small">
+                                    Data prevista
+                                </div>
+
+                                <div class="fw-semibold">
+                                    @Model.CleaningTask.ScheduledDate.ToString("dd/MM/yyyy 'às' HH:mm")
+                                </div>
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <div class="text-muted small">
+                                    Estado da limpeza
+                                </div>
+
+                                <div class="fw-semibold">
+                                    @Model.CleaningTask.Status
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="mt-3">
+                            <a asp-controller="CleaningTask"
+                               asp-action="Details"
+                               asp-route-id="@Model.CleaningTaskId"
+                               class="btn btn-outline-primary">
+
+                                <i class="bi bi-eye me-1"></i>
+                                Ver tarefa de limpeza
+                            </a>
+                        </div>
+
+                    </div>
+                </div>
+            }
+
+            @if (Model.MaintenanceId.HasValue)
+            {
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4">
+
+                        <h3 class="h5 fw-bold mb-3">
+                            <i class="bi bi-tools me-2"></i>
+                            Manutenção criada
+                        </h3>
+
+                        <p class="text-muted">
+                            Este reporte já foi convertido numa manutenção.
+                        </p>
+
+                        <a asp-controller="Maintenance"
+                           asp-action="Details"
+                           asp-route-id="@Model.MaintenanceId"
+                           class="btn btn-outline-success">
+
+                            <i class="bi bi-eye me-1"></i>
+                            Ver manutenção
+                        </a>
+
+                    </div>
+                </div>
+            }
+
+        </div>
+
+        <div class="col-12 col-lg-4">
+
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+
+                    <h3 class="h5 fw-bold mb-4">
+                        Informação do reporte
+                    </h3>
+
+                    <div class="mb-3">
+                        <div class="text-muted small">
+                            <i class="bi bi-house-door me-1"></i>
+                            Propriedade
+                        </div>
+
+                        <div class="fw-semibold">
+                            @(Model.Property?.Name ?? "Não disponível")
+                        </div>
+
+                        @if (!string.IsNullOrWhiteSpace(
+                            Model.Property?.Address))
+                        {
+                            <div class="small text-muted mt-1">
+                                @Model.Property.Address
+                            </div>
+                        }
+                    </div>
+
+                    <hr />
+
+                    <div class="mb-3">
+                        <div class="text-muted small">
+                            <i class="bi bi-person me-1"></i>
+                            Reportado por
+                        </div>
+
+                        <div class="fw-semibold">
+                            @if (Model.ReportedByUser != null)
+                            {
+                                @($"{Model.ReportedByUser.PrimeiroNome} " +
+                                  $"{Model.ReportedByUser.UltimoNome}")
+                            }
+                            else
+                            {
+                                <span>Utilizador não disponível</span>
+                            }
+                        </div>
+
+                        @if (!string.IsNullOrWhiteSpace(
+                            Model.ReportedByUser?.PhoneNumber))
+                        {
+                            <div class="small text-muted mt-1">
+                                <i class="bi bi-telephone me-1"></i>
+                                @Model.ReportedByUser.PhoneNumber
+                            </div>
+                        }
+                    </div>
+
+                    <hr />
+
+                    <div>
+                        <div class="text-muted small">
+                            <i class="bi bi-clock-history me-1"></i>
+                            Data do reporte
+                        </div>
+                            @Model.ReportedAt
+                        <div class="fw-semibold">
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            @if (Model.Status ==
+                MaintenanceReportStatus.PendingReview)
+            {
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4">
+
+                        <h3 class="h5 fw-bold mb-3">
+                            Decisão do gestor
+                        </h3>
+
+                        <p class="text-muted small">
+                            Analisa o problema e escolhe como deve ser tratado.
+                        </p>
+
+                        <div class="d-grid gap-2">
+
+                            <a asp-controller="Maintenance"
+                               asp-action="CreateFromReport"
+                               asp-route-reportId="@Model.Id"
+                               class="btn btn-primary">
+
+                                <i class="bi bi-tools me-1"></i>
+                                Criar manutenção
+                            </a>
+
+                            <form asp-controller="MaintenanceReport"
+                                  asp-action="Resolve"
+                                  method="post">
+
+                                @Html.AntiForgeryToken()
+
+                                <input type="hidden"
+                                       name="id"
+                                       value="@Model.Id" />
+
+                                <button type="submit"
+                                        class="btn btn-outline-success w-100">
+
+                                    <i class="bi bi-check-circle me-1"></i>
+                                    Resolver sem manutenção
+                                </button>
+                            </form>
+
+                            <form asp-controller="MaintenanceReport"
+                                  asp-action="Reject"
+                                  method="post"
+                                  onsubmit="return confirm(
+                                'Tens a certeza de que pretendes rejeitar este reporte?');">
+
+                                @Html.AntiForgeryToken()
+
+                                <input type="hidden"
+                                       name="id"
+                                       value="@Model.Id" />
+
+                                <button type="submit"
+                                        class="btn btn-outline-danger w-100">
+
+                                    <i class="bi bi-x-circle me-1"></i>
+                                    Rejeitar reporte
+                                </button>
+                            </form>
+
+                        </div>
+
+                    </div>
+                </div>
+            }
+
+        </div>
+
+    </div>
+
+</div>

@@ -1,0 +1,71 @@
+﻿@using CleanMadeira.Web.ViewModels.Team
+@model AddTeamMemberVM
+
+@{
+    ViewData["Title"] = "Adicionar membro";
+}
+
+<div class="container py-4">
+
+    <div class="card border-0 shadow-sm mx-auto"
+         style="max-width: 600px;">
+
+        <div class="card-body p-4">
+
+            <h1 class="h4 fw-bold mb-1">
+                Adicionar membro
+            </h1>
+
+            <p class="text-muted mb-4">
+                Adicione um limpador registado à sua empresa.
+            </p>
+
+            <form asp-action="AddMember"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <div asp-validation-summary="ModelOnly"
+                     class="text-danger mb-3">
+                </div>
+
+                <div class="mb-4">
+
+                    <label asp-for="Email"
+                           class="form-label">
+                        Email do limpador
+                    </label>
+
+                    <input asp-for="Email"
+                           class="form-control"
+                           placeholder="limpador@email.com" />
+
+                    <span asp-validation-for="Email"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+                <div class="d-flex gap-2">
+
+                    <button type="submit"
+                            class="btn btn-primary">
+
+                        <i class="bi bi-person-plus me-1"></i>
+                        Adicionar
+                    </button>
+
+                    <a asp-action="Index"
+                       class="btn btn-outline-secondary">
+                        Cancelar
+                    </a>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>

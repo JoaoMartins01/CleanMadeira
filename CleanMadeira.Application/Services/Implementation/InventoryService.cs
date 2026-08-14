@@ -1,11 +1,6 @@
 ﻿using CleanMadeira.Application.Common.Interfaces;
 using CleanMadeira.Application.Services.Interface;
 using CleanMadeira.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 public class InventoryService : IInventoryService
 {
     private readonly IInventoryRepository _inventoryRepository;
@@ -20,7 +15,7 @@ public class InventoryService : IInventoryService
         return await _inventoryRepository.GetAllAsync();
     }
 
-    public async Task<InventoryItem?> GetByIdAsync(Guid id)
+    public async Task<InventoryItem?> GetByIdAsync(Guid? id)
     {
         return await _inventoryRepository.GetByIdAsync(id);
     }

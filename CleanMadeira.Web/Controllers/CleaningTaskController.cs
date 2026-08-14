@@ -2,14 +2,15 @@
 using CleanMadeira.Application.Services.Interface;
 using CleanMadeira.Domain.Entities;
 using CleanMadeira.Domain.Entities.Enums;
-using CleanMadeira.Web.ViewModels;
 using CleanMadeira.Web.ViewModels.CleaningTask;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SkiaSharp;
+using System.Net.NetworkInformation;
 using System.Security.Claims;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace CleanMadeira.Web.Controllers;
 
@@ -49,7 +50,7 @@ public class CleaningTaskController : Controller
     public async Task<IActionResult> Details(Guid id)
     {
         var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-        
+
         var user = await _userManager.GetUserAsync(User);
 
         var task = await _cleaningTaskService.GetByIdAsync(id);
@@ -57,6 +58,10 @@ public class CleaningTaskController : Controller
         if (user.Role == UserRole.Dono)
         {
             task = await _cleaningTaskService.GetByIdAndOwnerAsync(id, userId);
+        }
+        else
+        {
+            task = await _cleaningTaskService.GetByLimpadorIdAsync(id);
         }
 
 
@@ -68,6 +73,7 @@ public class CleaningTaskController : Controller
             Id = task.Id,
 
             PropriedadeNome = task.Property?.Name ?? "",
+            TipoServico = task.CleaningType,
             Morada = task.Property?.Address ?? "",
             Freguesia = task.Property?.Freguesia ?? "",
             GestorNome = task.Property?.ApplicationUser != null
@@ -144,15 +150,21 @@ public class CleaningTaskController : Controller
         if (!ModelState.IsValid)
             return View(vm);
 
+        var user = await _userManager.GetUserAsync(User);
+
+        var property = await _propertyService.GetByIdAndOwnerAsync(vm.PropriedadeId, user.Id);
+
         var task = new CleaningTask
         {
             Id = Guid.NewGuid(),
             PropertyId = vm.PropriedadeId,
+            CleaningType = vm.TipoServico,
             AssignedUserId = vm.AssignedUserId,
             ScheduledDate = vm.ScheduledDate,
             Priority = vm.Prioridade,
             Status = CleaningStatus.Pendente,
             EstimatedMinutes = vm.EstimatedMinutes,
+            CleaningCompanyId = property.CleaningCompanyId,
             Notes = vm.Notas
         };
 
@@ -176,6 +188,7 @@ public class CleaningTaskController : Controller
         {
             Id = task.Id,
             PropriedadeId = task.PropertyId,
+            TipoServico = task.CleaningType,
             AssignedUserId = task.AssignedUserId,
             ScheduledDate = task.ScheduledDate,
             Prioridade = task.Priority,
@@ -202,6 +215,7 @@ public class CleaningTaskController : Controller
             return NotFound();
 
         task.PropertyId = vm.PropriedadeId;
+        task.CleaningType = vm.TipoServico;
         task.ScheduledDate = vm.ScheduledDate;
         task.Priority = vm.Prioridade;
         task.Status = (CleaningStatus)vm.Status;
@@ -266,6 +280,7 @@ public class CleaningTaskController : Controller
     string periodo = "mes")
     {
         var user = await _userManager.GetUserAsync(User);
+
 
         var tasks = await _cleaningTaskService
             .GetByLimpadorUserIdAsync(user.Id);
@@ -357,11 +372,38 @@ public class CleaningTaskController : Controller
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetEvents()
+    public async Task<IActionResult> GetEvents(string status)
     {
         var user = await _userManager.GetUserAsync(User);
 
-        var tasks = await _cleaningTaskService.GetByOwnerIdAsync(user.Id);
+        var tasks = await _cleaningTaskService.GetAllAsync();
+
+        if (user.Role == UserRole.Dono)
+        {
+            tasks = await _cleaningTaskService.GetByOwnerIdAsync(user.Id);
+        }
+        else
+        {
+            tasks = await _cleaningTaskService.GetByCompanyIdAsync((Guid)user?.CompanyId);
+        }
+
+        var rawStatus = Request.Query["status"].ToString();
+
+        if (status == "Geral")
+            tasks = tasks.Where(t => t.CleaningType == CleaningType.Geral);
+
+        if (status == "Exterior")
+            tasks = tasks.Where(t => t.CleaningType == CleaningType.Exterior);
+
+        if (status == "Janelas")
+            tasks = tasks.Where(t => t.CleaningType == CleaningType.Janelas);
+
+        if (status == "Intermediário")
+            tasks = tasks.Where(t => t.CleaningType == CleaningType.Intermediário);
+
+        if (status == "PosConstrucao")
+            tasks = tasks.Where(t => t.CleaningType == CleaningType.PosConstrução);
+
 
         var events = tasks.Select(t => new
         {
@@ -818,7 +860,8 @@ public class CleaningTaskController : Controller
 
         var query = _userManager.Users
             .Where(u =>
-                u.Role == UserRole.Limpador &&
+                (u.Role == UserRole.Limpador || u.Role == UserRole.GestorELimpador) &&
+                u.EmailConfirmed == true &&
                 u.Active);
 
         if (!string.IsNullOrWhiteSpace(search))
@@ -833,7 +876,7 @@ public class CleaningTaskController : Controller
                 numericTerm,
                 out var cleanerNumber);
 
-            query = query.Where(u => 
+            query = query.Where(u =>
                 (isCleanerNumber &&
                 u.CleanerNumber == cleanerNumber) ||
                 u.PrimeiroNome.Contains(term) ||
@@ -844,6 +887,7 @@ public class CleaningTaskController : Controller
         }
 
         var cleaners = await query
+            .Where(u => u.CompanyId == user.CompanyId)
             .OrderBy(u => u.PrimeiroNome)
             .ThenBy(u => u.UltimoNome)
             .Take(30)
@@ -858,6 +902,28 @@ public class CleaningTaskController : Controller
                 Active = u.Active
             })
             .ToListAsync();
+
+
+        if (user.Role == UserRole.GestorELimpador) {
+        
+             cleaners = await query
+            .Where(u => u.CompanyId == user.CompanyId)
+            .OrderBy(u => u.PrimeiroNome)
+            .ThenBy(u => u.UltimoNome)
+            .Take(30)
+            .Select(u => new CleanerSearchItemVM
+            {
+                Id = u.Id,
+                LimpadorCodigo = u.CleanerCode,
+                NomeCompleto =
+                    u.PrimeiroNome + " " + u.UltimoNome,
+                Email = u.Email ?? "",
+                Telemovel = u.PhoneNumber,
+                Active = u.Active
+            })
+            .ToListAsync();
+        }
+        
 
         var vm = new AssignCleanerVM
         {
@@ -877,8 +943,8 @@ public class CleaningTaskController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> AssignCleaner(AssignCleanerVM vm)
     {
-         var owner = await _userManager.GetUserAsync(User);
-        
+        var owner = await _userManager.GetUserAsync(User);
+
         if (owner == null)
             return Challenge();
         var id = vm.CleaningTaskId;
@@ -902,7 +968,7 @@ public class CleaningTaskController : Controller
         var cleaner = await _userManager.Users
             .FirstOrDefaultAsync(u =>
                 u.Id == vm.SelectedCleanerId.Value &&
-                u.Role == UserRole.Limpador &&
+                (u.Role == UserRole.Limpador || u.Role == UserRole.GestorELimpador) &&
                 u.Active);
 
         if (cleaner == null)
@@ -925,10 +991,12 @@ public class CleaningTaskController : Controller
             new { id = task.Id },
             protocol: Request.Scheme)!;
 
+        var propriedade = await _propertyService.GetByIdAsync(task.PropertyId);
+
         await _emailService.SendCleaningAssignedEmailAsync(
             cleaner,
             task,
-            task.Property,
+            propriedade,
             taskDetailsLink);
 
         TempData["Success"] =
@@ -973,6 +1041,26 @@ public class CleaningTaskController : Controller
         return RedirectToAction(
             nameof(Details),
             new { id = taskId });
+    }
+
+    public async Task<IActionResult> Team()
+    {
+        var user = await _userManager.GetUserAsync(User);
+
+        if (user == null)
+            return RedirectToAction("Login", "Account");
+
+        if (user.Role != UserRole.Gestor &&
+            user.Role != UserRole.GestorELimpador)
+        {
+            return Forbid();
+        }
+
+        var membros = await _userManager.Users
+            .Where(u => u.CompanyId == user.CompanyId)
+            .ToListAsync();
+
+        return View(membros);
     }
 
 

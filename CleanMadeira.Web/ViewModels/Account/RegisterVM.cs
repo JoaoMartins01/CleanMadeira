@@ -1,5 +1,4 @@
 ﻿using CleanMadeira.Domain.Entities.Enums;
-using Stripe.Terminal;
 using System.ComponentModel.DataAnnotations;
 
 namespace CleanMadeira.Web.ViewModels.Account;

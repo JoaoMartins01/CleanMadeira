@@ -1,10 +1,8 @@
-﻿using CleanMadeira.Application.Interfaces;
-using CleanMadeira.Application.Interfaces.Services;
+﻿using CleanMadeira.Application.Interfaces.Services;
 using CleanMadeira.Domain.Entities.Enums;
 using CleanMadeira.Web.ViewModels.PublicMaintenance;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Stripe;
 
 namespace CleanMadeira.Web.Controllers
 {

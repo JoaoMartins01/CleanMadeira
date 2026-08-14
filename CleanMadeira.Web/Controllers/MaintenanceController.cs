@@ -1,18 +1,16 @@
 ﻿using CleanMadeira.Application.Contract;
+using CleanMadeira.Application.Interfaces;
 using CleanMadeira.Application.Interfaces.Services;
-using CleanMadeira.Application.Services;
+using CleanMadeira.Application.Services.Implementation;
 using CleanMadeira.Application.Services.Interface;
 using CleanMadeira.Domain.Entities;
 using CleanMadeira.Domain.Entities.Enums;
-using CleanMadeira.Web.ViewModels.CleaningTask;
 using CleanMadeira.Web.ViewModels.Maintenance;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.AspNetCore.Razor.TagHelpers;
 using System.Security.Claims;
-using System.Security.Policy;
 
 namespace CleanMadeira.Web.Controllers;
 
@@ -21,19 +19,25 @@ public class MaintenanceController : Controller
 {
     private readonly IMaintenanceService _maintenanceService;
     private readonly IPropertyService _propertyService;
+    private readonly ICleaningTaskService _cleaningTaskService;
     private readonly IMaintenanceProviderService _maintenanceProviderService;
+    private readonly IMaintenanceReportService _maintenanceReportService;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IEmailService _emailService;
 
     public MaintenanceController(IMaintenanceService maintenanceService,
         IPropertyService propertyService,
+        ICleaningTaskService cleaningTaskService,
         IMaintenanceProviderService maintenanceProviderService,
+        IMaintenanceReportService maintenanceReportService,
         UserManager<ApplicationUser> userManager,
         IEmailService emailService)
     {
         _maintenanceService = maintenanceService;
         _propertyService = propertyService;
+        _cleaningTaskService = cleaningTaskService;
         _maintenanceProviderService = maintenanceProviderService;
+        _maintenanceReportService = maintenanceReportService;
         _userManager = userManager;
         _emailService = emailService;
     }
@@ -61,14 +65,14 @@ public class MaintenanceController : Controller
             AssignedUserId = maintenance.MaintenanceProviderId,
             PropertyName = maintenance.Property.Name,
             PropertyAddress = maintenance.Property.Address,
-            AssignedUserName = maintenance.MaintenanceProvider.Name,
+            AssignedUserName = maintenance.MaintenanceProvider?.Name,
             Title = maintenance.Title,
             Description = maintenance.Description,
             Priority = maintenance.Priority,
             Status = maintenance.Status,
             ScheduledDate = maintenance.ScheduledDate,
             CreatedAt = maintenance.CreatedAt,
-        };    
+        };
 
 
         return View(vm);
@@ -96,7 +100,7 @@ public class MaintenanceController : Controller
             PropertyId = model.PropertyId,
             AccessToken = Guid.NewGuid(),
             MaintenanceProviderId = model.AssignedUserId,
-        //    AssignedUserId = model.AssignedUserId,
+            //    AssignedUserId = model.AssignedUserId,
             Title = model.Title,
             Description = model.Description,
             Priority = model.Priority,
@@ -203,7 +207,7 @@ public class MaintenanceController : Controller
         {
             Id = maintenance.Id,
             PropriedadeId = maintenance.PropertyId,
-            AssignedUserId = maintenance.AssignedUserId,
+            AssignedUserId = maintenance.MaintenanceProviderId,
             Title = maintenance.Title,
             Description = maintenance.Description,
             Priority = maintenance.Priority,
@@ -258,7 +262,7 @@ public class MaintenanceController : Controller
             AssignedUserId = maintenance.MaintenanceProviderId,
             PropertyName = maintenance.Property.Name,
             PropertyAddress = maintenance.Property.Address,
-            AssignedUserName = maintenance.MaintenanceProvider.Name,
+            AssignedUserName = maintenance?.MaintenanceProvider?.Name,
             Title = maintenance.Title,
             Description = maintenance.Description,
             Priority = maintenance.Priority,
@@ -301,4 +305,201 @@ public class MaintenanceController : Controller
             "Category");
     }
 
+    [HttpGet]
+    public async Task<IActionResult> CreateFromReport(Guid reportId)
+    {
+        var user = await _userManager.GetUserAsync(User);
+
+        if (user == null)
+            return Unauthorized();
+
+        var report = await _maintenanceReportService.GetByIdAsync(reportId);
+
+        if (report == null)
+            return NotFound();
+
+        if (report.Property == null ||
+            report.Property.ApplicationUserId != user.Id)
+        {
+            return Forbid();
+        }
+
+        if (report.Status != MaintenanceReportStatus.PendingReview)
+        {
+            TempData["Error"] =
+                "Este reporte já foi analisado.";
+
+            return RedirectToAction(
+                "Details",
+                "MaintenanceReport",
+                new { id = reportId });
+        }
+
+        var model = new CreateMaintenanceFromReportVM
+        {
+            MaintenanceReportId = report.Id,
+            PropertyId = report.PropertyId,
+
+            ReportTitle = report.Title,
+            ReportDescription = report.Description,
+
+            PropertyName = report.Property.Name,
+            PropertyAddress = report.Property.Address,
+
+            ReportedByName = report.ReportedByUser != null
+                ? $"{report.ReportedByUser.PrimeiroNome} " +
+                  $"{report.ReportedByUser.UltimoNome}"
+                : "Utilizador não disponível",
+
+            ReportedAt = report.ReportedAt,
+
+            Title = report.Title,
+            Description = report.Description,
+            Priority = report.Priority,
+
+            ScheduledDate = DateTime.Now.AddDays(1)
+        };
+
+
+        await PopulateCreateFromReportVM(
+            model,
+            report,
+            user.Id);
+
+        return View(model);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> CreateFromReport(
+    CreateMaintenanceFromReportVM model)
+    {
+        var user = await _userManager.GetUserAsync(User);
+
+        if (user == null)
+            return Unauthorized();
+
+        var report = await _maintenanceReportService
+            .GetByIdAsync(model.MaintenanceReportId);
+
+        if (report == null)
+            return NotFound();
+
+        if (report.Property == null ||
+            report.Property.ApplicationUserId != user.Id)
+        {
+            return Forbid();
+        }
+
+        if (report.Status != MaintenanceReportStatus.PendingReview)
+        {
+            TempData["Error"] =
+                "Este reporte já foi analisado.";
+
+            return RedirectToAction(
+                "Details",
+                "MaintenanceReport",
+                new { id = report.Id });
+        }
+
+        if (model.PropertyId != report.PropertyId)
+        {
+            ModelState.AddModelError(
+                string.Empty,
+                "A propriedade indicada não corresponde ao reporte.");
+        }
+
+        MaintenanceProvider? provider = null;
+
+        if (model.MaintenanceProviderId.HasValue)
+        {
+            provider = await _maintenanceProviderService
+                .GetByIdAsync(model.MaintenanceProviderId.Value);
+
+            if (provider == null ||
+                provider.OwnerId != user.Id ||
+                !provider.Active)
+            {
+                ModelState.AddModelError(
+                    nameof(model.MaintenanceProviderId),
+                    "O prestador selecionado não é válido.");
+            }
+        }
+
+        if (!ModelState.IsValid)
+        {
+            await PopulateCreateFromReportVM(
+                model,
+                report,
+                user.Id);
+
+            return View(model);
+        }
+
+        var maintenance = new Maintenance
+        {
+            Id = Guid.NewGuid(),
+
+            PropertyId = report.PropertyId,
+
+            MaintenanceProviderId =
+                model.MaintenanceProviderId,
+
+            Title = model.Title.Trim(),
+            Description = model.Description.Trim(),
+
+            ScheduledDate = model.ScheduledDate,
+            Priority = model.Priority!.Value,
+
+
+            Status = MaintenanceStatus.Pendente,
+
+            CreatedAt = DateTime.UtcNow
+        };
+
+        await _maintenanceService.CreateAsync(maintenance);
+
+        await _maintenanceReportService.MarkAsConvertedAsync(
+            report.Id,
+            maintenance.Id);
+
+        TempData["Success"] =
+            "A manutenção foi criada a partir do reporte.";
+
+        return RedirectToAction(
+            nameof(Details),
+            new { id = maintenance.Id });
+    }
+
+    private async Task PopulateCreateFromReportVM(
+    CreateMaintenanceFromReportVM model,
+    MaintenanceReport report,
+    Guid ownerId)
+    {
+        model.MaintenanceReportId = report.Id;
+        model.PropertyId = report.PropertyId;
+
+        model.ReportTitle = report.Title;
+        model.ReportDescription = report.Description;
+
+        model.PropertyName = report.Property?.Name ?? "";
+        model.PropertyAddress = report.Property?.Address ?? "";
+
+        model.ReportedByName = report.ReportedByUser != null
+            ? $"{report.ReportedByUser.PrimeiroNome} {report.ReportedByUser.UltimoNome}"
+            : "";
+
+        model.ReportedAt = report.ReportedAt;
+
+        var providers = await _maintenanceProviderService
+            .GetByOwnerIdAsync(ownerId);
+
+        model.MaintenanceProviders = providers
+            .Select(provider => new SelectListItem
+            {
+                Value = provider.Id.ToString(),
+                Text = provider.Name
+            })
+            .ToList();
+    }
 }

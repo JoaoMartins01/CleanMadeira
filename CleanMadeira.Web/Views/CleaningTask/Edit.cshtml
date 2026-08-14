@@ -29,6 +29,25 @@
             </div>
 
             <div class="mb-3">
+            <label asp-for="TipoServico"
+                   class="form-label">
+            </label>
+
+            <select asp-for="TipoServico"
+                    class="form-select">
+                <option value="1">Geral</option>
+                <option value="2">Exterior</option>
+                <option value="3">Janelas</option>
+                <option value="4">Intemerdiário</option>
+                <option value="5">PosConstrucao</option>
+            </select>
+
+            <span asp-validation-for="TipoServico"
+                  class="text-danger">
+            </span>
+            </div>
+
+            <div class="mb-3">
                 <label asp-for="AssignedUserId" class="form-label">
                     Funcionária
                 </label>

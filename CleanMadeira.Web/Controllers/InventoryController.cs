@@ -1,5 +1,4 @@
-﻿using CleanMadeira.Application.Services.Implementation;
-using CleanMadeira.Application.Services.Interface;
+﻿using CleanMadeira.Application.Services.Interface;
 using CleanMadeira.Domain.Entities;
 using CleanMadeira.Web.ViewModels;
 using CleanMadeira.Web.ViewModels.Inventory;
@@ -7,7 +6,9 @@ using CleanMadeira.Web.ViewModels.Propriedade;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.Security.Claims;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace CleanMadeira.Web.Controllers;
 
@@ -31,9 +32,28 @@ public class InventoryController : Controller
 
     public async Task<IActionResult> Index(Guid? PropriedadeSelecionadaId)
     {
-        var propriedades = await _propertyService.GetAllAsync();
+        var user = await _userManager.GetUserAsync(User);
 
-        if (PropriedadeSelecionadaId == null && propriedades.Any())
+        var propriedades = await _propertyService.GetByUserAsync(user.Id);
+
+        // Se não existirem propriedades, devolve a página vazia
+        if (propriedades == null || !propriedades.Any())
+        {
+            var vmSemPropriedades = new InventoryIndexVM
+            {
+                PropriedadeSelecionadaId = null,
+
+                Propriedades = new List<SelectListItem>(),
+
+                Produtos = new List<InventoryItemVM>()
+            };
+
+            return View(vmSemPropriedades);
+        }
+
+        // Se nenhuma propriedade foi selecionada,
+        // selecionar automaticamente a primeira
+        if (PropriedadeSelecionadaId == null)
         {
             PropriedadeSelecionadaId = propriedades.First().Id;
         }
@@ -46,22 +66,25 @@ public class InventoryController : Controller
             PropriedadeSelecionadaId = PropriedadeSelecionadaId,
 
             Propriedades = propriedades
-        .Select(p => new SelectListItem
-        {
-            Value = p.Id.ToString(),
-            Text = p.Name
-        })
-        .ToList(),
+                .Select(p => new SelectListItem
+                {
+                    Value = p.Id.ToString(),
+                    Text = p.Name,
+                    Selected = p.Id == PropriedadeSelecionadaId
+                })
+                .ToList(),
 
-            Produtos = produtos.Select(p => new InventoryItemVM
-            {
-                Id = p.Id,
-                Nome = p.Name,
-                Quantidade = p.Quantity,
-                Unidade = p.Unity,
-                QuantidadeMinima = p.MinimumQuantity,
-                PropriedadeId = p.PropertyId
-            }).ToList()
+            Produtos = produtos
+                .Select(p => new InventoryItemVM
+                {
+                    Id = p.Id,
+                    Nome = p.Name,
+                    Quantidade = p.Quantity,
+                    Unidade = p.Unity,
+                    QuantidadeMinima = p.MinimumQuantity,
+                    PropriedadeId = p.PropertyId
+                })
+                .ToList()
         };
 
         return View(vm);
@@ -91,9 +114,36 @@ public class InventoryController : Controller
         return View(vm);
     }
 
-    public async Task<IActionResult> CreateAsync()
+    public async Task<IActionResult> CreateAsync(Guid? propriedadeId)
     {
-        await LoadPropriedadesAsync();
+        var user = await _userManager.GetUserAsync(User);
+
+        if (user == null)
+            return Unauthorized();
+
+        var properties = await _propertyService
+            .GetByUserAsync(user.Id);
+
+        if (propriedadeId.HasValue &&
+            !properties.Any(p => p.Id == propriedadeId.Value))
+        {
+            return Forbid();
+        }
+
+        await LoadPropriedadesAsync(); 
+
+        var model = new CreateInventoryItemVM
+        {
+            PropriedadeId = propriedadeId,
+
+            Propriedades = properties
+                .Select(p => new SelectListItem
+                {
+                    Value = p.Id.ToString(),
+                    Text = p.Name
+                })
+                .ToList()
+        };
 
         return View(new CreateInventoryItemVM());
     }
@@ -102,15 +152,34 @@ public class InventoryController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(CreateInventoryItemVM vm)
     {
+        var user = await _userManager.GetUserAsync(User);
+
+        if (user == null)
+            return Unauthorized();
+
+        var properties = await _propertyService
+            .GetByUserAsync(user.Id);
+
+        if (!properties.Any(p => p.Id == vm.PropriedadeId))
+        {
+            return Forbid();
+        }
+
         if (!ModelState.IsValid)
         {
-            await LoadPropriedadesAsync();
+            vm.Propriedades = properties
+                .Select(p => new SelectListItem
+                {
+                    Value = p.Id.ToString(),
+                    Text = p.Name
+                })
+                .ToList();
+
             return View(vm);
         }
 
         var item = new InventoryItem
         {
-            Id = Guid.NewGuid(),
             PropertyId = vm.PropriedadeId,
             Name = vm.Nome,
             Unity = vm.Unidade,
@@ -119,9 +188,16 @@ public class InventoryController : Controller
             Active = true
         };
 
-        await _inventoryService.CreateAsync(item);
 
-        return RedirectToAction(nameof(Index));
+        await _inventoryService.CreateAsync(item);
+            
+
+        return RedirectToAction(
+            nameof(Index),
+            new
+            {
+                propriedadeSelecionadaId = vm.PropriedadeId
+            });
     }
 
     public async Task<IActionResult> Edit(Guid id)
@@ -138,7 +214,8 @@ public class InventoryController : Controller
         var vm = new InventoryItemVM
         {
             Id = item.Id,
-            PropriedadeNome = propriedade.Name,
+            PropriedadeId = propriedade?.Id,
+            PropriedadeNome = propriedade?.Name,
             Nome = item.Name,
             Unidade = item.Unity,
             Quantidade = item.Quantity,
@@ -169,12 +246,17 @@ public class InventoryController : Controller
         item.Name = vm.Nome;
         item.Unity = vm.Unidade;
         item.Quantity = vm.Quantidade;
-        item.MinimumQuantity= vm.QuantidadeMinima;
+        item.MinimumQuantity = vm.QuantidadeMinima;
         item.Active = vm.Active;
 
         await _inventoryService.UpdateAsync(item);
 
-        return RedirectToAction(nameof(Index));
+        return RedirectToAction(
+            nameof(Index),
+            new
+            {
+                propriedadeSelecionadaId = vm.PropriedadeId
+            });
     }
 
     public async Task<IActionResult> Delete(Guid id)
@@ -261,13 +343,14 @@ public class InventoryController : Controller
 
         var user = await _userManager.GetUserAsync(User);
 
-        foreach (var item in vm.Items) { 
+        foreach (var item in vm.Items)
+        {
 
             var i = await _inventoryService.GetByIdAsync(item.InventoryItemId);
 
             if (i == null)
                 return NotFound();
-            
+
             i.Name = item.Nome;
             i.Quantity = item.QuantidadeAtual;
             i.MinimumQuantity = item.QuantidadeMinima;

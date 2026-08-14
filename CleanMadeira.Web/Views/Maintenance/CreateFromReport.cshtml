@@ -1,0 +1,345 @@
+﻿@using CleanMadeira.Domain.Entities.Enums
+@model CleanMadeira.Web.ViewModels.Maintenance.CreateMaintenanceFromReportVM
+
+@{
+    ViewData["Title"] = "Criar manutenção";
+}
+
+<div class="container-fluid py-4">
+
+    <div class="row justify-content-center">
+        <div class="col-12 col-xl-9">
+
+            <div class="mb-4">
+                <a asp-controller="MaintenanceReport"
+                   asp-action="Details"
+                   asp-route-id="@Model.MaintenanceReportId"
+                   class="text-decoration-none">
+
+                    <i class="bi bi-arrow-left me-1"></i>
+                    Voltar ao reporte
+                </a>
+            </div>
+
+            <div class="d-flex flex-column flex-md-row
+                justify-content-between align-items-md-center
+                gap-3 mb-4">
+
+                <div>
+                    <h1 class="h3 fw-bold mb-1">
+                        <i class="bi bi-tools me-2"></i>
+                        Criar manutenção
+                    </h1>
+
+                    <p class="text-muted mb-0">
+                        Cria uma intervenção a partir do problema reportado.
+                    </p>
+                </div>
+
+                <span class="badge bg-warning text-dark fs-6 px-3 py-2">
+                    <i class="bi bi-exclamation-triangle me-1"></i>
+                    Origem: reporte
+                </span>
+            </div>
+
+            <div class="row g-4">
+
+                <div class="col-12 col-lg-7">
+
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body p-4">
+
+                            <form asp-controller="Maintenance"
+                                  asp-action="CreateFromReport"
+                                  method="post">
+
+                                @Html.AntiForgeryToken()
+
+                                <input asp-for="MaintenanceReportId"
+                                       type="hidden" />
+
+                                <input asp-for="PropertyId"
+                                       type="hidden" />
+
+                                <div asp-validation-summary="ModelOnly"
+                                     class="alert alert-danger">
+                                </div>
+
+                                <div class="mb-4">
+                                    <label asp-for="Title"
+                                           class="form-label fw-semibold">
+
+                                        <i class="bi bi-card-heading me-1"></i>
+                                        Título
+                                    </label>
+
+                                    <input asp-for="Title"
+                                           class="form-control"
+                                           placeholder="Ex.: Reparação de fuga de água" />
+
+                                    <span asp-validation-for="Title"
+                                          class="text-danger small">
+                                    </span>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label asp-for="Description"
+                                           class="form-label fw-semibold">
+
+                                        <i class="bi bi-text-paragraph me-1"></i>
+                                        Descrição
+                                    </label>
+
+                                    <textarea asp-for="Description"
+                                              class="form-control"
+                                              rows="5"
+                                              placeholder="Descreve a intervenção necessária."></textarea>
+
+                                    <span asp-validation-for="Description"
+                                          class="text-danger small">
+                                    </span>
+                                </div>
+
+                                <div class="row g-3 mb-4">
+
+                                    <div class="col-12 col-md-6">
+                                        <label asp-for="ScheduledDate"
+                                               class="form-label fw-semibold">
+
+                                            <i class="bi bi-calendar-event me-1"></i>
+                                            Data prevista
+                                        </label>
+
+                                        <input asp-for="ScheduledDate"
+                                               type="datetime-local"
+                                               class="form-control" />
+
+                                        <span asp-validation-for="ScheduledDate"
+                                              class="text-danger small">
+                                        </span>
+                                    </div>
+
+                                    <div class="col-12 col-md-6">
+                                        <label asp-for="Priority"
+                                               class="form-label fw-semibold">
+
+                                            <i class="bi bi-flag me-1"></i>
+                                            Prioridade
+                                        </label>
+
+                                        <select asp-for="Priority"
+                                                class="form-select">
+
+                                            <option value="">
+                                                Selecionar prioridade
+                                            </option>
+
+                                            <option value="@MaintenancePriority.Baixa">
+                                                Baixa
+                                            </option>
+
+                                            <option value="@MaintenancePriority.Media">
+                                                Média
+                                            </option>
+
+                                            <option value="@MaintenancePriority.Alta">
+                                                Alta
+                                            </option>
+
+                                            <option value="@MaintenancePriority.Urgente">
+                                                Urgente
+                                            </option>
+
+                                        </select>
+
+                                        <span asp-validation-for="Priority"
+                                              class="text-danger small">
+                                        </span>
+                                    </div>
+
+                                </div>
+
+                                <div class="mb-4">
+                                    <label asp-for="MaintenanceProviderId"
+                                           class="form-label fw-semibold">
+
+                                        <i class="bi bi-person-workspace me-1"></i>
+                                        Prestador
+                                    </label>
+
+                                    <select asp-for="MaintenanceProviderId"
+                                            asp-items="Model.MaintenanceProviders"
+                                            class="form-select">
+
+                                        <option value="">
+                                            Selecionar prestador
+                                        </option>
+                                    </select>
+
+                                    <span asp-validation-for="MaintenanceProviderId"
+                                          class="text-danger small">
+                                    </span>
+
+                                    <div class="form-text">
+                                        Podes deixar sem prestador e atribuir mais tarde.
+                                    </div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label asp-for="ManagerNotes"
+                                           class="form-label fw-semibold">
+
+                                        <i class="bi bi-journal-text me-1"></i>
+                                        Notas do gestor
+                                    </label>
+
+                                    <textarea asp-for="ManagerNotes"
+                                              class="form-control"
+                                              rows="4"
+                                              placeholder="Instruções adicionais para o prestador."></textarea>
+
+                                    <span asp-validation-for="ManagerNotes"
+                                          class="text-danger small">
+                                    </span>
+                                </div>
+
+                                <div class="alert alert-info d-flex gap-2">
+                                    <i class="bi bi-info-circle flex-shrink-0"></i>
+
+                                    <div>
+                                        Ao guardar, o reporte será marcado como
+                                        convertido em manutenção.
+                                    </div>
+                                </div>
+
+                                <div class="d-grid d-sm-flex
+                                    justify-content-sm-end gap-2">
+
+                                    <a asp-controller="MaintenanceReport"
+                                       asp-action="Details"
+                                       asp-route-id="@Model.MaintenanceReportId"
+                                       class="btn btn-outline-secondary">
+
+                                        Cancelar
+                                    </a>
+
+                                    <button type="submit"
+                                            class="btn btn-primary">
+
+                                        <i class="bi bi-check-lg me-1"></i>
+                                        Criar manutenção
+                                    </button>
+
+                                </div>
+
+                            </form>
+
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="col-12 col-lg-5">
+
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-body p-4">
+
+                            <h2 class="h5 fw-bold mb-4">
+                                <i class="bi bi-exclamation-triangle me-2"></i>
+                                Dados do reporte
+                            </h2>
+
+                            <div class="mb-3">
+                                <div class="text-muted small">
+                                    Problema
+                                </div>
+
+                                <div class="fw-semibold">
+                                    @Model.ReportTitle
+                                </div>
+                            </div>
+
+                            <hr />
+
+                            <div class="mb-3">
+                                <div class="text-muted small">
+                                    Propriedade
+                                </div>
+
+                                <div class="fw-semibold">
+                                    @Model.PropertyName
+                                </div>
+
+                                @if (!string.IsNullOrWhiteSpace(
+                                    Model.PropertyAddress))
+                                {
+                                    <div class="small text-muted mt-1">
+                                        @Model.PropertyAddress
+                                    </div>
+                                }
+                            </div>
+
+                            @if (!string.IsNullOrWhiteSpace(
+                                Model.ReportLocation))
+                            {
+                                <hr />
+
+                                <div class="mb-3">
+                                    <div class="text-muted small">
+                                        Local do problema
+                                    </div>
+
+                                    <div class="fw-semibold">
+                                        @Model.ReportLocation
+                                    </div>
+                                </div>
+                            }
+
+                            <hr />
+
+                            <div>
+                                <div class="text-muted small mb-2">
+                                    Descrição original
+                                </div>
+
+                                <div class="bg-light rounded p-3"
+                                     style="white-space: pre-line;">
+
+                                    @Model.ReportDescription
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body p-4">
+
+                            <h2 class="h6 fw-bold mb-3">
+                                <i class="bi bi-person me-2"></i>
+                                Reportado por
+                            </h2>
+
+                            <div class="fw-semibold">
+                                @Model.ReportedByName
+                            </div>
+
+                            <div class="small text-muted mt-1">
+                                @Model.ReportedAt.ToLocalTime().ToString("dd/MM/yyyy 'às' HH:mm")
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

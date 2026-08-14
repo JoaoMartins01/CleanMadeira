@@ -128,14 +128,14 @@
                         <tr>
                             <td>@maintenance.Title</td>
                             <td>@maintenance.Property.Name</td>
-                            <td>@maintenance.MaintenanceProvider.Name</td>
+                            <td>@maintenance.MaintenanceProvider?.Name</td>
                             <td>
                                 @maintenance.ScheduledDate.ToString("dd/MM/yyyy HH:mm")
                             </td>
                             <td>@maintenance.Priority</td>
                             <td>@maintenance.Status</td>
                             <td class="text-end">
-                                <a asp-controller=" Maintenance"
+                                <a asp-controller="Maintenance"
                                    asp-action="Edit"
                                    asp-route-id="@maintenance.Id"
                                    class="btn btn-sm btn-outline-primary"

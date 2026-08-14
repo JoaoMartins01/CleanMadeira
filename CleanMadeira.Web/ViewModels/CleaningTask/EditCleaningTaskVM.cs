@@ -18,6 +18,10 @@ public class EditCleaningTaskVM
     public TaskPriority Prioridade { get; set; }
 
     [Required]
+    [Display(Name = "Tipo de Serviço")]
+    public CleaningType? TipoServico { get; set; }
+
+    [Required]
     [Display(Name = "Estado")]
     public TaskStatus Status { get; set; }
 

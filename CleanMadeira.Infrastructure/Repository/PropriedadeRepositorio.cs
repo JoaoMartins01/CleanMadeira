@@ -1,9 +1,6 @@
 ﻿using CleanMadeira.Application.Common.Interfaces;
-using CleanMadeira.Domain.Entities;
 using CleanMadeira.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using SendGrid.Helpers.Mail;
 using Property = CleanMadeira.Domain.Entities.Property;
 
 public class PropertyRepository

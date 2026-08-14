@@ -5,6 +5,7 @@ using CleanMadeira.Web.ViewModels.CleaningTask;
 using CleanMadeira.Web.ViewModels.Propriedade;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Globalization;
 using System.Security.Claims;
 
@@ -15,6 +16,7 @@ public class PropriedadeController : Controller
     private readonly IPropertyService _propertyService;
     private readonly ICleaningTaskService _cleaningTaskService;
     private readonly IInventoryService _inventoryService;
+    private readonly ICompanyService _companyService;
     private readonly ICalendarIntegrationService _calendarIntegrationService;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly SignInManager<ApplicationUser> _signInManager;
@@ -22,12 +24,14 @@ public class PropriedadeController : Controller
     public PropriedadeController(IPropertyService propertyService,
         ICleaningTaskService cleaningTaskService,
         IInventoryService inventoryService,
+        ICompanyService companyService,
         ICalendarIntegrationService calendarIntegrationService,
         UserManager<ApplicationUser> userManager,
         SignInManager<ApplicationUser> signInManager)
     {
         _propertyService = propertyService;
         _cleaningTaskService = cleaningTaskService;
+        _companyService = companyService;
         _calendarIntegrationService = calendarIntegrationService;
         _userManager = userManager;
         _signInManager = signInManager;
@@ -65,6 +69,8 @@ public class PropriedadeController : Controller
         var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
         var property = await _propertyService.GetByIdAndOwnerAsync(id, userId);
+
+        
 
         if (property == null)
             return NotFound();
@@ -125,8 +131,15 @@ public class PropriedadeController : Controller
         return View(model);
     }
 
-    public IActionResult Create()
+    public async Task<IActionResult> CreateAsync()
     {
+        var companies = await _companyService.GetAllAsync();
+
+        ViewBag.Companies = new SelectList(
+            companies,
+            "Id",
+            "Name");
+
         return View(new PropriedadeVM());
     }
 
@@ -138,6 +151,43 @@ public class PropriedadeController : Controller
 
         var exists = await _propertyService.ExistsAsync(vm.Nome,
              user.Id);
+
+        var companies = await _companyService.GetAllAsync();
+
+        ViewBag.Companies = new SelectList(
+            companies,
+            "Id",
+            "Name");
+
+
+        double? latitude = null;
+        double? longitude = null;
+
+        if (!string.IsNullOrWhiteSpace(vm.Latitude))
+        {
+            if (double.TryParse(
+                vm.Latitude,
+                NumberStyles.Float,
+                CultureInfo.InvariantCulture,
+                out var lat))
+            {
+                latitude = lat;
+            }
+        }
+
+        if (!string.IsNullOrWhiteSpace(vm.Longitude))
+        {
+            if (double.TryParse(
+                vm.Longitude,
+                NumberStyles.Float,
+                CultureInfo.InvariantCulture,
+                out var lng))
+            {
+                longitude = lng;
+            }
+        }
+
+
 
         if (vm.Latitude == null || vm.Longitude == null)
         {
@@ -163,13 +213,14 @@ public class PropriedadeController : Controller
             PostalCode = vm.CodigoPostal,
             Address = vm.Endereco,
             Freguesia = vm.Freguesia,
-            Latitude = vm.Latitude,
-            Longitude = vm.Longitude,
+            Latitude = latitude,
+            Longitude = longitude,
             Rooms = vm.Quartos,
             Bathrooms = vm.CasasBanho,
             NumberGuests = vm.NumeroHospedes,
             Description = vm.Descricao,
             ApplicationUserId = user.Id,
+            CleaningCompanyId = vm.CleaningCompanyId,
             Active = true
         };
 
@@ -184,11 +235,15 @@ public class PropriedadeController : Controller
 
         var property = await _propertyService.GetByIdAndOwnerAsync(id, userId);
 
+        var companies = await _companyService.GetAllAsync();
+
+        ViewBag.Companies = new SelectList(
+            companies,
+            "Id",
+            "Name");
+
         if (property == null)
             return NotFound();
-
-
-
 
         var vm = new PropriedadeVM
         {
@@ -197,8 +252,10 @@ public class PropriedadeController : Controller
             Endereco = property.Address,
             Freguesia = property.Freguesia,
             CodigoPostal = property.PostalCode,
-            Latitude = property.Latitude,
-            Longitude = property.Longitude,
+            Latitude = property.Latitude?.ToString(
+            CultureInfo.InvariantCulture),
+            Longitude = property.Longitude?.ToString(
+            CultureInfo.InvariantCulture),
             CasasBanho = property.Bathrooms,
             Quartos = property.Rooms,
             NumeroHospedes = property.NumberGuests,
@@ -216,6 +273,30 @@ public class PropriedadeController : Controller
         if (id != vm.Id)
             return NotFound();
 
+        var companies = await _companyService.GetAllAsync();
+
+        ViewBag.Companies = new SelectList(
+            companies,
+            "Id",
+            "Name");
+
+        var latitude = ParseCoordinate(vm.Latitude);
+        var longitude = ParseCoordinate(vm.Longitude);
+
+        if (!string.IsNullOrWhiteSpace(vm.Latitude) && latitude == null)
+        {
+            ModelState.AddModelError(
+                nameof(vm.Latitude),
+                "Latitude inválida.");
+        }
+
+        if (!string.IsNullOrWhiteSpace(vm.Longitude) && longitude == null)
+        {
+            ModelState.AddModelError(
+                nameof(vm.Longitude),
+                "Longitude inválida.");
+        }
+
         if (!ModelState.IsValid)
             return View(vm);
 
@@ -230,8 +311,8 @@ public class PropriedadeController : Controller
         property.Address = vm.Endereco;
         property.Freguesia = vm.Freguesia;
         property.PostalCode = vm.CodigoPostal;
-        property.Latitude = vm.Latitude;
-        property.Longitude = vm.Longitude;
+        property.Latitude = latitude;
+        property.Longitude = longitude;
         property.Bathrooms = vm.CasasBanho;
         property.Rooms = vm.Quartos;
         property.NumberGuests = vm.NumeroHospedes;
@@ -349,5 +430,24 @@ public class PropriedadeController : Controller
         TempData["Success"] = "Propriedade reativada com sucesso.";
 
         return RedirectToAction(nameof(Inactive));
+    }
+
+    private double? ParseCoordinate(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return null;
+
+        value = value.Trim().Replace(",", ".");
+
+        if (double.TryParse(
+            value,
+            NumberStyles.Float,
+            CultureInfo.InvariantCulture,
+            out var result))
+        {
+            return result;
+        }
+
+        return null;
     }
 }

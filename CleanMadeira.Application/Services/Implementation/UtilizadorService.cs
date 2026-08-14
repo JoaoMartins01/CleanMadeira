@@ -16,7 +16,7 @@ public class UtilizadorService : IUtilizadorService
         return await _utilizadorRepository.GetAllAsync();
     }
 
-    public async Task<Utilizador?> GetByIdAsync(Guid id)
+    public async Task<Utilizador?> GetByIdAsync(Guid? id)
     {
         return await _utilizadorRepository.GetByIdAsync(id);
     }

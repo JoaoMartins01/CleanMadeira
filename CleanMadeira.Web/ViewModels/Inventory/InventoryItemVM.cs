@@ -8,7 +8,7 @@ public class InventoryItemVM
 
     [Required(ErrorMessage = "A propriedade é obrigatória.")]
     [Display(Name = "Propriedade")]
-    public Guid PropriedadeId { get; set; }
+    public Guid? PropriedadeId { get; set; }
     public string? PropriedadeNome { get; set; }
 
     [Required(ErrorMessage = "O nome do produto é obrigatório.")]
@@ -21,11 +21,11 @@ public class InventoryItemVM
 
     [Range(0, int.MaxValue)]
     [Display(Name = "Quantidade")]
-    public int Quantidade { get; set; }
+    public int? Quantidade { get; set; }
 
     [Range(0, int.MaxValue)]
     [Display(Name = "Quantidade Mínima")]
-    public int QuantidadeMinima { get; set; }
+    public int? QuantidadeMinima { get; set; }
 
     [Display(Name = "Ativo")]
     public bool Active { get; set; } = true;

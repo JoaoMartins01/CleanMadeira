@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CleanMadeira.Domain.Entities
+﻿namespace CleanMadeira.Domain.Entities
 {
     public class InventoryItem
     {
         public Guid Id { get; set; }
 
-        public Guid PropertyId { get; set; }
+        public Guid? PropertyId { get; set; }
 
         public Property Property { get; set; }
 
@@ -18,9 +12,9 @@ namespace CleanMadeira.Domain.Entities
 
         public string Unity { get; set; }
 
-        public int Quantity { get; set; }
+        public int? Quantity { get; set; }
 
-        public int MinimumQuantity { get; set; }
+        public int? MinimumQuantity { get; set; }
 
         public bool Active { get; set; }
 

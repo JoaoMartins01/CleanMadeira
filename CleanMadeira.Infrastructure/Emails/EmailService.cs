@@ -14,6 +14,54 @@ public class EmailService : IEmailService
         _configuration = configuration;
     }
 
+    /* public async Task SendEmailAsync(
+        string to,
+        string subject,
+        string body)
+     {
+         var senderEmail =
+             _configuration["EmailSettings:SenderEmail"];
+
+         var password =
+             _configuration["EmailSettings:Password"];
+
+         if (string.IsNullOrWhiteSpace(senderEmail))
+         {
+             throw new InvalidOperationException(
+                 "EmailSettings:SenderEmail não está configurado.");
+         }
+
+         if (string.IsNullOrWhiteSpace(password))
+         {
+             throw new InvalidOperationException(
+                 "EmailSettings:Password não está configurado.");
+         }
+
+         using var message = new MailMessage();
+
+         message.From = new MailAddress(
+             senderEmail,
+             "CleanMadeira");
+
+         message.To.Add(to);
+         message.Subject = subject;
+         message.Body = body;
+         message.IsBodyHtml = true;
+
+         using var smtpClient =
+             new SmtpClient("smtp.gmail.com", 587);
+
+         smtpClient.EnableSsl = true;
+         smtpClient.UseDefaultCredentials = false;
+
+         smtpClient.Credentials = new NetworkCredential(
+             senderEmail,
+             password);
+
+         await smtpClient.SendMailAsync(message);
+     }*/
+
+
     public async Task SendEmailAsync(
         string to,
         string subject,
@@ -72,7 +120,7 @@ public class EmailService : IEmailService
 
         var safeLink = WebUtility.HtmlEncode(confirmationLink);
 
-        var roleContent = user.Role == UserRole.Limpador
+        var roleContent = user.Role == UserRole.Limpador || user.Role == UserRole.GestorELimpador
             ? """
           <li>📅 Consultar as limpezas que lhe forem atribuídas</li>
           <li>🏠 Ver os detalhes das propriedades</li>
@@ -229,11 +277,11 @@ public class EmailService : IEmailService
 
         var safeLink = WebUtility.HtmlEncode(loginLink);
 
-        var title = user.Role == UserRole.Limpador
+        var title = user.Role == UserRole.Limpador || user.Role == UserRole.GestorELimpador
             ? "A sua área de trabalho está pronta"
             : "A gestão dos seus alojamentos começa aqui";
 
-        var description = user.Role == UserRole.Limpador
+        var description = user.Role == UserRole.Limpador || user.Role == UserRole.GestorELimpador
             ? """
           Já pode consultar as limpezas que lhe forem atribuídas,
           verificar os detalhes das propriedades e atualizar o progresso
@@ -264,6 +312,7 @@ public class EmailService : IEmailService
                     <table role="presentation"
                            width="100%"
                            cellpadding="0"
+
                            cellspacing="0"
                            style="
                                max-width:600px;
@@ -543,7 +592,7 @@ public class EmailService : IEmailService
             property.Name ?? "Propriedade");
 
         var safeAddress = System.Net.WebUtility.HtmlEncode(
-            property.Address?? "Morada não indicada");
+            property.Address ?? "Morada não indicada");
 
         var safePriority = System.Net.WebUtility.HtmlEncode(
             task.Priority.ToString());

@@ -5,7 +5,6 @@ using CleanMadeira.Application.Services.Interface;
 using CleanMadeira.Domain.Entities;
 using CleanMadeira.Domain.Entities.Enums;
 using Ical.Net.CalendarComponents;
-using Ical.Net.DataTypes;
 using Microsoft.Extensions.Configuration;
 using IcalCalendar = Ical.Net.Calendar;
 
@@ -30,7 +29,7 @@ public class CalendarSyncService : ICalendarSyncService
     private readonly IEmailService
         _emailService;
 
-    private readonly IConfiguration 
+    private readonly IConfiguration
         _configuration;
 
     public CalendarSyncService(
@@ -421,7 +420,7 @@ public class CalendarSyncService : ICalendarSyncService
 
         var nomeUtilizador =
             propriedade.ApplicationUser?.PrimeiroNome ?? "utilizador";
-        
+
         var nomePropriedade =
             propriedade.Name ?? "Propriedade";
 

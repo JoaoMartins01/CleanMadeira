@@ -4,8 +4,6 @@ using CleanMadeira.Domain.Entities.Enums;
 //using CleanMadeira.Domain.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using WhiteLagoon.Domain.Entities;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace CleanMadeira.Infrastructure.Data;
 
@@ -18,11 +16,7 @@ public static class DbInitializer
     {
         await context.Database.MigrateAsync();
 
-       // await SeedRolesAsync(roleManager);
-
-        var company = await SeedCompanyAsync(context);
-
-        await SeedAdminUserAsync(userManager, company.Id);
+        await SeedRolesAsync(roleManager);
 
         await context.SaveChangesAsync();
     }
@@ -53,8 +47,8 @@ public static class DbInitializer
         }
     }
 
-   private static async Task<Company> SeedCompanyAsync(
-        ApplicationDbContext context)
+    /*private static async Task<Company> SeedCompanyAsync(
+         ApplicationDbContext context)
     {
         var company = await context.Companies
             .FirstOrDefaultAsync(x => x.Name == "CleanMadeira Demo");
@@ -68,7 +62,7 @@ public static class DbInitializer
             Name = "CleanMadeira Demo",
             Nif = "000000000",
             Email = "demo@cleanmadeira.pt",
-            PhoneNumber= "900000000",
+            PhoneNumber = "900000000",
             Active = true,
             CreatedAt = DateTime.UtcNow
         };
@@ -78,11 +72,10 @@ public static class DbInitializer
         await context.SaveChangesAsync();
 
         return company;
-    }
+    }*/
 
-    private static async Task SeedAdminUserAsync(
-        UserManager<ApplicationUser> userManager,
-        Guid companyId)
+    public static async Task SeedAdminUserAsync(
+        UserManager<ApplicationUser> userManager)
     {
         var email = "admin@cleanmadeira.pt";
 

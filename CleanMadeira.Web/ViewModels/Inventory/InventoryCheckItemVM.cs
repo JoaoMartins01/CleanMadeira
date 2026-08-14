@@ -6,9 +6,9 @@
 
         public string Nome { get; set; } = string.Empty;
 
-        public int QuantidadeAtual { get; set; }
+        public int? QuantidadeAtual { get; set; }
 
-        public int QuantidadeMinima { get; set; }
+        public int? QuantidadeMinima { get; set; }
 
         public string Unidade { get; set; } = string.Empty;
 

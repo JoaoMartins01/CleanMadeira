@@ -1,0 +1,298 @@
+﻿@using CleanMadeira.Domain.Entities.Enums
+@model CleanMadeira.Web.ViewModels.Maintenance.MaintenanceReportVM
+
+@{
+    ViewData["Title"] = "Reportar problema";
+}
+
+<div class="container py-4">
+
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-8 col-xl-7">
+
+            <div class="mb-4">
+                <a asp-controller="CleaningTask"
+                   asp-action="Details"
+                   asp-route-id="@Model.CleaningTaskId"
+                   class="text-decoration-none">
+
+                    <i class="bi bi-arrow-left me-1"></i>
+                    Voltar à tarefa
+                </a>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4 p-md-5">
+
+                    <div class="text-center mb-4">
+                        <div class="mb-3">
+                            <span class="d-inline-flex align-items-center
+                                justify-content-center rounded-circle
+                                bg-warning-subtle text-warning"
+                                  style="width: 64px; height: 64px;">
+
+                                <i class="bi bi-exclamation-triangle fs-2"></i>
+                            </span>
+                        </div>
+
+                        <h1 class="h3 fw-bold mb-2">
+                            Reportar problema
+                        </h1>
+
+                        <p class="text-muted mb-0">
+                            Regista um problema encontrado durante a limpeza.
+                            O gestor irá analisar a ocorrência.
+                        </p>
+                    </div>
+
+                    @if (!string.IsNullOrWhiteSpace(Model.PropertyName))
+                    {
+                        <div class="alert alert-light border mb-4">
+                            <div class="d-flex align-items-start gap-3">
+
+                                <i class="bi bi-house-door fs-4 text-primary"></i>
+
+                                <div>
+                                    <div class="small text-muted">
+                                        Propriedade
+                                    </div>
+
+                                    <div class="fw-semibold">
+                                        @Model.PropertyName
+                                    </div>
+
+                                    @if (!string.IsNullOrWhiteSpace(Model.PropertyAddress))
+                                    {
+                                        <div class="small text-muted mt-1">
+                                            @Model.PropertyAddress
+                                        </div>
+                                    }
+                                </div>
+
+                            </div>
+                        </div>
+                    }
+
+                    <form asp-controller="MaintenanceReport"
+                          asp-action="ReportProblem"
+                          method="post"
+                          enctype="multipart/form-data">
+
+                        @Html.AntiForgeryToken()
+
+                        <input asp-for="CleaningTaskId" type="hidden" />
+                        <input asp-for="PropertyId" type="hidden" />
+
+                        <div asp-validation-summary="ModelOnly"
+                             class="alert alert-danger">
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Title"
+                                   class="form-label fw-semibold">
+
+                                <i class="bi bi-card-heading me-1"></i>
+                                Título do problema
+                            </label>
+
+                            <input asp-for="Title"
+                                   class="form-control"
+                                   placeholder="Ex.: Fuga de água na casa de banho" />
+
+                            <span asp-validation-for="Title"
+                                  class="text-danger small">
+                            </span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Location"
+                                   class="form-label fw-semibold">
+
+                                <i class="bi bi-geo-alt me-1"></i>
+                                Local do problema
+                            </label>
+
+                            <input asp-for="Location"
+                                   class="form-control"
+                                   placeholder="Ex.: Casa de banho principal" />
+
+                            <span asp-validation-for="Location"
+                                  class="text-danger small">
+                            </span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Description"
+                                   class="form-label fw-semibold">
+
+                                <i class="bi bi-text-paragraph me-1"></i>
+                                Descrição
+                            </label>
+
+                            <textarea asp-for="Description"
+                                      class="form-control"
+                                      rows="5"
+                                      placeholder="Descreve o problema com o máximo de detalhe possível."></textarea>
+
+                            <span asp-validation-for="Description"
+                                  class="text-danger small">
+                            </span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Priority"
+                                   class="form-label fw-semibold">
+
+                                <i class="bi bi-flag me-1"></i>
+                                Prioridade
+                            </label>
+
+                            <select asp-for="Priority"
+                                    class="form-select">
+
+                                <option value="">
+                                    Selecionar prioridade
+                                </option>
+
+                                <option value="@MaintenancePriority.Baixa">
+                                    Baixa
+                                </option>
+
+                                <option value="@MaintenancePriority.Media">
+                                    Media
+                                </option>
+
+                                <option value="@MaintenancePriority.Alta">
+                                    Alta
+                                </option>
+
+                                <option value="@MaintenancePriority.Urgente">
+                                    Urgente
+                                </option>
+                            </select>
+
+                            <span asp-validation-for="Priority"
+                                  class="text-danger small">
+                            </span>
+
+                            <div class="form-text">
+                                Usa “Urgente” apenas quando o problema precisar
+                                de atenção imediata.
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Photos"
+                                   class="form-label fw-semibold">
+
+                                <i class="bi bi-camera me-1"></i>
+                                Fotografias
+                            </label>
+
+                            <input asp-for="Photos"
+                                   type="file"
+                                   class="form-control"
+                                   accept="image/jpeg,image/png,image/webp"
+                                   multiple />
+
+                            <span asp-validation-for="Photos"
+                                  class="text-danger small">
+                            </span>
+
+                            <div class="form-text">
+                                Podes adicionar várias fotografias do problema.
+                            </div>
+                        </div>
+
+                        <div id="photoPreview"
+                             class="row g-2 mb-4">
+                        </div>
+
+                        <div class="alert alert-info d-flex gap-2"
+                             role="alert">
+
+                            <i class="bi bi-info-circle flex-shrink-0"></i>
+
+                            <div>
+                                Este reporte será enviado ao gestor para análise.
+                                Não será criado automaticamente um pedido para um
+                                prestador de manutenção.
+                            </div>
+                        </div>
+
+                        <div class="d-grid d-sm-flex gap-2 justify-content-sm-end">
+
+                            <a asp-controller="CleaningTask"
+                               asp-action="Details"
+                               asp-route-id="@Model.CleaningTaskId"
+                               class="btn btn-outline-secondary">
+
+                                Cancelar
+                            </a>
+
+                            <button type="submit"
+                                    class="btn btn-warning">
+
+                                <i class="bi bi-send me-1"></i>
+                                Enviar reporte
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const photoInput = document.getElementById("Photos");
+            const previewContainer =
+                document.getElementById("photoPreview");
+
+            if (!photoInput || !previewContainer) {
+                return;
+            }
+
+            photoInput.addEventListener("change", function() {
+                previewContainer.innerHTML = "";
+
+                const files = Array.from(this.files);
+
+                files.forEach(file => {
+                    if (!file.type.startsWith("image/")) {
+                        return;
+                    }
+
+                    const reader = new FileReader();
+
+                    reader.onload = function(event) {
+                        const column = document.createElement("div");
+                        column.className = "col-4 col-md-3";
+
+                        const image = document.createElement("img");
+                        image.src = event.target.result;
+                        image.alt = "Pré-visualização";
+                        image.className =
+                            "img-fluid rounded border w-100";
+                        image.style.height = "110px";
+                        image.style.objectFit = "cover";
+
+                        column.appendChild(image);
+                        previewContainer.appendChild(column);
+                    };
+
+                    reader.readAsDataURL(file);
+                });
+            });
+        });
+    </script>
+}

@@ -26,6 +26,8 @@ public class ApplicationUser : IdentityUser<Guid>
     // Navegação
     public OwnerType Type { get; set; }
 
+    public Guid? CompanyId { get; set; }
+
     public String? CompanyName { get; set; }
 
     public ICollection<CleaningTask> CleaningTasks { get; set; }

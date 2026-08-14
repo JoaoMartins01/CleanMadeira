@@ -23,8 +23,8 @@ public class UtilizadorController : Controller
         if (loggedUser == null)
             return RedirectToAction("Login", "Account");
 
-       var users = await _userManager.Users
-            .ToListAsync();
+        var users = await _userManager.Users
+             .ToListAsync();
 
         var vm = users.Select(u => new UtilizadorVM
         {
@@ -40,70 +40,70 @@ public class UtilizadorController : Controller
         return View(vm);
     }
 
- /*   public IActionResult Create()
-    {
-        return View(new CreateUserViewModel());
-    }
+    /*   public IActionResult Create()
+       {
+           return View(new CreateUserViewModel());
+       }
 
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(CreateUserViewModel vm)
-    {
-        if (!ModelState.IsValid)
-            return View(vm);
+       [HttpPost]
+       [ValidateAntiForgeryToken]
+       public async Task<IActionResult> Create(CreateUserViewModel vm)
+       {
+           if (!ModelState.IsValid)
+               return View(vm);
 
-        var loggedUser = await _userManager.GetUserAsync(User);
+           var loggedUser = await _userManager.GetUserAsync(User);
 
-        if (loggedUser == null)
-            return RedirectToAction("Login", "Account");
+           if (loggedUser == null)
+               return RedirectToAction("Login", "Account");
 
-        var user = new ApplicationUser
-        {
-            Id = Guid.NewGuid(),
-            UserName = vm.Email,
-            Email = vm.Email,
-            PrimeiroNome = vm.FirstName,
-            UltimoNome = vm.LastName,
-            PhoneNumber = vm.Phone,
-            Role = vm.Role,
-            Ativo = true,
-            CreatedAt = DateTime.UtcNow,
-            //OwnerId = loggedUser.Id
-        };
+           var user = new ApplicationUser
+           {
+               Id = Guid.NewGuid(),
+               UserName = vm.Email,
+               Email = vm.Email,
+               PrimeiroNome = vm.FirstName,
+               UltimoNome = vm.LastName,
+               PhoneNumber = vm.Phone,
+               Role = vm.Role,
+               Ativo = true,
+               CreatedAt = DateTime.UtcNow,
+               //OwnerId = loggedUser.Id
+           };
 
-        var result = await _userManager.CreateAsync(user, vm.Password);
+           var result = await _userManager.CreateAsync(user, vm.Password);
 
-        if (!result.Succeeded)
-        {
-            foreach (var error in result.Errors)
-                ModelState.AddModelError("", error.Description);
+           if (!result.Succeeded)
+           {
+               foreach (var error in result.Errors)
+                   ModelState.AddModelError("", error.Description);
 
-            return View(vm);
-        }
+               return View(vm);
+           }
 
-        return RedirectToAction(nameof(Index));
-    }
+           return RedirectToAction(nameof(Index));
+       }
 
-    public async Task<IActionResult> Details(Guid id)
-    {
-        var user = await _userManager.FindByIdAsync(id.ToString());
+       public async Task<IActionResult> Details(Guid id)
+       {
+           var user = await _userManager.FindByIdAsync(id.ToString());
 
-        if (user == null)
-            return NotFound();
+           if (user == null)
+               return NotFound();
 
-        var vm = new UtilizadorVM
-        {
-            Id = user.Id,
-            PrimeiroNome = user.PrimeiroNome,
-            UltimoNome = user.UltimoNome,
-            Email = user.Email ?? "",
-            Telemovel = user.PhoneNumber,
-            Role = user.Role,
-            Ativo = user.Ativo
-        };
+           var vm = new UtilizadorVM
+           {
+               Id = user.Id,
+               PrimeiroNome = user.PrimeiroNome,
+               UltimoNome = user.UltimoNome,
+               Email = user.Email ?? "",
+               Telemovel = user.PhoneNumber,
+               Role = user.Role,
+               Ativo = user.Ativo
+           };
 
-        return View(vm);
-    }*/
+           return View(vm);
+       }*/
 
     public async Task<IActionResult> Edit(Guid id)
     {

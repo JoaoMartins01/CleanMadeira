@@ -1,6 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
-using CleanMadeira.Application.Common.Interfaces;
+﻿using CleanMadeira.Application.Common.Interfaces;
 using CleanMadeira.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 
 
 public class Repository<T> : IRepository<T>
@@ -17,7 +17,7 @@ public class Repository<T> : IRepository<T>
         _dbSet = context.Set<T>();
     }
 
-    public virtual async Task<T?> GetByIdAsync(Guid id)
+    public virtual async Task<T?> GetByIdAsync(Guid? id)
     {
         return await _dbSet.FindAsync(id);
     }

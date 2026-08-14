@@ -1,12 +1,4 @@
-﻿using CleanMadeira.Application.Common.Interfaces;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
-using CleanMadeira.Domain.Entities;
+﻿using CleanMadeira.Domain.Entities;
 
 namespace CleanMadeira.Application.Common.Interfaces
 {

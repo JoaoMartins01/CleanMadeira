@@ -1,5 +1,4 @@
 ﻿using CleanMadeira.Application.Common.Interfaces;
-using CleanMadeira.Application.Services.Interface;
 using CleanMadeira.Domain.Entities;
 
 public interface ICompanyService : IService<Company>
@@ -19,7 +18,7 @@ public class CompanyService : ICompanyService
         return await _companyRepository.GetAllAsync();
     }
 
-    public async Task<Company?> GetByIdAsync(Guid id)
+    public async Task<Company?> GetByIdAsync(Guid? id)
     {
         return await _companyRepository.GetByIdAsync(id);
     }

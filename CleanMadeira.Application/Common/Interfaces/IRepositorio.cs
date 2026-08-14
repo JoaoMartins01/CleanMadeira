@@ -1,8 +1,8 @@
 ﻿namespace CleanMadeira.Application.Common.Interfaces
 {
-    public interface IRepository<T> 
+    public interface IRepository<T>
     {
-        Task<T?> GetByIdAsync(Guid id);
+        Task<T?> GetByIdAsync(Guid? id);
 
         Task<IEnumerable<T>> GetAllAsync();
 

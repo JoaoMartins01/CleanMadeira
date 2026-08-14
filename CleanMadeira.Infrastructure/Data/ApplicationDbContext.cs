@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using WhiteLagoon.Domain.Entities;
 
 namespace CleanMadeira.Infrastructure.Data;
+
 public class ApplicationDbContext
     : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
 {
@@ -37,6 +38,8 @@ public class ApplicationDbContext
     public DbSet<Maintenance> Maintenances { get; set; }
 
     public DbSet<MaintenanceProvider> MaintenanceProviders { get; set; }
+
+    public DbSet<MaintenanceReport> MaintenanceReports { get; set; }
 
     //public DbSet<Notification> Notifications { get; set; }
 
@@ -75,6 +78,12 @@ public class ApplicationDbContext
             .WithOne(i => i.Property)
             .HasForeignKey(i => i.PropertyId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Entity<Property>()
+        .HasOne(p => p.CleaningCompany)
+        .WithMany(c => c.Properties)
+        .HasForeignKey(p => p.CleaningCompanyId)
+        .OnDelete(DeleteBehavior.SetNull);
 
         builder.Entity<Property>()
             .Property(p => p.Latitude)
@@ -147,11 +156,11 @@ public class ApplicationDbContext
                 .WithMany()
                 .HasForeignKey(m => m.AssignedUserId)
                 .OnDelete(DeleteBehavior.SetNull);
-            
-           entity.HasOne(x => x.MaintenanceProvider)
-                .WithMany()
-                .HasForeignKey(x => x.MaintenanceProviderId)
-                .OnDelete(DeleteBehavior.SetNull);
+
+            entity.HasOne(x => x.MaintenanceProvider)
+                 .WithMany()
+                 .HasForeignKey(x => x.MaintenanceProviderId)
+                 .OnDelete(DeleteBehavior.SetNull);
         });
 
 
@@ -177,6 +186,30 @@ public class ApplicationDbContext
                   .HasForeignKey(x => x.OwnerId)
                   .OnDelete(DeleteBehavior.Restrict);
         });
+
+        builder.Entity<MaintenanceReport>()
+            .HasOne(x => x.CleaningTask)
+            .WithMany()
+            .HasForeignKey(x => x.CleaningTaskId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<MaintenanceReport>()
+            .HasOne(x => x.Property)
+            .WithMany()
+            .HasForeignKey(x => x.PropertyId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<MaintenanceReport>()
+            .HasOne(x => x.ReportedByUser)
+            .WithMany()
+            .HasForeignKey(x => x.ReportedByUserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<MaintenanceReport>()
+            .HasOne(x => x.Maintenance)
+            .WithOne()
+            .HasForeignKey<MaintenanceReport>(x => x.MaintenanceId)
+            .OnDelete(DeleteBehavior.SetNull);
         /* builder.Entity<Property>()
              .HasMany(p => p.Reservations)
              .WithOne(r => r.Property)

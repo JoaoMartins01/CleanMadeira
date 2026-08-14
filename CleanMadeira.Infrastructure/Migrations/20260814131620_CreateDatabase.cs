@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace CleanMadeira.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class CreateDatabase : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -53,6 +53,9 @@ namespace CleanMadeira.Infrastructure.Migrations
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Adress = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Phone = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Type = table.Column<int>(type: "int", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
                     Active = table.Column<bool>(type: "bit", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
@@ -129,8 +132,8 @@ namespace CleanMadeira.Infrastructure.Migrations
                     Active = table.Column<bool>(type: "bit", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Type = table.Column<int>(type: "int", nullable: false),
-                    CompanyName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CompanyId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CompanyName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -277,11 +280,12 @@ namespace CleanMadeira.Infrastructure.Migrations
                     Freguesia = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Latitude = table.Column<double>(type: "float(18)", precision: 18, scale: 6, nullable: true),
                     Longitude = table.Column<double>(type: "float(18)", precision: 18, scale: 6, nullable: true),
-                    Rooms = table.Column<int>(type: "int", nullable: false),
-                    Bathrooms = table.Column<int>(type: "int", nullable: false),
+                    Rooms = table.Column<int>(type: "int", nullable: true),
+                    Bathrooms = table.Column<int>(type: "int", nullable: true),
                     NumberGuests = table.Column<int>(type: "int", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CompanyId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CleaningCompanyId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CleanerId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     Active = table.Column<bool>(type: "bit", nullable: false),
                     DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
@@ -295,10 +299,16 @@ namespace CleanMadeira.Infrastructure.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Properties_Companies_CompanyId",
-                        column: x => x.CompanyId,
-                        principalTable: "Companies",
+                        name: "FK_Properties_AspNetUsers_CleanerId",
+                        column: x => x.CleanerId,
+                        principalTable: "AspNetUsers",
                         principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Properties_Companies_CleaningCompanyId",
+                        column: x => x.CleaningCompanyId,
+                        principalTable: "Companies",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
                 });
 
             migrationBuilder.CreateTable(
@@ -330,6 +340,7 @@ namespace CleanMadeira.Infrastructure.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     PropertyId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     AssignedUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CleaningCompanyId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     ScheduledDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     StartedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     CompletedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -340,7 +351,8 @@ namespace CleanMadeira.Infrastructure.Migrations
                     EstimatedMinutes = table.Column<int>(type: "int", nullable: false),
                     StartTime = table.Column<DateTime>(type: "datetime2", nullable: true),
                     EndTime = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    ActualMinutes = table.Column<int>(type: "int", nullable: true)
+                    ActualMinutes = table.Column<int>(type: "int", nullable: true),
+                    CleaningType = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -351,6 +363,11 @@ namespace CleanMadeira.Infrastructure.Migrations
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.SetNull);
+                    table.ForeignKey(
+                        name: "FK_CleaningTasks_Companies_CleaningCompanyId",
+                        column: x => x.CleaningCompanyId,
+                        principalTable: "Companies",
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_CleaningTasks_Properties_PropertyId",
                         column: x => x.PropertyId,
@@ -367,8 +384,8 @@ namespace CleanMadeira.Infrastructure.Migrations
                     PropertyId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Unity = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Quantity = table.Column<int>(type: "int", nullable: false),
-                    MinimumQuantity = table.Column<int>(type: "int", nullable: false),
+                    Quantity = table.Column<int>(type: "int", nullable: true),
+                    MinimumQuantity = table.Column<int>(type: "int", nullable: true),
                     Active = table.Column<bool>(type: "bit", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
@@ -500,6 +517,50 @@ namespace CleanMadeira.Infrastructure.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "MaintenanceReports",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CleaningTaskId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    PropertyId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    ReportedByUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    MaintenanceId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Priority = table.Column<int>(type: "int", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    ReportedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MaintenanceReports", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_MaintenanceReports_AspNetUsers_ReportedByUserId",
+                        column: x => x.ReportedByUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_MaintenanceReports_CleaningTasks_CleaningTaskId",
+                        column: x => x.CleaningTaskId,
+                        principalTable: "CleaningTasks",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_MaintenanceReports_Maintenances_MaintenanceId",
+                        column: x => x.MaintenanceId,
+                        principalTable: "Maintenances",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
+                    table.ForeignKey(
+                        name: "FK_MaintenanceReports_Properties_PropertyId",
+                        column: x => x.PropertyId,
+                        principalTable: "Properties",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -560,6 +621,11 @@ namespace CleanMadeira.Infrastructure.Migrations
                 column: "AssignedUserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_CleaningTasks_CleaningCompanyId",
+                table: "CleaningTasks",
+                column: "CleaningCompanyId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_CleaningTasks_PropertyId",
                 table: "CleaningTasks",
                 column: "PropertyId");
@@ -573,6 +639,28 @@ namespace CleanMadeira.Infrastructure.Migrations
                 name: "IX_MaintenanceProviders_OwnerId",
                 table: "MaintenanceProviders",
                 column: "OwnerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MaintenanceReports_CleaningTaskId",
+                table: "MaintenanceReports",
+                column: "CleaningTaskId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MaintenanceReports_MaintenanceId",
+                table: "MaintenanceReports",
+                column: "MaintenanceId",
+                unique: true,
+                filter: "[MaintenanceId] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MaintenanceReports_PropertyId",
+                table: "MaintenanceReports",
+                column: "PropertyId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MaintenanceReports_ReportedByUserId",
+                table: "MaintenanceReports",
+                column: "ReportedByUserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Maintenances_AssignedUserId",
@@ -595,9 +683,14 @@ namespace CleanMadeira.Infrastructure.Migrations
                 column: "ApplicationUserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Properties_CompanyId",
+                name: "IX_Properties_CleanerId",
                 table: "Properties",
-                column: "CompanyId");
+                column: "CleanerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Properties_CleaningCompanyId",
+                table: "Properties",
+                column: "CleaningCompanyId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Reservations_CalendarIntegrationId_ExternalUid",
@@ -652,7 +745,7 @@ namespace CleanMadeira.Infrastructure.Migrations
                 name: "InventoryItems");
 
             migrationBuilder.DropTable(
-                name: "Maintenances");
+                name: "MaintenanceReports");
 
             migrationBuilder.DropTable(
                 name: "Reservations");
@@ -667,13 +760,16 @@ namespace CleanMadeira.Infrastructure.Migrations
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "MaintenanceProviders");
+                name: "Maintenances");
 
             migrationBuilder.DropTable(
                 name: "CalendarIntegrations");
 
             migrationBuilder.DropTable(
                 name: "CleaningTasks");
+
+            migrationBuilder.DropTable(
+                name: "MaintenanceProviders");
 
             migrationBuilder.DropTable(
                 name: "Properties");

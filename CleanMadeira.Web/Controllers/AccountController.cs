@@ -1,5 +1,4 @@
-﻿using AspNetCoreGeneratedDocument;
-using CleanMadeira.Application.Contract;
+﻿using CleanMadeira.Application.Contract;
 using CleanMadeira.Application.Services.Interface;
 using CleanMadeira.Domain.Entities;
 using CleanMadeira.Domain.Entities.Enums;
@@ -8,7 +7,6 @@ using CleanMadeira.Web.ViewModels.Account;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CleanMadeira.Web.Controllers;
 
@@ -151,9 +149,9 @@ public class AccountController : Controller
                 },
                 protocol: Request.Scheme);
 
-                await _emailService.SendConfirmationEmailAsync(
-                    user,
-                    confirmationLink);
+            await _emailService.SendConfirmationEmailAsync(
+                user,
+                confirmationLink);
 
             return RedirectToAction(nameof(RegisterConfirmation));
         }

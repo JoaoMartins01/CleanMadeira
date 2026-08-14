@@ -24,6 +24,6 @@ public class DashboardVM
     public List<CleaningTaskVM> UpcomingTasks { get; set; }
         = new();
 
-    public List<InventoryItem> LowStockItems { get; set; }
+    public List<InventoryItemVM> LowStockItems { get; set; }
         = new();
 }

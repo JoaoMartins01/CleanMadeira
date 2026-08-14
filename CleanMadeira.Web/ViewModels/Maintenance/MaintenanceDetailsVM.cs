@@ -1,4 +1,5 @@
 ﻿using CleanMadeira.Domain.Entities.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace CleanMadeira.Web.ViewModels.Maintenance;
 
@@ -6,7 +7,7 @@ public class MaintenanceDetailsVM
 {
     public Guid Id { get; set; }
 
-    public Guid PropertyId { get; set; }
+    public Guid? PropertyId { get; set; }
 
     public Guid? AssignedUserId { get; set; }
 

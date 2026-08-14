@@ -9,7 +9,17 @@
         ? $"{currentUser.PrimeiroNome} {currentUser.UltimoNome}"
         : "Utilizador";
 
+    var isOwner = currentUser?.Role == UserRole.Dono;
     var isCleaner = currentUser?.Role == UserRole.Limpador;
+    var isCleanerAndManager = currentUser?.Role == UserRole.GestorELimpador;
+
+    var currentController =
+        ViewContext.RouteData.Values["controller"]?.ToString();
+
+    var maintenanceMenuOpen =
+        currentController == "Maintenance" ||
+        currentController == "MaintenanceReport" ||
+        currentController == "MaintenanceProvider";
 }
 
 <!DOCTYPE html>
@@ -28,6 +38,8 @@
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
           rel="stylesheet" />
+    
+    <link rel="icon" type="image/png" href="~/images/favicon.png" />
 
     <link rel="stylesheet" href="~/css/site.css" />
     <link rel="stylesheet" href="~/css/layout.css" asp-append-version="true" />
@@ -56,7 +68,32 @@
                         <span>Minhas Limpezas</span>
                     </a>
                 }
-                else
+
+                @if (isCleanerAndManager)
+                {
+                    <a asp-controller="CleaningTask"
+                       asp-action="MyTasks"
+                       class="sidebar-link">
+                        <i class="bi bi-check2-square"></i>
+                        <span>Minhas Limpezas</span>
+                    </a>
+
+                    <a asp-controller="CleaningTask"
+                       asp-action="Index"
+                       class="sidebar-link">
+                        <i class="bi bi-calendar-check"></i>
+                        <span>Limpezas</span>
+                    </a>
+
+                    <a asp-controller="Team"
+                       asp-action="Index"
+                       class="sidebar-link">
+                        <i class="bi bi-check2-square"></i>
+                        <span>Equipa</span>
+                    </a>
+                }
+
+                @if(isOwner)
                 {
                     <a asp-controller="Dashboard"
                        asp-action="Index"
@@ -79,19 +116,87 @@
                         <span>Limpezas</span>
                     </a>
 
+                    <a class="nav-link d-flex justify-content-between align-items-center">
                     <a asp-controller="Inventory"
                        asp-action="Index"
                        class="sidebar-link">
                         <i class="bi bi-box-seam"></i>
                         <span>Inventário</span>
                     </a>
-
-                    <a asp-controller="Maintenance"
-                       asp-action="Index"
-                       class="sidebar-link">
-                        <i class="bi bi-tools"></i>
-                        <span>Manutenção</span>
                     </a>
+                        <button type="button"
+                                class="nav-link maintenance-menu-toggle
+                            @(maintenanceMenuOpen ? "active" : "")"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#maintenanceSubmenu"
+                                aria-expanded="@maintenanceMenuOpen.ToString().ToLower()"
+                                aria-controls="maintenanceSubmenu">
+
+                            <span class="d-flex align-items-center">
+                                <i class="bi bi-tools nav-icon"></i>
+                                <span>Manutenções</span>
+                            </span>
+
+                            <i class="bi bi-chevron-down maintenance-chevron"></i>
+                        </button>
+
+                        <div id="maintenanceSubmenu"
+                             class="collapse @(maintenanceMenuOpen ? "show" : "")">
+
+                            <div class="maintenance-submenu">
+
+                                <a asp-controller="MaintenanceReport"
+                                   asp-action="Index"
+                                   class="maintenance-submenu-link
+                                    @(currentController == "MaintenanceReport"
+                                       ? "active"
+                                       : "")">
+
+                                    <i class="bi bi-exclamation-triangle"></i>
+                                    <span>Reportes</span>
+                                </a>
+
+                                <a asp-controller="Maintenance"
+                                   asp-action="Index"
+                                   class="maintenance-submenu-link
+                                    @(currentController == "Maintenance"
+                                       ? "active"
+                                       : "")">
+
+                                    <i class="bi bi-wrench-adjustable"></i>
+                                    <span>Manutenções</span>
+                                </a>
+
+                                <a asp-controller="MaintenanceProvider"
+                                   asp-action="Index"
+                                   class="maintenance-submenu-link
+                                    @(currentController == "MaintenanceProvider"
+                                       ? "active"
+                                       : "")">
+
+                                    <i class="bi bi-person-workspace"></i>
+                                    <span>Prestadores</span>
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                    
+                }
+
+                @if (User.IsInRole("Admin"))
+                {
+                    <li class="nav-item">
+                        <a asp-controller="AdminCompany"
+                           asp-action="Index"
+                           class="nav-link">
+
+                            <i class="bi bi-building-check me-2"></i>
+                            Empresas pendentes
+
+                        </a>
+                    </li>
                 }
 
             </nav>

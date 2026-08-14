@@ -1,5 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
-using CleanMadeira.Domain.Entities.Enums;
+﻿using CleanMadeira.Domain.Entities.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace CleanMadeira.Web.ViewModels.CleaningTask;
 
@@ -40,6 +40,9 @@ public class CleaningTaskVM
 
     [Display(Name = "Prioridade")]
     public TaskPriority Prioridade { get; set; }
+
+    [Display(Name = "Tipo de Serviço")]
+    public CleaningType? TipoServico { get; set; }
 
     [Display(Name = "Duração Estimada (min)")]
     public int EstimatedMinutes { get; set; }

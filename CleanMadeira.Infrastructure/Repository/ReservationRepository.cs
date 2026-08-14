@@ -1,13 +1,7 @@
 ﻿using CleanMadeira.Application.Common.Interfaces;
-using CleanMadeira.Application.Services.Implementation;
 using CleanMadeira.Domain.Entities;
 using CleanMadeira.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CleanMadeira.Infrastructure.Repository
 {

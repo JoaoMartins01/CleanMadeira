@@ -191,6 +191,16 @@
                                       class="text-danger">
                                 </span>
                             </div>
+
+                            <div class="mb-3">
+                                <label asp-for="CleaningCompanyId" class="form-label"></label>
+
+                                <select asp-for="CleaningCompanyId"
+                                        asp-items="ViewBag.Companies"
+                                        class="form-select">
+                                    <option value="">Selecione a empresa de limpeza</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -715,12 +725,12 @@
 
         if (latitudeDisplay) {
         latitudeDisplay.value =
-        latitudeValue.replace(".", ",");
+        latitudeValue;
         }
 
         if (longitudeDisplay) {
         longitudeDisplay.value =
-        longitudeValue.replace(".", ",");
+        longitudeValue;
         }
         }
 

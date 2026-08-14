@@ -1,10 +1,4 @@
 ﻿using CleanMadeira.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using WhiteLagoon.Domain.Entities;
 
 namespace CleanMadeira.Application.Services.Interface
 {
@@ -15,7 +9,10 @@ namespace CleanMadeira.Application.Services.Interface
         Task CompleteAsync(Guid id);
         Task<IEnumerable<CleaningTask>> GetByLimpadorUserIdAsync(Guid cleanerUserId);
         Task<IEnumerable<CleaningTask>> GetByOwnerIdAsync(Guid ownerId);
+        Task<IEnumerable<CleaningTask>> GetByCompanyIdAsync(Guid companyId);
         Task<CleaningTask?> GetByIdAndOwnerAsync(Guid id, Guid ownerId);
+        Task<CleaningTask?> GetByLimpadorIdAsync(Guid id);
+        Task<CleaningTask?> GetByIdAsync(Guid? id);
         Task AddCleanerUpdateAsync(Guid taskId, string? cleanerNotes, List<TaskPhoto> photos);
         Task<bool> HasOpenTasksByPropertyIdAsync(Guid propriedadeId);
 

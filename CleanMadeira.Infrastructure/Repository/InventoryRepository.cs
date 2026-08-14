@@ -2,7 +2,6 @@
 using CleanMadeira.Domain.Entities;
 using CleanMadeira.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using SendGrid.Helpers.Mail;
 
 namespace CleanMadeira.Infrastructure.Repository
 {
@@ -73,7 +72,7 @@ namespace CleanMadeira.Infrastructure.Repository
                 .Include(i => i.Property)
                 .Where(i => i.Property.ApplicationUserId == ownerId &&
                             i.Property.Active &&
-                            i.Quantity<= i.MinimumQuantity)
+                            i.Quantity <= i.MinimumQuantity)
                 .OrderBy(i => i.Property.Name)
                 .ThenBy(i => i.Name)
                 .ToListAsync();

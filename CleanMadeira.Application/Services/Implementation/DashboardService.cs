@@ -1,5 +1,5 @@
-﻿using CleanMadeira.Application.Common.Interfaces;
-using CleanMadeira.Application.Common.DTO;
+﻿using CleanMadeira.Application.Common.DTO;
+using CleanMadeira.Application.Common.Interfaces;
 using CleanMadeira.Application.Services.Interface;
 using CleanMadeira.Domain.Entities.Enums;
 //using CleanMadeira.Domain.Enums;
@@ -7,25 +7,25 @@ using CleanMadeira.Domain.Entities.Enums;
 namespace CleanMadeira.Application.Services;
 
 public class DashboardService : IDashboardService
-    {
-        private readonly ICleaningTaskRepository _cleaningTaskRepositorio;
-        private readonly IPropertyRepository _propertyRepository;
-        private readonly IUtilizadorRepositorio _utilizadorRepositorio;
-        private readonly IInventoryRepository _inventoryRepositorio;
+{
+    private readonly ICleaningTaskRepository _cleaningTaskRepositorio;
+    private readonly IPropertyRepository _propertyRepository;
+    private readonly IUtilizadorRepositorio _utilizadorRepositorio;
+    private readonly IInventoryRepository _inventoryRepositorio;
 
     public DashboardService(
             ICleaningTaskRepository cleaningTaskRepositorio,
             IPropertyRepository propertyRepository,
             IUtilizadorRepositorio utilizadorRepositorio,
             IInventoryRepository inventoryRepositorio)
-        {
-            _cleaningTaskRepositorio = cleaningTaskRepositorio;
-            _propertyRepository = propertyRepository;
-            _utilizadorRepositorio = utilizadorRepositorio;
-            _inventoryRepositorio = inventoryRepositorio;
+    {
+        _cleaningTaskRepositorio = cleaningTaskRepositorio;
+        _propertyRepository = propertyRepository;
+        _utilizadorRepositorio = utilizadorRepositorio;
+        _inventoryRepositorio = inventoryRepositorio;
     }
 
-        public async Task<DashboardDto> GetDashboardAsync(Guid ownerId)
+    public async Task<DashboardDto> GetDashboardAsync(Guid ownerId)
     {
         var tasks = await _cleaningTaskRepositorio.GetByOwnerIdAsync(ownerId);
         var properties = await _propertyRepository.GetByUserIdAsync(ownerId);

@@ -1,9 +1,4 @@
 ﻿using CleanMadeira.Domain.Entities.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CleanMadeira.Domain.Entities
 {
@@ -11,9 +6,8 @@ namespace CleanMadeira.Domain.Entities
     {
         public Guid Id { get; set; }
         public Guid AccessToken { get; set; }
-        public Guid PropertyId { get; set; }
+        public Guid? PropertyId { get; set; }
         public Property Property { get; set; } = null!;
-
         public Guid? AssignedUserId { get; set; }
         public ApplicationUser? AssignedUser { get; set; }
         public Guid? MaintenanceProviderId { get; set; }

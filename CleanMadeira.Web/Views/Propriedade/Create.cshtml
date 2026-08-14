@@ -159,6 +159,16 @@
                                       class="text-danger"></span>
                             </div>
 
+                            <div class="mb-3">
+                                <label asp-for="CleaningCompanyId" class="form-label"></label>
+
+                                <select asp-for="CleaningCompanyId"
+                                        asp-items="ViewBag.Companies"
+                                        class="form-select">
+                                    <option value="">Selecione a empresa de limpeza</option>
+                                </select>
+                            </div>
+
 
                         </div>
                     </div>
@@ -859,20 +869,19 @@
                     longitude
                 ) {
                     const lat = Number(latitude)
-                        .toFixed(8)
-                        .replace(".", ",");
+                        .toFixed(8);
 
                     const lng = Number(longitude)
-                        .toFixed(8)
-                        .replace(".", ",");
+                        .toFixed(8);
+
                     if (latitudeInput) {
                         latitudeInput.value =
-        Number(latitude).toFixed(7).replace(".", ",");
+                            Number(latitude).toFixed(7);
                     }
 
                     if (longitudeInput) {
                         longitudeInput.value =
-                            Number(longitude).toFixed(7).replace(".", ",");
+                            Number(longitude).toFixed(7);
                     }
                 }
 

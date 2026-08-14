@@ -1,7 +1,6 @@
 ﻿using CleanMadeira.Application.Common.Interfaces;
 using CleanMadeira.Application.Services.Interface;
 using CleanMadeira.Domain.Entities;
-using Newtonsoft.Json.Linq;
 
 public class PropertyService : IPropertyService
 {
@@ -17,7 +16,7 @@ public class PropertyService : IPropertyService
         return await _propertyRepository.GetAllAsync();
     }
 
-    public async Task<Property?> GetByIdAsync(Guid id)
+    public async Task<Property?> GetByIdAsync(Guid? id)
     {
         return await _propertyRepository.GetByIdAsync(id);
     }

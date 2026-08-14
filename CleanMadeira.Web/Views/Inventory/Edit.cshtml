@@ -15,7 +15,7 @@
         <form asp-action="Edit" method="post">
             @Html.AntiForgeryToken()
 
-            <input asp-for="Id" type="hidden" />
+            <input asp-for="PropriedadeId" type="hidden" />
 
             <div class="mb-3">
                 <label asp-for="PropriedadeNome" class="form-label"></label>
@@ -72,6 +72,5 @@
                 Cancelar
             </a>
         </form>
-
     </div>
 </div>

@@ -1,0 +1,333 @@
+﻿@using CleanMadeira.Domain.Entities
+@using CleanMadeira.Domain.Entities.Enums
+@using Microsoft.AspNetCore.Identity
+@model Company
+
+@inject UserManager<ApplicationUser> UserManager
+
+@{
+    ViewData["Title"] = "Empresa em validação";
+
+    var currentUser = await UserManager.GetUserAsync(User);
+    var isCleanerAndManager = currentUser?.Role == UserRole.Limpador;
+}
+
+<div class="container-fluid py-4">
+
+    <div class="row justify-content-center">
+
+        <div class="col-12 col-md-9 col-lg-7 col-xl-6">
+
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show"
+                     role="alert">
+
+                    <i class="bi bi-check-circle-fill me-2"></i>
+
+                    @TempData["Success"]
+
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="alert">
+                    </button>
+
+                </div>
+            }
+
+            <div class="card border-0 shadow-sm overflow-hidden">
+
+                <!-- Cabeçalho -->
+                <div class="card-body text-center p-4 p-md-5">
+
+                    @if (Model.Status == CompanyStatus.Pendente)
+                    {
+                        <div class="mb-4">
+
+                            <div class="status-icon bg-warning-subtle text-warning">
+                                <i class="bi bi-hourglass-split"></i>
+                            </div>
+
+                        </div>
+
+                        <h1 class="h3 fw-bold mb-2">
+                            Empresa em validação
+                        </h1>
+
+                        <p class="text-muted mb-4">
+                            A empresa foi criada com sucesso e está
+                            a aguardar validação.
+                        </p>
+                    }
+                    else if (Model.Status == CompanyStatus.Rejeitada)
+                    {
+                        <div class="mb-4">
+
+                            <div class="status-icon bg-danger-subtle text-danger">
+                                <i class="bi bi-x-circle"></i>
+                            </div>
+
+                        </div>
+
+                        <h1 class="h3 fw-bold mb-2">
+                            Empresa não aprovada
+                        </h1>
+
+                        <p class="text-muted mb-4">
+                            Não foi possível aprovar esta empresa.
+                        </p>
+                    }
+                    else if (Model.Status == CompanyStatus.Suspensa)
+                    {
+                        <div class="mb-4">
+
+                            <div class="status-icon bg-secondary-subtle text-secondary">
+                                <i class="bi bi-pause-circle"></i>
+                            </div>
+
+                        </div>
+
+                        <h1 class="h3 fw-bold mb-2">
+                            Empresa suspensa
+                        </h1>
+
+                        <p class="text-muted mb-4">
+                            O acesso às funcionalidades da empresa
+                            encontra-se temporariamente suspenso.
+                        </p>
+                    }
+
+                    <!-- Dados da empresa -->
+                    <div class="company-info text-start">
+
+                        <div class="d-flex align-items-center mb-3">
+
+                            <div class="company-icon me-3">
+                                <i class="bi bi-building"></i>
+                            </div>
+
+                            <div>
+                                <div class="text-muted small">
+                                    Empresa
+                                </div>
+
+                                <div class="fw-semibold">
+                                    @Model.Name
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <hr />
+
+                        <div class="row g-3">
+
+                            <div class="col-12 col-sm-6">
+
+                                <div class="text-muted small mb-1">
+                                    NIF
+                                </div>
+
+                                <div class="fw-semibold">
+                                    @(string.IsNullOrWhiteSpace(Model.Nif)
+                                        ? "-"
+                                        : Model.Nif)
+                                </div>
+
+                            </div>
+
+                            <div class="col-12 col-sm-6">
+
+                                <div class="text-muted small mb-1">
+                                    Tipo
+                                </div>
+
+                                <div class="fw-semibold">
+                                    @Model.Type
+                                </div>
+
+                            </div>
+
+                            <div class="col-12 col-sm-6">
+
+                                <div class="text-muted small mb-1">
+                                    Email
+                                </div>
+
+                                <div class="fw-semibold text-break">
+                                    @Model.Email
+                                </div>
+
+                            </div>
+
+                            <div class="col-12 col-sm-6">
+
+                                <div class="text-muted small mb-1">
+                                    Estado
+                                </div>
+
+                                @if (Model.Status == CompanyStatus.Pendente)
+                                {
+                                    <span class="badge rounded-pill
+                                        bg-warning-subtle
+                                        text-warning-emphasis">
+
+                                        <i class="bi bi-clock me-1"></i>
+                                        Pendente
+
+                                    </span>
+                                }
+                                else if (Model.Status == CompanyStatus.Rejeitada)
+                                {
+                                    <span class="badge rounded-pill
+                                        bg-danger-subtle
+                                        text-danger-emphasis">
+
+                                        Rejeitada
+
+                                    </span>
+                                }
+                                else if (Model.Status == CompanyStatus.Suspensa)
+                                {
+                                    <span class="badge rounded-pill
+                                        bg-secondary-subtle
+                                        text-secondary-emphasis">
+
+                                        Suspensa
+
+                                    </span>
+                                }
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    @if (Model.Status == CompanyStatus.Pendente)
+                    {
+                        <div class="alert alert-light border
+                            text-start mt-4 mb-0">
+
+                            <div class="d-flex gap-3">
+
+                                <i class="bi bi-info-circle-fill
+                                    text-primary fs-5">
+                                </i>
+
+                                <div>
+
+                                    <div class="fw-semibold mb-1">
+                                        O que acontece agora?
+                                    </div>
+
+                                    <div class="small text-muted">
+                                        Os dados da empresa serão analisados.
+                                        Depois da aprovação, as funcionalidades
+                                        destinadas à empresa ficarão disponíveis.
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                    }
+
+                </div>
+
+                <!-- Rodapé -->
+                <div class="card-footer bg-light border-0 p-3 p-md-4">
+
+                    <div class="d-flex flex-column flex-sm-row
+                        justify-content-between gap-2">
+
+                        @if (!isCleanerAndManager)
+                        {
+                            <a asp-controller="Dashboard"
+                            asp-action="Index"
+                            class="btn btn-outline-secondary">
+
+                                <i class="bi bi-house me-1"></i>
+                                Voltar ao Dashboard
+
+                            </a>             
+                        }     
+                        @if (Model.Status == CompanyStatus.Pendente)
+                        {
+                            <a asp-controller="Company"
+                               asp-action="Edit"
+                               class="btn btn-outline-primary">
+
+                                <i class="bi bi-pencil me-1"></i>
+                                Editar dados
+
+                            </a>
+                        }
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<style>
+
+    .status-icon {
+        width: 82px;
+        height: 82px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        font-size: 2.2rem;
+    }
+
+    .company-info {
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 16px;
+        padding: 1.25rem;
+    }
+
+    .company-icon {
+        width: 44px;
+        height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #e7f1ff;
+        color: #0d6efd;
+        border-radius: 12px;
+        font-size: 1.25rem;
+    }
+
+    @@media (max-width: 575.98px) {
+
+        .container-fluid {
+            padding-left: 12px;
+            padding-right: 12px;
+        }
+
+        .status-icon {
+            width: 70px;
+            height: 70px;
+            font-size: 1.8rem;
+        }
+
+        .company-info {
+            padding: 1rem;
+        }
+
+        .card-footer .btn {
+            width: 100%;
+        }
+    }
+
+</style>

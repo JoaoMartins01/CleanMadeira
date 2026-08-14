@@ -1,11 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using CleanMadeira.Domain.Entities.Enums;
 
 namespace CleanMadeira.Domain.Entities
 {
@@ -20,7 +13,7 @@ namespace CleanMadeira.Domain.Entities
         public ICollection<ApplicationUser> Users { get; set; }
         = new List<ApplicationUser>();
 
-        public ICollection<Property> Property { get; set; }
+        public ICollection<Property> Properties { get; set; }
             = new List<Property>();
 
         public string Email { get; set; }
@@ -28,6 +21,12 @@ namespace CleanMadeira.Domain.Entities
         public string PhoneNumber { get; set; }
 
         public string Adress { get; set; }
+
+        public string Phone { get; set;  }
+        public CompanyType Type { get; set; }
+
+        public CompanyStatus Status { get; set; }
+        = CompanyStatus.Pendente;
 
         public bool Active { get; set; }
 

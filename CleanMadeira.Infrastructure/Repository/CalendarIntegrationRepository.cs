@@ -1,9 +1,7 @@
-﻿using CleanMadeira.Application.Common.Interfaces;
-using CleanMadeira.Domain.Entities;
+﻿using CleanMadeira.Domain.Entities;
 using CleanMadeira.Domain.Entities.Enums;
 using CleanMadeira.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 public class CalendarIntegrationRepository
     : ICalendarIntegrationRepository

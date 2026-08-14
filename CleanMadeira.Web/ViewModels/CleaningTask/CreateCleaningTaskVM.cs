@@ -17,6 +17,8 @@ public class CreateCleaningTaskVM
     [Required(ErrorMessage = "Selecione uma prioridade.")]
     [Display(Name = "Prioridade")]
     public TaskPriority Prioridade { get; set; }
+    [Display(Name = "Tipo de Serviço")]
+    public CleaningType TipoServico { get; set; }
 
     [Range(0, 1440, ErrorMessage = "O tempo estimado deve estar entre 0 e 1440 minutos.")]
     [Display(Name = "Tempo Estimado (minutos)")]

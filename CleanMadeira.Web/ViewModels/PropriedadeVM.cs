@@ -26,20 +26,23 @@ public class PropriedadeVM
     public string CodigoPostal { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "Selecione a localização no mapa.")]
-    public double? Latitude { get; set; }
-    public double? Longitude { get; set; }
+    public string? Latitude { get; set; }
+    public string? Longitude { get; set; }
 
     [Display(Name = "Quartos")]
-    public int Quartos { get; set; }
+    public int? Quartos { get; set; }
 
     [Display(Name = "Casas de Banho")]
-    public int CasasBanho { get; set; }
+    public int? CasasBanho { get; set; }
 
     [Display(Name = "Numero de Hospedes")]
     public int? NumeroHospedes { get; set; }
 
     [Display(Name = "Descrição")]
     public string? Descricao { get; set; }
+
+    [Display(Name = "Empresa de Limpeza")]
+    public Guid? CleaningCompanyId { get; set; }
 
     [Display(Name = "Ativo")]
     public bool Active { get; set; } = true;

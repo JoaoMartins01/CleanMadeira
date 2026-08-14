@@ -226,6 +226,12 @@ namespace CleanMadeira.Infrastructure.Migrations
                     b.Property<string>("CleanerNotes")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid?>("CleaningCompanyId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int?>("CleaningType")
+                        .HasColumnType("int");
+
                     b.Property<DateTime?>("CompletedAt")
                         .HasColumnType("datetime2");
 
@@ -260,6 +266,8 @@ namespace CleanMadeira.Infrastructure.Migrations
 
                     b.HasIndex("AssignedUserId");
 
+                    b.HasIndex("CleaningCompanyId");
+
                     b.HasIndex("PropertyId");
 
                     b.ToTable("CleaningTasks");
@@ -293,9 +301,19 @@ namespace CleanMadeira.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("PhoneNumber")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -314,17 +332,18 @@ namespace CleanMadeira.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("MinimumQuantity")
+                    b.Property<int?>("MinimumQuantity")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("PropertyId")
+                    b.Property<Guid?>("PropertyId")
+                        .IsRequired()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("Quantity")
+                    b.Property<int?>("Quantity")
                         .HasColumnType("int");
 
                     b.Property<string>("Unity")
@@ -364,7 +383,8 @@ namespace CleanMadeira.Infrastructure.Migrations
                     b.Property<int>("Priority")
                         .HasColumnType("int");
 
-                    b.Property<Guid>("PropertyId")
+                    b.Property<Guid?>("PropertyId")
+                        .IsRequired()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("ScheduledDate")
@@ -430,6 +450,56 @@ namespace CleanMadeira.Infrastructure.Migrations
                     b.ToTable("MaintenanceProviders");
                 });
 
+            modelBuilder.Entity("CleanMadeira.Domain.Entities.MaintenanceReport", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("CleaningTaskId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("MaintenanceId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Priority")
+                        .HasColumnType("int");
+
+                    b.Property<Guid?>("PropertyId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("ReportedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("ReportedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CleaningTaskId");
+
+                    b.HasIndex("MaintenanceId")
+                        .IsUnique()
+                        .HasFilter("[MaintenanceId] IS NOT NULL");
+
+                    b.HasIndex("PropertyId");
+
+                    b.HasIndex("ReportedByUserId");
+
+                    b.ToTable("MaintenanceReports");
+                });
+
             modelBuilder.Entity("CleanMadeira.Domain.Entities.Property", b =>
                 {
                     b.Property<Guid>("Id")
@@ -446,10 +516,13 @@ namespace CleanMadeira.Infrastructure.Migrations
                     b.Property<Guid>("ApplicationUserId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("Bathrooms")
+                    b.Property<int?>("Bathrooms")
                         .HasColumnType("int");
 
-                    b.Property<Guid?>("CompanyId")
+                    b.Property<Guid?>("CleanerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("CleaningCompanyId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("DeletedAt")
@@ -481,14 +554,16 @@ namespace CleanMadeira.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Rooms")
+                    b.Property<int?>("Rooms")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ApplicationUserId");
 
-                    b.HasIndex("CompanyId");
+                    b.HasIndex("CleanerId");
+
+                    b.HasIndex("CleaningCompanyId");
 
                     b.ToTable("Properties");
                 });
@@ -802,6 +877,10 @@ namespace CleanMadeira.Infrastructure.Migrations
                         .HasForeignKey("AssignedUserId")
                         .OnDelete(DeleteBehavior.SetNull);
 
+                    b.HasOne("CleanMadeira.Domain.Entities.Company", "CleaningCompany")
+                        .WithMany()
+                        .HasForeignKey("CleaningCompanyId");
+
                     b.HasOne("CleanMadeira.Domain.Entities.Property", "Property")
                         .WithMany("CleaningTasks")
                         .HasForeignKey("PropertyId")
@@ -809,6 +888,8 @@ namespace CleanMadeira.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("AssignedUser");
+
+                    b.Navigation("CleaningCompany");
 
                     b.Navigation("Property");
                 });
@@ -860,6 +941,37 @@ namespace CleanMadeira.Infrastructure.Migrations
                     b.Navigation("Owner");
                 });
 
+            modelBuilder.Entity("CleanMadeira.Domain.Entities.MaintenanceReport", b =>
+                {
+                    b.HasOne("CleanMadeira.Domain.Entities.CleaningTask", "CleaningTask")
+                        .WithMany()
+                        .HasForeignKey("CleaningTaskId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("CleanMadeira.Domain.Entities.Maintenance", "Maintenance")
+                        .WithOne()
+                        .HasForeignKey("CleanMadeira.Domain.Entities.MaintenanceReport", "MaintenanceId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("CleanMadeira.Domain.Entities.Property", "Property")
+                        .WithMany()
+                        .HasForeignKey("PropertyId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("CleanMadeira.Domain.Entities.ApplicationUser", "ReportedByUser")
+                        .WithMany()
+                        .HasForeignKey("ReportedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("CleaningTask");
+
+                    b.Navigation("Maintenance");
+
+                    b.Navigation("Property");
+
+                    b.Navigation("ReportedByUser");
+                });
+
             modelBuilder.Entity("CleanMadeira.Domain.Entities.Property", b =>
                 {
                     b.HasOne("CleanMadeira.Domain.Entities.ApplicationUser", "ApplicationUser")
@@ -868,13 +980,20 @@ namespace CleanMadeira.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("CleanMadeira.Domain.Entities.Company", "Company")
-                        .WithMany("Property")
-                        .HasForeignKey("CompanyId");
+                    b.HasOne("CleanMadeira.Domain.Entities.ApplicationUser", "Cleaner")
+                        .WithMany()
+                        .HasForeignKey("CleanerId");
+
+                    b.HasOne("CleanMadeira.Domain.Entities.Company", "CleaningCompany")
+                        .WithMany("Properties")
+                        .HasForeignKey("CleaningCompanyId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("ApplicationUser");
 
-                    b.Navigation("Company");
+                    b.Navigation("Cleaner");
+
+                    b.Navigation("CleaningCompany");
                 });
 
             modelBuilder.Entity("CleanMadeira.Domain.Entities.Reservation", b =>
@@ -978,7 +1097,7 @@ namespace CleanMadeira.Infrastructure.Migrations
 
             modelBuilder.Entity("CleanMadeira.Domain.Entities.Company", b =>
                 {
-                    b.Navigation("Property");
+                    b.Navigation("Properties");
 
                     b.Navigation("Users");
                 });

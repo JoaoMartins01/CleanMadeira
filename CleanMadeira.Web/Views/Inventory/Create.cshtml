@@ -16,17 +16,13 @@
             @Html.AntiForgeryToken()
 
             <div class="mb-3">
-                <label asp-for="PropriedadeId" class="form-label">
-                    Propriedade
-                </label>
+                <label asp-for="PropriedadeId" class="form-label"></label>
 
                 <select asp-for="PropriedadeId"
                         asp-items="ViewBag.Propriedades"
                         class="form-select">
-                    <option value="">Selecionar propriedade</option>
+                    <option value="">Selecione uma propriedade</option>
                 </select>
-
-                <span asp-validation-for="PropriedadeId" class="text-danger"></span>
             </div>
 
             <div class="mb-3">
@@ -73,7 +69,8 @@
                 Guardar
             </button>
 
-            <a asp-action="Index" class="btn btn-secondary">
+            <a asp-action="Index"
+            class="btn btn-secondary">
                 Cancelar
             </a>
         </form>

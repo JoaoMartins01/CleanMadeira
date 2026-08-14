@@ -19,24 +19,46 @@
         white-space: normal;
     }
 
-    .priority-legend {
-        display: flex;
-        gap: 12px;
-        flex-wrap: wrap;
-        margin-bottom: 16px;
+    .calendar-legend {
+        background: #fff;
+        border-radius: 8px;
     }
 
-    .legend-item {
+    .legend-row {
         display: flex;
         align-items: center;
-        gap: 6px;
-        font-size: 14px;
+        flex-wrap: wrap;
+        gap: 10px 14px;
+        margin-bottom: 10px;
     }
 
-    .legend-color {
-        width: 14px;
-        height: 14px;
-        border-radius: 4px;
+        .legend-row:last-child {
+            margin-bottom: 0;
+        }
+
+    .legend-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        white-space: nowrap;
+    }
+
+        .legend-item i {
+            font-size: 0.95rem;
+        }
+
+    @@media (max-width: 576px) {
+        .legend-row {
+            gap: 8px 10px;
+        }
+
+        .legend-item {
+            font-size: 0.9rem;
+        }
+
+        .calendar-legend {
+            font-size: 0.9rem;
+        }
     }
 
     .fc-daygrid-event {
@@ -88,7 +110,52 @@
     .calendar-event-custom {
         display: flex;
         align-items: flex-start;
-        gap: 6px;
+        gap: 7px;
+        width: 100%;
+    }
+
+    .event-content {
+        min-width: 0;
+        flex: 1;
+    }
+
+    .event-title-line {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        min-width: 0;
+    }
+
+        .event-title-line i {
+            display: inline-block !important;
+            flex-shrink: 0;
+        }
+
+    .event-property-name {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    @@media (max-width: 576px) {
+
+        .event-title-line {
+            display: flex !important;
+            align-items: center;
+            gap: 4px;
+        }
+
+            .event-title-line i {
+                display: inline-block !important;
+            }
+
+        .event-time {
+            font-size: 0.75rem;
+        }
+
+        .event-property-name {
+            font-size: 0.85rem;
+        }
     }
 
     .priority-indicator {
@@ -138,6 +205,48 @@
     .event-without-cleaner .event-title-line {
             font-weight: 700;
     }
+
+    .modal-footer {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        width: 100%;
+        padding: 16px;
+        justify-content: stretch;
+    }
+
+        .modal-footer .btn {
+            width: 100%;
+            min-height: 46px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 !important;
+            white-space: nowrap;
+        }
+
+        .modal-footer .btn-details {
+            grid-column: 1 / -1;
+        }
+
+        .modal-footer .delete-form {
+            width: 100%;
+            margin: 0;
+        }
+
+    @@media (max-width: 576px) {
+
+        modal-footer {
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+            .modal-footer .btn {
+                font-size: 0.9rem;
+                padding-left: 8px;
+                padding-right: 8px;
+            }
+    }
 </style>
 
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -157,28 +266,55 @@
 </button>
 
 <br />
-<div class="card border-0 shadow-sm mb-3">
-    <div class="card-body py-2">
-        <div class="d-flex flex-wrap gap-3 align-items-center">
-            <strong>Prioridade:</strong>
-            <span class="badge bg-success">Baixa</span>
-            <span class="badge bg-primary">Normal</span>
-            <span class="badge bg-warning text-dark">Alta</span>
-            <span class="badge bg-danger">Urgente</span>
-        </div>
-        <div class="d-flex flex-wrap gap-3 align-items-center">
-            <span><i class="bi bi-hourglass-split text-warning"></i> Pendente</span>
-            <span><i class="bi bi-play-circle-fill text-primary"></i> Em progresso</span>
-            <span><i class="bi bi-check-circle-fill text-success"></i> Concluída</span>
-        </div>
-        <div class="d-flex flex-wrap gap-3 align-items-center">
-            <span class="legend-item">
-                <i class="bi bi-person-exclamation text-danger"></i>
-                Sem limpador atribuído
-            </span>
-        </div>
+<div class="calendar-legend">
+
+    <div class="legend-row">
+        <strong>Prioridade:</strong>
+
+        <span class="badge bg-success">Baixa</span>
+        <span class="badge bg-primary">Normal</span>
+        <span class="badge bg-warning text-dark">Alta</span>
+        <span class="badge bg-danger">Urgente</span>
     </div>
+
+    <div class="legend-row">
+        <span class="legend-item">
+            <i class="bi bi-hourglass-split text-warning"></i>
+            Pendente
+        </span>
+
+        <span class="legend-item">
+            <i class="bi bi-play-circle-fill text-primary"></i>
+            Em progresso
+        </span>
+
+        <span class="legend-item">
+            <i class="bi bi-check-circle-fill text-success"></i>
+            Concluída
+        </span>
+
+        <span class="legend-item">
+            <i class="bi bi-person-x-fill text-danger"></i>
+            Sem limpador atribuído
+        </span>
+    </div>
+
 </div>
+
+<form method="get" class="row g-2 mb-4">
+
+    <div class="col-md-5">
+        <select id="statusFilter" class="form-select">
+            <option value="">Todos</option>
+            <option value="Geral">Geral</option>
+            <option value="Exterior">Exterior</option>
+            <option value="Janelas">Janelas</option>
+            <option value="Intermediário">Intermédia</option>
+            <option value="PosConstrucao">Pós-construção</option>
+        </select>
+    </div>
+</form>
+
 
 <div class="card shadow-sm">
     <div class="card border-0 shadow-sm calendar-card">
@@ -240,18 +376,20 @@
                         </div>
 
                         <div class="mb-3">
-                            <label asp-for="AssignedUserId"
+                            <label asp-for="TipoServico"
                                    class="form-label">
-                                Funcionário(a)
                             </label>
 
-                            <select asp-for="AssignedUserId"
-                                    asp-items="ViewBag.Limpadores"
+                            <select asp-for="TipoServico"
                                     class="form-select">
-                                <option value="">Selecionar funcionário(a)</option>
+                                <option value="1">Geral</option>
+                                <option value="2">Exterior</option>
+                                <option value="3">Janelas</option>
+                                <option value="4">Intemerdiário</option>
+                                <option value="5">PosConstrucao</option>
                             </select>
 
-                            <span asp-validation-for="AssignedUserId"
+                            <span asp-validation-for="TipoServico"
                                   class="text-danger">
                             </span>
                         </div>
@@ -466,6 +604,7 @@
         const cleaningModalElement = document.getElementById("cleaningModal");
         const detailsModalElement = document.getElementById("detailsModal");
 
+
         const newCleaningBtn = document.getElementById("newCleaningBtn");
 
         const cleaningModal = cleaningModalElement
@@ -560,68 +699,109 @@
 
         displayEventTime: false,
 
-        events: "/CleaningTask/GetEvents",
+                events: function(fetchInfo, successCallback, failureCallback) {
+                    const status = document
+                        .getElementById("statusFilter")
+                        .value;
 
-        eventDidMount: function (info) {
-        const props = info.event.extendedProps;
+                    const url =
+                        `/CleaningTask/GetEvents?status=${encodeURIComponent(status)}`;
 
-        let icon = "";
-        switch (props.estado) {
-        case "Pendente":
-        icon = '<i class="bi bi-hourglass-split text-warning"></i>';
-        break;
-        case "EmProgresso":
-        icon = '<i class="bi bi-play-circle-fill text-primary"></i>';
-        break;
-        case "Completo":
-        icon = '<i class="bi bi-check-circle-fill text-success"></i>';
-        break;
-        }
+                    fetch(url)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error("Erro ao carregar as tarefas.");
+                            }
 
-        let priorityClass = "";
-        switch (props.prioridade) {
-        case "Baixa":
-        priorityClass = "priority-low";
-        break;
-        case "Normal":
-        priorityClass = "priority-normal";
-        break;
-        case "Alta":
-        priorityClass = "priority-high";
-        break;
-        case "Urgente":
-        priorityClass = "priority-urgent";
-        break;
-        }
+                            return response.json();
+                        })
+                        .then(events => successCallback(events))
+                        .catch(error => failureCallback(error));
+                },
 
-        const withoutCleanerIcon = props.semLimpador
-        ? '<i class="bi bi-person-exclamation text-danger ms-1" title="Sem limpador atribuído"></i>'
-        : '';
+                eventDidMount: function(info) {
+                    const props = info.event.extendedProps;
 
-        const hora = info.event.start.toLocaleTimeString("pt-PT", {
-        hour: "2-digit",
-        minute: "2-digit"
-        });
+                    let icon = "";
 
-        const main = info.el.querySelector(".fc-event-title");
+                    switch (props.estado) {
+                        case "Pendente":
+                            icon = '<i class="bi bi-hourglass-split text-warning"></i>';
+                            break;
 
-        if (main) {
-        main.innerHTML = `
-        <div class="calendar-event-custom">
-        <div class="priority-indicator ${priorityClass}"></div>
+                        case "EmProgresso":
+                            icon = '<i class="bi bi-play-circle-fill text-primary"></i>';
+                            break;
 
-        <div>
-        <div class="event-time">${hora}</div>
-        <div class="event-title-line">
-        ${icon}
-        ${info.event.title}
-        ${withoutCleanerIcon}
-        </div>
-        </div>
-        </div>
-        `;
-        }
-        },
+                        case "Completo":
+                            icon = '<i class="bi bi-check-circle-fill text-success"></i>';
+                            break;
+                    }
+
+                    let priorityClass = "";
+
+                    switch (props.prioridade) {
+                        case "Baixa":
+                            priorityClass = "priority-low";
+                            break;
+
+                        case "Normal":
+                            priorityClass = "priority-normal";
+                            break;
+
+                        case "Alta":
+                            priorityClass = "priority-high";
+                            break;
+
+                        case "Urgente":
+                            priorityClass = "priority-urgent";
+                            break;
+                    }
+
+                    const withoutCleanerIcon = props.semLimpador
+                        ? `
+                    <i class="bi bi-person-exclamation text-danger ms-1"
+                       title="Sem limpador atribuído">
+                    </i>
+                  `
+                        : "";
+
+                    const hora = info.event.start.toLocaleTimeString("pt-PT", {
+                        hour: "2-digit",
+                        minute: "2-digit"
+                    });
+
+                    const main =
+                        info.el.querySelector(".fc-event-title") ||
+                        info.el.querySelector(".fc-event-main") ||
+                        info.el;
+
+                    main.innerHTML = `
+                <div class="calendar-event-custom">
+
+                    <div class="priority-indicator ${priorityClass}"></div>
+
+                    <div class="event-content">
+
+                        <div class="event-time">
+                            ${hora}
+                        </div>
+
+                        <div class="event-title-line">
+                            ${icon}
+
+                            <span class="event-property-name">
+                                ${info.event.title}
+                            </span>
+
+                            ${withoutCleanerIcon}
+                        </div>
+
+                    </div>
+
+                </div>
+            `;
+                },
 
         eventClick: function (info) {
         const props = info.event.extendedProps;
@@ -788,6 +968,13 @@
         }
 
         calendar.render();
+
+        statusFilter.addEventListener("change", function() {
+            console.log("Selecionado agora:", this.value);
+
+            calendar.refetchEvents();
+        });
+
         });
     </script>
 }

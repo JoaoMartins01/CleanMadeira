@@ -2,10 +2,7 @@
 using CleanMadeira.Domain.Entities;
 using CleanMadeira.Domain.Entities.Enums;
 using CleanMadeira.Infrastructure.Data;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using SendGrid.Helpers.Mail;
-using WhiteLagoon.Domain.Entities;
 
 public class CleaningTaskRepository
     : Repository<CleaningTask>,
@@ -62,7 +59,7 @@ public class CleaningTaskRepository
             .ToListAsync();
     }
 
-    public async Task<CleaningTask?> GetByIdAsync(Guid id)
+    public async Task<CleaningTask?> GetByLimpadorIdAsync(Guid id)
     {
         return await _context.CleaningTasks
             .Include(t => t.Property)
@@ -78,6 +75,17 @@ public class CleaningTaskRepository
             .Include(t => t.Property)
             .Include(t => t.AssignedUser)
             .Where(t => t.Property.ApplicationUserId == ownerId &&
+                   t.Property.Active)
+            .OrderBy(t => t.ScheduledDate)
+            .ToListAsync();
+    }
+
+    public async Task<IEnumerable<CleaningTask>> GetByCompanyIdAsync(Guid CompanyId)
+    {
+        return await _context.CleaningTasks
+            .Include(t => t.Property)
+            .Include(t => t.AssignedUser)
+            .Where(t => t.CleaningCompanyId == CompanyId &&
                    t.Property.Active)
             .OrderBy(t => t.ScheduledDate)
             .ToListAsync();

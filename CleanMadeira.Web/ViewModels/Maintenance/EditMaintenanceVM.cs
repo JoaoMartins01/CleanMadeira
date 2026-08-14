@@ -11,7 +11,7 @@ public class EditMaintenanceVM
 
     [Required(ErrorMessage = "Selecione uma propriedade.")]
     [Display(Name = "Propriedade")]
-    public Guid PropriedadeId { get; set; }
+    public Guid? PropriedadeId { get; set; }
 
     [Display(Name = "Responsável")]
     public Guid? AssignedUserId { get; set; }

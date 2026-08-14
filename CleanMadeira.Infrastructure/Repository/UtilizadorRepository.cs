@@ -1,8 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
-using CleanMadeira.Application.Common.Interfaces;
+﻿using CleanMadeira.Application.Common.Interfaces;
 using CleanMadeira.Domain.Entities;
-using SendGrid.Helpers.Mail;
 using CleanMadeira.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 
 public class UtilizadorRepository
     : Repository<Utilizador>,
