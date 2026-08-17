@@ -2,66 +2,106 @@
 using CleanMadeira.Domain.Entities;
 using CleanMadeira.Domain.Entities.Enums;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using System.Net;
 using System.Net.Mail;
 
 public class EmailService : IEmailService
 {
     private readonly IConfiguration _configuration;
+    private readonly ILogger<EmailService> _logger;
 
-    public EmailService(IConfiguration configuration)
+    public EmailService(IConfiguration configuration, ILogger<EmailService> logger)
     {
         _configuration = configuration;
+        _logger = logger;
     }
 
-    /* public async Task SendEmailAsync(
-        string to,
-        string subject,
-        string body)
-     {
-         var senderEmail =
-             _configuration["EmailSettings:SenderEmail"];
+   /* public async Task SendEmailAsync(
+    string to,
+    string subject,
+    string body)
+    {
+        var senderEmail =
+            _configuration["EmailSettings:SenderEmail"];
 
-         var password =
-             _configuration["EmailSettings:Password"];
+        var password =
+            _configuration["EmailSettings:Password"];
 
-         if (string.IsNullOrWhiteSpace(senderEmail))
-         {
-             throw new InvalidOperationException(
-                 "EmailSettings:SenderEmail não está configurado.");
-         }
+        if (string.IsNullOrWhiteSpace(senderEmail))
+        {
+            _logger.LogError(
+                "EmailSettings:SenderEmail não está configurado.");
 
-         if (string.IsNullOrWhiteSpace(password))
-         {
-             throw new InvalidOperationException(
-                 "EmailSettings:Password não está configurado.");
-         }
+            throw new InvalidOperationException(
+                "EmailSettings:SenderEmail não está configurado.");
+        }
 
-         using var message = new MailMessage();
+        if (string.IsNullOrWhiteSpace(password))
+        {
+            _logger.LogError(
+                "EmailSettings:Password não está configurado.");
 
-         message.From = new MailAddress(
-             senderEmail,
-             "CleanMadeira");
+            throw new InvalidOperationException(
+                "EmailSettings:Password não está configurado.");
+        }
 
-         message.To.Add(to);
-         message.Subject = subject;
-         message.Body = body;
-         message.IsBodyHtml = true;
+        try
+        {
+            _logger.LogInformation(
+                "A tentar enviar email para {Email} através de smtp.gmail.com:587",
+                to);
 
-         using var smtpClient =
-             new SmtpClient("smtp.gmail.com", 587);
+            using var message = new MailMessage();
 
-         smtpClient.EnableSsl = true;
-         smtpClient.UseDefaultCredentials = false;
+            message.From = new MailAddress(
+                senderEmail,
+                "CleanMadeira");
 
-         smtpClient.Credentials = new NetworkCredential(
-             senderEmail,
-             password);
+            message.To.Add(to);
+            message.Subject = subject;
+            message.Body = body;
+            message.IsBodyHtml = true;
 
-         await smtpClient.SendMailAsync(message);
-     }*/
+            using var smtpClient =
+                new SmtpClient("smtp.gmail.com", 587);
 
+            smtpClient.EnableSsl = true;
+            smtpClient.UseDefaultCredentials = false;
 
+            smtpClient.Credentials =
+                new NetworkCredential(
+                    senderEmail,
+                    password);
+
+            await smtpClient.SendMailAsync(message);
+
+            _logger.LogInformation(
+                "Email enviado com sucesso para {Email}",
+                to);
+        }
+        catch (SmtpException ex)
+        {
+            _logger.LogError(
+                ex,
+                "Erro SMTP. StatusCode={StatusCode}. Destinatário={Email}",
+                ex.StatusCode,
+                to);
+
+            throw;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(
+                ex,
+                "Erro inesperado ao enviar email para {Email}",
+                to);
+
+            throw;
+        }
+    }*/
+
+    
     public async Task SendEmailAsync(
         string to,
         string subject,

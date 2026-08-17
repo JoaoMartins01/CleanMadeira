@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CleanMadeira.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260814131620_CreateDatabase")]
-    partial class CreateDatabase
+    [Migration("20260815130715_UpdateCalendarIntegration")]
+    partial class UpdateCalendarIntegration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -195,10 +195,22 @@ namespace CleanMadeira.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("IsEnabled")
                         .HasColumnType("bit");
 
                     b.Property<DateTime?>("LastSync")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("LastSyncAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("LastSyncError")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("NextSyncAt")
                         .HasColumnType("datetime2");
 
                     b.Property<Guid>("PropertyId")

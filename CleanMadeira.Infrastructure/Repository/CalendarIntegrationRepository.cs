@@ -42,6 +42,15 @@ public class CalendarIntegrationRepository
                 x.Provider == provider);
     }
 
+    public async Task<List<CalendarIntegration>>
+    GetAllActiveAsync()
+    {
+        return await _context.CalendarIntegrations
+            .Where(x => x.IsActive)
+            .ToListAsync();
+    }
+
+
     public async Task AddAsync(
         CalendarIntegration integration)
     {

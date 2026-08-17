@@ -79,6 +79,7 @@ builder.Services.AddScoped<IMaintenanceRepository, MaintenanceRepository>();
 builder.Services.AddScoped<ICalendarIntegrationService, CalendarIntegrationService>();
 builder.Services.AddScoped<IMaintenanceProviderService, MaintenanceProviderService>();
 builder.Services.AddScoped<IMaintenanceReportService, MaintenanceReportService>();
+builder.Services.AddHostedService<CalendarSyncBackgroundService>();
 builder.Services.AddHttpClient<
     ICalendarSyncService,
     CalendarSyncService>(client =>

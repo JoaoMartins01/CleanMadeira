@@ -206,6 +206,30 @@
                     </button>
                 </div>
 
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">
+                        Procurar rua ou morada
+                    </label>
+
+                    <div class="input-group">
+                        <input type="text"
+                               id="addressSearch"
+                               class="form-control"
+                               placeholder="Ex.: Rua de Santa Catarina, Funchal" />
+
+                        <button type="button"
+                                id="searchAddressButton"
+                                class="btn btn-outline-primary">
+                            <i class="bi bi-search"></i>
+                            Procurar
+                        </button>
+                    </div>
+
+                    <div id="addressResults"
+                         class="list-group mt-2">
+                    </div>
+                </div>
+
                 <!-- Informações adicionais -->
                 <div class="card property-form-card mb-4">
                     <div class="card-header">
@@ -626,8 +650,15 @@
                 const longitudeInput =
                     document.getElementById("propertyLongitude");
 
-                const currentLocationButton =
-                    document.getElementById("useCurrentLocation");
+                const currentLocationButton = document.getElementById("useCurrentLocation");
+
+                const addressSearch = document.getElementById("addressSearch");
+
+                const searchAddressButton = document.getElementById("searchAddressButton");
+
+                const addressResults = document.getElementById("addressResults");
+
+                
 
                 // =====================================================
                 // CAMPOS DO RESUMO
@@ -800,6 +831,33 @@
                 updateLocation();
                 updateDescription();
 
+
+                // =====================================================
+                // PESQUISA DE MORADAS
+                // =====================================================
+
+                if (searchAddressButton) {
+                    searchAddressButton.addEventListener(
+                    "click",
+                function () {
+                    searchAddress();
+                }
+                );
+                }
+
+                if (addressSearch) {
+                    addressSearch.addEventListener(
+                    "keydown",
+                function (event) {
+
+                if (event.key === "Enter") {
+                    event.preventDefault();
+                    searchAddress();
+                }
+                }
+                );
+                }
+
                 // =====================================================
                 // MAPA LEAFLET
                 // =====================================================
@@ -863,6 +921,109 @@
                 ).addTo(map);
 
                 let marker = null;
+
+                async function searchAddress() {
+
+    const query = addressSearch.value.trim();
+
+    if (!query) {
+        return;
+    }
+
+    addressResults.innerHTML = `
+        <div class="list-group-item text-muted">
+            A procurar...
+        </div>
+    `;
+
+    try {
+
+        const url =
+            "https://nominatim.openstreetmap.org/search" +
+            "?format=json" +
+            "&addressdetails=1" +
+            "&limit=5" +
+            "&countrycodes=pt" +
+            "&q=" +
+            encodeURIComponent(query + ", Madeira");
+
+        const response = await fetch(url);
+
+        if (!response.ok) {
+            throw new Error(
+                "Erro ao procurar a morada."
+            );
+        }
+
+        const results = await response.json();
+
+        addressResults.innerHTML = "";
+
+        if (!results.length) {
+
+            addressResults.innerHTML = `
+                <div class="list-group-item text-muted">
+                    Não foram encontradas moradas.
+                </div>
+            `;
+
+            return;
+        }
+
+        results.forEach(result => {
+
+            const item =
+                document.createElement("button");
+
+            item.type = "button";
+
+            item.className =
+                "list-group-item list-group-item-action";
+
+            item.innerHTML = `
+                <i class="bi bi-geo-alt-fill
+                          text-danger me-2"></i>
+
+                ${result.display_name}
+            `;
+
+            item.addEventListener(
+                "click",
+                function () {
+
+                    const latitude =
+                        Number(result.lat);
+
+                    const longitude =
+                        Number(result.lon);
+
+                    setLocation(
+                        latitude,
+                        longitude
+                    );
+
+                    addressResults.innerHTML = "";
+
+                    addressSearch.value =
+                        result.display_name;
+                }
+            );
+
+            addressResults.appendChild(item);
+        });
+
+    }
+    catch (error) {
+
+        console.error(error);
+
+        addressResults.innerHTML = `
+            <div class="list-group-item text-danger">
+                Não foi possível procurar a morada.
+            </div>
+        `;
+    }
+}
 
                 function updateCoordinates(
                     latitude,

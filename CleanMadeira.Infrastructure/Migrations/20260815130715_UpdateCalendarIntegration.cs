@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace CleanMadeira.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class CreateDatabase : Migration
+    public partial class UpdateCalendarIntegration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -320,7 +320,11 @@ namespace CleanMadeira.Infrastructure.Migrations
                     Provider = table.Column<int>(type: "int", nullable: false),
                     CalendarUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsEnabled = table.Column<bool>(type: "bit", nullable: false),
-                    LastSync = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    LastSync = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    LastSyncAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    NextSyncAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    LastSyncError = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {

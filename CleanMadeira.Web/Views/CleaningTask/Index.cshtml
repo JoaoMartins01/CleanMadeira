@@ -247,6 +247,35 @@
                 padding-right: 8px;
             }
     }
+
+    .event-content {
+        min-width: 0;
+    }
+
+    .event-title-line {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-weight: 600;
+    }
+
+    .event-cleaner {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        margin-top: 3px;
+        font-size: 0.72rem;
+        font-weight: 400;
+        opacity: 0.85;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+        .event-cleaner span {
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
 </style>
 
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -766,6 +795,20 @@
                   `
                         : "";
 
+                    const cleanerHtml = props.funcionaria
+                        ? `
+                    <div class="event-cleaner">
+                        <i class="bi bi-person-fill"></i>
+                        ${props.funcionaria}
+                    </div>
+                  `
+                        : `
+                    <div class="event-cleaner text-danger">
+                        <i class="bi bi-person-exclamation"></i>
+                        Sem limpador
+                    </div>
+                  `;
+
                     const hora = info.event.start.toLocaleTimeString("pt-PT", {
                         hour: "2-digit",
                         minute: "2-digit"
@@ -794,11 +837,10 @@
                                 ${info.event.title}
                             </span>
 
-                            ${withoutCleanerIcon}
+                            
                         </div>
-
+                                ${cleanerHtml}
                     </div>
-
                 </div>
             `;
                 },

@@ -12,6 +12,7 @@ public interface ICalendarIntegrationRepository
         Guid propertyId,
         CalendarProvider provider);
 
+    Task<List<CalendarIntegration>> GetAllActiveAsync();
     Task AddAsync(CalendarIntegration integration);
 
     Task DeleteAsync(CalendarIntegration integration);

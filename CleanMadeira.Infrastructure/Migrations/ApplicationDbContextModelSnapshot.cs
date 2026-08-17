@@ -192,10 +192,22 @@ namespace CleanMadeira.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("IsEnabled")
                         .HasColumnType("bit");
 
                     b.Property<DateTime?>("LastSync")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("LastSyncAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("LastSyncError")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("NextSyncAt")
                         .HasColumnType("datetime2");
 
                     b.Property<Guid>("PropertyId")

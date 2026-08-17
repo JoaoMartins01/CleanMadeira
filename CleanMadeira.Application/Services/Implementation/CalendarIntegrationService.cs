@@ -107,6 +107,11 @@ public class CalendarIntegrationService
         );
     }
 
+    public Task<List<CalendarIntegration>> GetAllActiveAsync()
+    {
+        return _repository.GetAllActiveAsync();
+    }
+
     public async Task<(bool Success, string Message)> DeleteAsync(
         Guid integrationId,
         Guid userId)

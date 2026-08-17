@@ -10,6 +10,7 @@ public class CreateMaintenanceVM
     [Display(Name = "Propriedade")]
     public Guid PropertyId { get; set; }
 
+    [Required(ErrorMessage = "Adicione um responsável.")]
     [Display(Name = "Responsável")]
     public Guid AssignedUserId { get; set; }
 

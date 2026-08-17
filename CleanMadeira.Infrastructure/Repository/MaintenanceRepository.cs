@@ -56,6 +56,7 @@ public class MaintenanceRepository : IMaintenanceRepository
             .Include(m => m.Property)
             .Include(m => m.MaintenanceProvider)
             .Where(m => m.Property.ApplicationUserId == ownerId)
+            .OrderByDescending(m => m.ScheduledDate)
             .ToListAsync();
     }
 

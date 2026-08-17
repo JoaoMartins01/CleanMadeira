@@ -5,6 +5,7 @@
 }
 
 <div class="container py-4">
+
     @if (TempData["Success"] != null)
     {
         <div class="alert alert-success alert-dismissible fade show"
@@ -34,28 +35,41 @@
             </button>
         </div>
     }
-    <div class="d-flex justify-content-between align-items-center mb-4">
 
-        <div>
-            <h2 class="fw-bold">@Model.Propriedade.Nome</h2>
+
+    <!-- =====================================================
+         CABEÇALHO
+         ===================================================== -->
+
+    <div class="property-header mb-4">
+
+        <div class="property-header-info">
+
+            <h2 class="fw-bold mb-1">
+                @Model.Propriedade.Nome
+            </h2>
 
             <p class="text-muted mb-0">
+                <i class="bi bi-geo-alt-fill me-1"></i>
                 @Model.Propriedade.Endereco
             </p>
+
         </div>
 
-        <div>
+        <div class="property-header-actions">
 
             <a asp-action="Edit"
                asp-route-id="@Model.Propriedade.Id"
                class="btn btn-warning">
 
+                <i class="bi bi-pencil-square me-1"></i>
                 Editar
             </a>
 
             <a asp-action="Index"
                class="btn btn-outline-secondary">
 
+                <i class="bi bi-arrow-left me-1"></i>
                 Voltar
             </a>
 
@@ -64,25 +78,39 @@
     </div>
 
 
-    <div class="row">
+    <!-- =====================================================
+         RESUMO
+         ===================================================== -->
 
-        <div class="col-lg-3 mb-3">
+    <div class="row g-3">
 
-            <div class="card shadow-sm">
+        <!-- CALENDÁRIOS -->
+
+        <div class="col-12 col-sm-6 col-xl-3">
+
+            <div class="card property-stat-card h-100">
 
                 <div class="card-body text-center">
 
-                    <h5>📅 Calendários</h5>
+                    <div class="stat-icon mb-3">
+                        <i class="bi bi-calendar3"></i>
+                    </div>
 
-                    <h2>@Model.CalendarCount</h2>
+                    <h5 class="fw-bold">
+                        Calendários
+                    </h5>
+
+                    <div class="stat-value">
+                        @Model.CalendarCount
+                    </div>
 
                     <a asp-controller="CalendarIntegration"
                        asp-action="Index"
                        asp-route-propriedadeId="@Model.Propriedade.Id"
-                       class="btn btn-primary btn-sm mt-2">
+                       class="btn btn-primary mt-3">
 
+                        <i class="bi bi-gear me-1"></i>
                         Gerir
-
                     </a>
 
                 </div>
@@ -92,34 +120,50 @@
         </div>
 
 
-        <div class="col-lg-3 mb-3">
+        <!-- LIMPEZAS -->
 
-            <div class="card shadow-sm">
+        <div class="col-12 col-sm-6 col-xl-3">
+
+            <div class="card property-stat-card h-100">
 
                 <div class="card-body text-center">
 
-                    <h5>🧹 Limpezas</h5>
+                    <div class="stat-icon mb-3">
+                        <i class="bi bi-stars"></i>
+                    </div>
+
+                    <h5 class="fw-bold">
+                        Limpezas
+                    </h5>
 
                     @if (Model.NextCleaningTask != null)
                     {
-                        <p>
+                        <div class="next-cleaning">
 
-                            @Model.NextCleaningTask.ScheduledDate.ToString("dd/MM/yyyy")
+                            <div class="small text-muted">
+                                Próxima
+                            </div>
 
-                        </p>
+                            <div class="fw-semibold">
+                                @Model.NextCleaningTask.ScheduledDate.ToString("dd/MM/yyyy")
+                            </div>
+
+                        </div>
                     }
                     else
                     {
-                        <p>Sem limpezas.</p>
+                        <div class="text-muted">
+                            Sem limpezas.
+                        </div>
                     }
 
                     <a asp-controller="CleaningTask"
                        asp-action="Index"
                        asp-route-propertyId="@Model.Propriedade.Id"
-                       class="btn btn-primary btn-sm">
+                       class="btn btn-primary mt-3">
 
+                        <i class="bi bi-eye me-1"></i>
                         Ver
-
                     </a>
 
                 </div>
@@ -129,23 +173,33 @@
         </div>
 
 
-        <div class="col-lg-3 mb-3">
+        <!-- INVENTÁRIO -->
 
-            <div class="card shadow-sm">
+        <div class="col-12 col-sm-6 col-xl-3">
+
+            <div class="card property-stat-card h-100">
 
                 <div class="card-body text-center">
 
-                    <h5>📦 Inventário</h5>
+                    <div class="stat-icon mb-3">
+                        <i class="bi bi-box-seam"></i>
+                    </div>
 
-                    <h2>@Model.InventoryCount</h2>
+                    <h5 class="fw-bold">
+                        Inventário
+                    </h5>
+
+                    <div class="stat-value">
+                        @Model.InventoryCount
+                    </div>
 
                     <a asp-controller="Inventory"
                        asp-action="Index"
                        asp-route-propertyId="@Model.Propriedade.Id"
-                       class="btn btn-primary btn-sm">
+                       class="btn btn-primary mt-3">
 
+                        <i class="bi bi-boxes me-1"></i>
                         Gerir
-
                     </a>
 
                 </div>
@@ -155,23 +209,33 @@
         </div>
 
 
-        <div class="col-lg-3 mb-3">
+        <!-- FOTOGRAFIAS -->
 
-            <div class="card shadow-sm">
+        <div class="col-12 col-sm-6 col-xl-3">
+
+            <div class="card property-stat-card h-100">
 
                 <div class="card-body text-center">
 
-                    <h5>📸 Fotografias</h5>
+                    <div class="stat-icon mb-3">
+                        <i class="bi bi-camera-fill"></i>
+                    </div>
 
-                    <h2>@Model.PhotoCount</h2>
+                    <h5 class="fw-bold">
+                        Fotografias
+                    </h5>
+
+                    <div class="stat-value">
+                        @Model.PhotoCount
+                    </div>
 
                     <a asp-controller="Photo"
                        asp-action="Index"
                        asp-route-propertyId="@Model.Propriedade.Id"
-                       class="btn btn-primary btn-sm">
+                       class="btn btn-primary mt-3">
 
+                        <i class="bi bi-eye me-1"></i>
                         Ver
-
                     </a>
 
                 </div>
@@ -183,57 +247,145 @@
     </div>
 
 
-    <div class="card shadow-sm mt-4">
+    <!-- =====================================================
+         CALENDÁRIOS CONFIGURADOS
+         ===================================================== -->
 
-        <div class="card-header">
+    <div class="card calendar-card mt-4">
 
-            <h4 class="mb-0">
+        <div class="card-header bg-white">
 
-                Calendários Configurados
+            <div class="d-flex
+                justify-content-between
+                align-items-center
+                gap-2">
 
-            </h4>
+                <div>
+
+                    <h4 class="mb-1 fw-bold">
+                        Calendários Configurados
+                    </h4>
+
+                    <div class="text-muted small">
+                        Integrações associadas a esta propriedade
+                    </div>
+
+                </div>
+
+                <a asp-controller="CalendarIntegration"
+                   asp-action="Index"
+                   asp-route-propriedadeId="@Model.Propriedade.Id"
+                   class="btn btn-outline-primary btn-sm">
+
+                    <i class="bi bi-gear"></i>
+
+                    <span class="d-none d-sm-inline ms-1">
+                        Gerir
+                    </span>
+
+                </a>
+
+            </div>
 
         </div>
 
-        <div class="card-body">
 
-            @if (Model.CalendarIntegrations.Any())
-            {
-                <table class="table table-hover align-middle">
-                    <thead>
+        @if (Model.CalendarIntegrations.Any())
+        {
+            <!-- =============================================
+                 DESKTOP
+                 ============================================= -->
+
+            <div class="table-responsive d-none d-md-block">
+
+                <table class="table table-hover align-middle mb-0">
+
+                    <thead class="table-light">
+
                         <tr>
-                            <th>Plataforma</th>
-                            <th>Estado</th>
-                            <th>Última sincronização</th>
-                            <th class="text-end">Ações</th>
+
+                            <th class="ps-4">
+                                Plataforma
+                            </th>
+
+                            <th>
+                                Estado
+                            </th>
+
+                            <th>
+                                Última sincronização
+                            </th>
+
+                            <th class="text-end pe-4">
+                                Ações
+                            </th>
+
                         </tr>
+
                     </thead>
 
                     <tbody>
+
                         @foreach (var item in Model.CalendarIntegrations)
                         {
                             <tr>
-                                <td>@item.Provider</td>
+
+                                <td class="ps-4">
+
+                                    <div class="d-flex
+                                        align-items-center
+                                        gap-2">
+
+                                        <div class="calendar-provider-icon">
+                                            <i class="bi bi-calendar-event"></i>
+                                        </div>
+
+                                        <span class="fw-semibold">
+                                            @item.Provider
+                                        </span>
+
+                                    </div>
+
+                                </td>
+
 
                                 <td>
+
                                     @if (item.IsEnabled)
                                     {
-                                        <span class="badge bg-success">
+                                        <span class="badge
+                                            rounded-pill
+                                            bg-success">
+
+                                            <i class="bi bi-check-circle me-1"></i>
                                             Ativa
                                         </span>
                                     }
                                     else
                                     {
-                                        <span class="badge bg-secondary">
+                                        <span class="badge
+                                            rounded-pill
+                                            bg-secondary">
+
+                                            <i class="bi bi-pause-circle me-1"></i>
                                             Desativada
                                         </span>
                                     }
+
                                 </td>
 
+
                                 <td>
+
                                     @if (item.LastSync.HasValue)
                                     {
-                                         @item.LastSync.Value.ToLocalTime().ToString("dd/MM/yyyy HH:mm")
+                                        <div>
+                                            @item.LastSync.Value.ToLocalTime().ToString("dd/MM/yyyy")
+                                        </div>
+
+                                        <div class="small text-muted">
+                                            @item.LastSync.Value.ToLocalTime().ToString("HH:mm")
+                                        </div>
                                     }
                                     else
                                     {
@@ -241,13 +393,18 @@
                                             Nunca
                                         </span>
                                     }
+
                                 </td>
 
-                                <td class="text-end">
+
+                                <td class="text-end pe-4">
+
                                     <form asp-controller="CalendarIntegration"
                                           asp-action="Sync"
                                           method="post"
                                           class="d-inline">
+
+                                        @Html.AntiForgeryToken()
 
                                         <input type="hidden"
                                                name="id"
@@ -258,40 +415,340 @@
                                                value="@Model.Propriedade.Id" />
 
                                         <button type="submit"
-                                                class="btn btn-sm btn-outline-primary"
+                                                class="btn
+                                            btn-sm
+                                            btn-outline-primary"
                                                 disabled="@(!item.IsEnabled)">
 
-                                            <i class="bi bi-arrow-repeat"></i>
+                                            <i class="bi bi-arrow-repeat me-1"></i>
                                             Sincronizar
+
                                         </button>
+
                                     </form>
+
                                 </td>
+
                             </tr>
                         }
+
                     </tbody>
+
                 </table>
-            }
-            else
-            {
-                <div class="text-center py-5">
 
-                    <h5>
+            </div>
 
-                        Ainda não existem calendários.
 
-                    </h5>
+            <!-- =============================================
+                 MOBILE
+                 ============================================= -->
 
-                    <a asp-controller="CalendarIntegration"
-                       asp-action="Index"
-                       asp-route-propriedadeId="@Model.Propriedade.Id"
-                       class="btn btn-primary">
+            <div class="d-md-none p-3">
 
-                        Adicionar Calendário
+                <div class="d-flex flex-column gap-3">
 
-                    </a>
+                    @foreach (var item in Model.CalendarIntegrations)
+                    {
+                        <div class="calendar-mobile-item">
+
+                            <div class="d-flex
+                                justify-content-between
+                                align-items-start
+                                gap-3 mb-3">
+
+                                <div>
+
+                                    <div class="text-muted small mb-1">
+                                        Plataforma
+                                    </div>
+
+                                    <div class="fw-bold">
+                                        <i class="bi bi-calendar-event
+                                        text-primary me-1"></i>
+
+                                        @item.Provider
+                                    </div>
+
+                                </div>
+
+
+                                @if (item.IsEnabled)
+                                {
+                                    <span class="badge
+                                        rounded-pill
+                                        bg-success">
+
+                                        Ativa
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge
+                                        rounded-pill
+                                        bg-secondary">
+
+                                        Desativada
+                                    </span>
+                                }
+
+                            </div>
+
+
+                            <div class="calendar-sync-info mb-3">
+
+                                <div class="text-muted small mb-1">
+                                    Última sincronização
+                                </div>
+
+                                @if (item.LastSync.HasValue)
+                                {
+                                    <div class="fw-semibold">
+
+                                        <i class="bi bi-clock-history
+                                        me-1
+                                        text-muted"></i>
+
+                                        @item.LastSync.Value
+                                        .ToLocalTime()
+                                        .ToString("dd/MM/yyyy 'às' HH:mm")
+
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="text-muted">
+                                        Nunca sincronizado
+                                    </div>
+                                }
+
+                            </div>
+
+
+                            <form asp-controller="CalendarIntegration"
+                                  asp-action="Sync"
+                                  method="post">
+
+                                @Html.AntiForgeryToken()
+
+                                <input type="hidden"
+                                       name="id"
+                                       value="@item.Id" />
+
+                                <input type="hidden"
+                                       name="propriedadeId"
+                                       value="@Model.Propriedade.Id" />
+
+                                <button type="submit"
+                                        class="btn
+                                    btn-outline-primary
+                                    w-100"
+                                        disabled="@(!item.IsEnabled)">
+
+                                    <i class="bi bi-arrow-repeat me-1"></i>
+                                    Sincronizar
+
+                                </button>
+
+                            </form>
+
+                        </div>
+                    }
 
                 </div>
-            }
-        </div>
+
+            </div>
+        }
+        else
+        {
+            <div class="card-body text-center py-5">
+
+                <div class="empty-calendar-icon mb-3">
+                    <i class="bi bi-calendar-x"></i>
+                </div>
+
+                <h5 class="fw-bold">
+                    Ainda não existem calendários
+                </h5>
+
+                <p class="text-muted">
+                    Adicione uma integração para sincronizar
+                    automaticamente as reservas.
+                </p>
+
+                <a asp-controller="CalendarIntegration"
+                   asp-action="Index"
+                   asp-route-propriedadeId="@Model.Propriedade.Id"
+                   class="btn btn-primary">
+
+                    <i class="bi bi-plus-lg me-1"></i>
+                    Adicionar Calendário
+
+                </a>
+
+            </div>
+        }
+
     </div>
+
 </div>
+
+
+<style>
+
+    .property-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+    }
+
+    .property-header-actions {
+        display: flex;
+        gap: 8px;
+    }
+
+
+    /* CARDS */
+
+    .property-stat-card {
+        border: 1px solid #e9ecef;
+        border-radius: 16px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, .06);
+    }
+
+        .property-stat-card .card-body {
+            padding: 24px 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 210px;
+        }
+
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #eaf2ff;
+        color: #0d6efd;
+        border-radius: 14px;
+        font-size: 1.4rem;
+    }
+
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 600;
+        line-height: 1;
+        margin-top: 5px;
+    }
+
+    .next-cleaning {
+        min-height: 48px;
+    }
+
+
+    /* CALENDÁRIO */
+
+    .calendar-card {
+        border: 1px solid #e9ecef;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, .06);
+    }
+
+        .calendar-card .card-header {
+            padding: 18px 22px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+    .calendar-provider-icon {
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #eaf2ff;
+        color: #0d6efd;
+        border-radius: 10px;
+    }
+
+
+    /* MOBILE CALENDAR */
+
+    .calendar-mobile-item {
+        padding: 16px;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        background: #fff;
+    }
+
+    .calendar-sync-info {
+        padding: 12px;
+        background: #f8f9fa;
+        border-radius: 10px;
+    }
+
+
+    /* EMPTY */
+
+    .empty-calendar-icon {
+        width: 70px;
+        height: 70px;
+        margin: auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f1f3f5;
+        color: #6c757d;
+        border-radius: 50%;
+        font-size: 2rem;
+    }
+
+
+    /* MOBILE */
+
+    @@media (max-width: 767.98px) {
+
+        .container {
+            padding-left: 12px;
+            padding-right: 12px;
+        }
+
+        .property-header {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .property-header-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+        }
+
+            .property-header-actions .btn {
+                width: 100%;
+            }
+
+        .property-stat-card .card-body {
+            min-height: 190px;
+        }
+
+        .calendar-card .card-header {
+            padding: 16px;
+        }
+
+        .calendar-mobile-item .btn {
+            min-height: 44px;
+        }
+    }
+
+
+    @@media (max-width: 420px) {
+
+        .property-header-actions {
+            grid-template-columns: 1fr;
+        }
+    }
+
+</style>

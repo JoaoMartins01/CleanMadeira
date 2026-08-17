@@ -10,6 +10,8 @@ public interface ICalendarIntegrationService
         CalendarIntegration integration,
         Guid userId);
 
+    Task<List<CalendarIntegration>> GetAllActiveAsync();
+
     Task<(bool Success, string Message)> DeleteAsync(
         Guid integrationId,
         Guid userId);

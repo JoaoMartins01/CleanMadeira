@@ -12,6 +12,7 @@ namespace CleanMadeira.Domain.Entities
         public Guid? AssignedUserId { get; set; }
 
         public ApplicationUser? AssignedUser { get; set; }
+
         public Guid? CleaningCompanyId { get; set; }
 
         public Company? CleaningCompany { get; set; }
