@@ -37,7 +37,7 @@ public class PropertyRepository
             .FirstOrDefaultAsync(p => p.Id == id);
     }
 
-    public async Task<Property?> GetByIdAndOwnerAsync(Guid id, Guid ownerId)
+    public async Task<Property?> GetByIdAndOwnerIdAsync(Guid id, Guid ownerId)
     {
         return await _context.Properties
             .FirstOrDefaultAsync(x =>

@@ -13,6 +13,7 @@ using CleanMadeira.Infrastructure.Repositories;
 using CleanMadeira.Infrastructure.Repository;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -49,8 +50,30 @@ builder.Services
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.LoginPath = "/Account/Login";
-    options.AccessDeniedPath = "/Account/AccessDenied";
+
+    options.ExpireTimeSpan =
+        TimeSpan.FromDays(30);
+
+    options.SlidingExpiration = true;
+
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SecurePolicy =
+        CookieSecurePolicy.Always;
+
+    options.Cookie.SameSite =
+        SameSiteMode.Lax;
 });
+
+// Data Protection
+var keysPath = Path.Combine(
+    Environment.GetEnvironmentVariable("HOME") ?? ".",
+    "DataProtection-Keys"
+);
+
+builder.Services
+    .AddDataProtection()
+    .PersistKeysToFileSystem(new DirectoryInfo(keysPath))
+    .SetApplicationName("CleanMadeira");
 
 builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();
 builder.Services.AddScoped<IPropertyRepository, PropertyRepository>();

@@ -24,6 +24,11 @@ public class MaintenanceService : IMaintenanceService
         return await _maintenanceRepository.GetByIdAsync(id);
     }
 
+    public async Task<Maintenance?> GetByIdAndOwnerIdAsync(Guid id, Guid ownerId)
+    {
+        return await _maintenanceRepository.GetByIdAndOwnerIdAsync(id, ownerId);
+    }
+
     public async Task<IEnumerable<Maintenance>> GetByOwnerIdAsync(
         Guid ownerId)
     {

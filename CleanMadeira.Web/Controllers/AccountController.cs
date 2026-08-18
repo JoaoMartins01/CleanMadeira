@@ -1,7 +1,7 @@
 ﻿using CleanMadeira.Application.Contract;
 using CleanMadeira.Application.Services.Interface;
 using CleanMadeira.Domain.Entities;
-using CleanMadeira.Domain.Entities.Enums;
+using CleanMadeira.Domain.Enums;
 using CleanMadeira.Web.ViewModels;
 using CleanMadeira.Web.ViewModels.Account;
 using Microsoft.AspNetCore.Authorization;
@@ -29,8 +29,25 @@ public class AccountController : Controller
         _cleanerNumberGenerator = cleanerNumberGenerator;
     }
 
-    public IActionResult Login()
+    public async Task<IActionResult> LoginAsync()
     {
+        if (User.Identity?.IsAuthenticated == true)
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            if (user.Role == UserRole.Limpador || user.Role == UserRole.GestorELimpador)
+            {
+                return RedirectToAction("MyTasks", "CleaningTask");
+            }
+            else
+            {
+                return RedirectToAction(
+                    "Index",
+                    "Dashboard"
+                );
+            }
+        }
+
         return View(new LoginVM());
     }
 

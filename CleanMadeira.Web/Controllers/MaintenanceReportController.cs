@@ -2,12 +2,13 @@
 using CleanMadeira.Application.Interfaces;
 using CleanMadeira.Application.Services.Interface;
 using CleanMadeira.Domain.Entities;
-using CleanMadeira.Domain.Entities.Enums;
+using CleanMadeira.Domain.Enums;
 using CleanMadeira.Web.ViewModels.Maintenance;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Mail;
+using System.Security.Claims;
 
 namespace CleanMadeira.Web.Controllers;
 
@@ -45,8 +46,10 @@ public class MaintenanceReportController : Controller
     [HttpGet]
     public async Task<IActionResult> ReportProblem(Guid cleaningTaskId)
     {
+        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
         var task = await _cleaningTaskService
-            .GetByLimpadorIdAsync(cleaningTaskId);
+            .GetByIdAndCleanerIdAsync(cleaningTaskId, userId);
 
         if (task == null)
             return NotFound();
@@ -70,8 +73,10 @@ public class MaintenanceReportController : Controller
         if (!ModelState.IsValid)
             return View(model);
 
+        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
         var task = await _cleaningTaskService
-            .GetByLimpadorIdAsync(model.CleaningTaskId);
+            .GetByIdAndCleanerIdAsync(model.CleaningTaskId, userId);
 
         if (task == null)
             return NotFound();

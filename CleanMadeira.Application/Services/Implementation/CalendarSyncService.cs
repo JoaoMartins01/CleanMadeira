@@ -3,7 +3,7 @@ using CleanMadeira.Application.Contract;
 using CleanMadeira.Application.Models;
 using CleanMadeira.Application.Services.Interface;
 using CleanMadeira.Domain.Entities;
-using CleanMadeira.Domain.Entities.Enums;
+using CleanMadeira.Domain.Enums;
 using Ical.Net.CalendarComponents;
 using Microsoft.Extensions.Configuration;
 using IcalCalendar = Ical.Net.Calendar;

@@ -8,6 +8,8 @@ public interface IMaintenanceService
 
     Task<Maintenance?> GetByIdAsync(Guid id);
 
+    Task<Maintenance?> GetByIdAndOwnerIdAsync(Guid id, Guid ownerId);
+
     Task<IEnumerable<Maintenance>> GetByOwnerIdAsync(Guid ownerId);
 
     Task<IEnumerable<Maintenance>> GetByAssignedUserIdAsync(Guid userId);

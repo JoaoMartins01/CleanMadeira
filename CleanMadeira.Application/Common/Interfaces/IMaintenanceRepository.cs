@@ -7,7 +7,7 @@ public interface IMaintenanceRepository
     Task<IEnumerable<Maintenance>> GetAllAsync();
 
     Task<Maintenance?> GetByIdAsync(Guid id);
-
+    Task<Maintenance?> GetByIdAndOwnerIdAsync(Guid id, Guid OwnerId);
     Task<IEnumerable<Maintenance>> GetByPropertyIdAsync(Guid propertyId);
 
     Task<IEnumerable<Maintenance>> GetByAssignedUserIdAsync(Guid userId);

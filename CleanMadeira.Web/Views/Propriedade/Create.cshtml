@@ -835,6 +835,104 @@
                 // =====================================================
                 // PESQUISA DE MORADAS
                 // =====================================================
+                if (currentLocationButton) {
+                    currentLocationButton.addEventListener(
+                        "click",
+                        function () {
+
+                            if (!navigator.geolocation) {
+                                alert(
+                                    "O seu dispositivo não suporta geolocalização."
+                                );
+
+                                return;
+                            }
+
+                            const originalText =
+                                currentLocationButton.innerHTML;
+
+                            currentLocationButton.disabled = true;
+
+                            currentLocationButton.innerHTML = `
+                                <span class="spinner-border
+                                             spinner-border-sm
+                                             me-2">
+                                </span>
+                                A obter localização...
+                            `;
+
+                            navigator.geolocation.getCurrentPosition(
+
+                                // SUCESSO
+                                function (position) {
+
+                                    const latitude =
+                                        position.coords.latitude;
+
+                                    const longitude =
+                                        position.coords.longitude;
+
+                                    setLocation(
+                                        latitude,
+                                        longitude
+                                    );
+
+                                    currentLocationButton.disabled =
+                                        false;
+
+                                    currentLocationButton.innerHTML =
+                                        originalText;
+                                },
+
+                                // ERRO
+                                function (error) {
+
+                                    console.error(
+                                        "Erro de geolocalização:",
+                                        error
+                                    );
+
+                                    let message =
+                                        "Não foi possível obter a localização.";
+
+                                    switch (error.code) {
+
+                                        case error.PERMISSION_DENIED:
+                                            message =
+                                                "A permissão de localização foi recusada.";
+                                            break;
+
+                                        case error.POSITION_UNAVAILABLE:
+                                            message =
+                                                "A localização não está disponível.";
+                                            break;
+
+                                        case error.TIMEOUT:
+                                            message =
+                                                "Demorou demasiado tempo a obter a localização.";
+                                            break;
+                                    }
+
+                                    alert(message);
+
+                                    currentLocationButton.disabled =
+                                        false;
+
+                                    currentLocationButton.innerHTML =
+                                        originalText;
+                                },
+
+                                // OPÇÕES
+                                {
+                                    enableHighAccuracy: true,
+                                    timeout: 15000,
+                                    maximumAge: 0
+                                }
+                            );
+                        }
+                    );
+                }
+
 
                 if (searchAddressButton) {
                     searchAddressButton.addEventListener(

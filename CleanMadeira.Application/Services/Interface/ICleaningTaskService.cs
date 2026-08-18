@@ -10,8 +10,8 @@ namespace CleanMadeira.Application.Services.Interface
         Task<IEnumerable<CleaningTask>> GetByLimpadorUserIdAsync(Guid cleanerUserId);
         Task<IEnumerable<CleaningTask>> GetByOwnerIdAsync(Guid ownerId);
         Task<IEnumerable<CleaningTask>> GetByCompanyIdAsync(Guid companyId);
-        Task<CleaningTask?> GetByIdAndOwnerAsync(Guid id, Guid ownerId);
-        Task<CleaningTask?> GetByLimpadorIdAsync(Guid id);
+        Task<CleaningTask?> GetByIdAndOwnerIdAsync(Guid id, Guid ownerId);
+        Task<CleaningTask?> GetByIdAndCleanerIdAsync(Guid id, Guid cleanerId);
         Task<CleaningTask?> GetByIdAsync(Guid? id);
         Task AddCleanerUpdateAsync(Guid taskId, string? cleanerNotes, List<TaskPhoto> photos);
         Task<bool> HasOpenTasksByPropertyIdAsync(Guid propriedadeId);

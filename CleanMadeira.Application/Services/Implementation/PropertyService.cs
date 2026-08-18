@@ -21,9 +21,9 @@ public class PropertyService : IPropertyService
         return await _propertyRepository.GetByIdAsync(id);
     }
 
-    public async Task<Property?> GetByIdAndOwnerAsync(Guid id, Guid ownerId)
+    public async Task<Property?> GetByIdAndOwnerIdAsync(Guid id, Guid ownerId)
     {
-        return await _propertyRepository.GetByIdAndOwnerAsync(id, ownerId);
+        return await _propertyRepository.GetByIdAndOwnerIdAsync(id, ownerId);
     }
 
     public async Task CreateAsync(Property propriedade)

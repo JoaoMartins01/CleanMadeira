@@ -38,6 +38,15 @@ namespace CleanMadeira.Infrastructure.Repositories
                 .FirstOrDefaultAsync(x => x.Id == id);
         }
 
+        public async Task<MaintenanceProvider?> GetByIdAndOwnerIdAsync(Guid id, Guid ownerId)
+        {
+            return await _context.MaintenanceProviders
+                .Include(x => x.Owner)
+                .FirstOrDefaultAsync(x => 
+                    x.Id == id &&
+                    x.OwnerId == ownerId);
+        }
+
         public async Task AddAsync(MaintenanceProvider provider)
         {
             await _context.MaintenanceProviders.AddAsync(provider);

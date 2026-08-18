@@ -1,7 +1,7 @@
 ﻿using CleanMadeira.Application.Contract;
 using CleanMadeira.Application.Services.Interface;
 using CleanMadeira.Domain.Entities;
-using CleanMadeira.Domain.Entities.Enums;
+using CleanMadeira.Domain.Enums;
 using CleanMadeira.Web.ViewModels.CleaningTask;
 using ImageMagick;
 using Microsoft.AspNetCore.Identity;
@@ -59,11 +59,11 @@ public class CleaningTaskController : Controller
 
         if (user.Role == UserRole.Dono)
         {
-            task = await _cleaningTaskService.GetByIdAndOwnerAsync(id, userId);
+            task = await _cleaningTaskService.GetByIdAndOwnerIdAsync(id, userId);
         }
         else
         {
-            task = await _cleaningTaskService.GetByLimpadorIdAsync(id);
+            task = await _cleaningTaskService.GetByIdAndCleanerIdAsync(id, userId);
         }
 
 
@@ -154,7 +154,7 @@ public class CleaningTaskController : Controller
 
         var user = await _userManager.GetUserAsync(User);
 
-        var property = await _propertyService.GetByIdAndOwnerAsync(vm.PropriedadeId, user.Id);
+        var property = await _propertyService.GetByIdAndOwnerIdAsync(vm.PropriedadeId, user.Id);
 
         var task = new CleaningTask
         {
@@ -166,7 +166,7 @@ public class CleaningTaskController : Controller
             Priority = vm.Prioridade,
             Status = CleaningStatus.Pendente,
             EstimatedMinutes = vm.EstimatedMinutes,
-            CleaningCompanyId = property.CleaningCompanyId,
+            CleaningCompanyId = property?.CleaningCompanyId,
             Notes = vm.Notas
         };
 
@@ -179,7 +179,7 @@ public class CleaningTaskController : Controller
     {
         var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-        var task = await _cleaningTaskService.GetByIdAndOwnerAsync(id, userId);
+        var task = await _cleaningTaskService.GetByIdAndOwnerIdAsync(id, userId);
 
         if (task == null)
             return NotFound();
@@ -211,7 +211,7 @@ public class CleaningTaskController : Controller
 
         var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-        var task = await _cleaningTaskService.GetByIdAndOwnerAsync(vm.Id, userId);
+        var task = await _cleaningTaskService.GetByIdAndOwnerIdAsync(vm.Id, userId);
 
         if (task == null)
             return NotFound();
@@ -233,7 +233,7 @@ public class CleaningTaskController : Controller
     {
         var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-        var task = await _cleaningTaskService.GetByIdAndOwnerAsync(id, userId);
+        var task = await _cleaningTaskService.GetByIdAndOwnerIdAsync(id, userId);
 
         if (task == null)
             return NotFound();
@@ -259,7 +259,7 @@ public class CleaningTaskController : Controller
     {
         var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-        var task = await _cleaningTaskService.GetByIdAndOwnerAsync(id, userId);
+        var task = await _cleaningTaskService.GetByIdAndOwnerIdAsync(id, userId);
 
         if (task == null)
             return NotFound();

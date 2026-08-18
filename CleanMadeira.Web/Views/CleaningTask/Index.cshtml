@@ -787,27 +787,19 @@
                             break;
                     }
 
-                    const withoutCleanerIcon = props.semLimpador
+                    const cleanerHtml = props.semLimpador
                         ? `
-                    <i class="bi bi-person-exclamation text-danger ms-1"
-                       title="Sem limpador atribuído">
-                    </i>
-                  `
-                        : "";
-
-                    const cleanerHtml = props.funcionaria
-                        ? `
-                    <div class="event-cleaner">
-                        <i class="bi bi-person-fill"></i>
-                        ${props.funcionaria}
-                    </div>
-                  `
+                <div class="event-cleaner">
+                    <i class="bi bi-person-fill text-danger"></i>
+                    <span>Sem limpador</span>
+                </div>
+              `
                         : `
-                    <div class="event-cleaner text-danger">
-                        <i class="bi bi-person-exclamation"></i>
-                        Sem limpador
-                    </div>
-                  `;
+                <div class="event-cleaner">
+                    <i class="bi bi-person-fill"></i>
+                    <span>${props.funcionaria ?? ""}</span>
+                </div>
+              `;
 
                     const hora = info.event.start.toLocaleTimeString("pt-PT", {
                         hour: "2-digit",

@@ -1,7 +1,7 @@
 ﻿using CleanMadeira.Application.Common.DTO;
 using CleanMadeira.Application.Common.Interfaces;
 using CleanMadeira.Application.Services.Interface;
-using CleanMadeira.Domain.Entities.Enums;
+using CleanMadeira.Domain.Enums;
 //using CleanMadeira.Domain.Enums;
 
 namespace CleanMadeira.Application.Services;

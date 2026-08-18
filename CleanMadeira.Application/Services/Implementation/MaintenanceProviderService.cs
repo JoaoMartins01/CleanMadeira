@@ -29,6 +29,11 @@ namespace CleanMadeira.Application.Services
             return await _repository.GetByIdAsync(id);
         }
 
+        public async Task<MaintenanceProvider?> GetByIdAndOwnerIdAsync(Guid id, Guid ownerId)
+        {
+            return await _repository.GetByIdAndOwnerIdAsync(id, ownerId);
+        }
+
         public async Task AddAsync(MaintenanceProvider provider)
         {
             provider.Id = Guid.NewGuid();

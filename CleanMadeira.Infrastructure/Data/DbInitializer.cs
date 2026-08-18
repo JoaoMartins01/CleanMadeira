@@ -1,5 +1,6 @@
 ﻿using CleanMadeira.Domain.Entities;
-using CleanMadeira.Domain.Entities.Enums;
+using CleanMadeira.Domain.Enums;
+
 
 //using CleanMadeira.Domain.Enums;
 using Microsoft.AspNetCore.Identity;

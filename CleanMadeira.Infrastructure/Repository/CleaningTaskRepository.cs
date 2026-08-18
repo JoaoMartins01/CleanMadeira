@@ -1,6 +1,6 @@
 ﻿using CleanMadeira.Application.Common.Interfaces;
 using CleanMadeira.Domain.Entities;
-using CleanMadeira.Domain.Entities.Enums;
+using CleanMadeira.Domain.Enums;
 using CleanMadeira.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -59,15 +59,7 @@ public class CleaningTaskRepository
             .ToListAsync();
     }
 
-    public async Task<CleaningTask?> GetByLimpadorIdAsync(Guid id)
-    {
-        return await _context.CleaningTasks
-            .Include(t => t.Property)
-            .Include(t => t.Property.ApplicationUser)
-            .Include(t => t.AssignedUser)
-            .Include(t => t.Photos)
-            .FirstOrDefaultAsync(t => t.Id == id);
-    }
+    
 
     public async Task<IEnumerable<CleaningTask>> GetByOwnerIdAsync(Guid ownerId)
     {
@@ -91,7 +83,7 @@ public class CleaningTaskRepository
             .ToListAsync();
     }
 
-    public async Task<CleaningTask?> GetByIdAndOwnerAsync(Guid id, Guid ownerId)
+    public async Task<CleaningTask?> GetByIdAndOwnerIdAsync(Guid id, Guid ownerId)
     {
         return await _context.CleaningTasks
             .Include(t => t.Property)
@@ -100,6 +92,18 @@ public class CleaningTaskRepository
             .FirstOrDefaultAsync(x =>
                 x.Id == id &&
                 x.Property.ApplicationUserId == ownerId);
+    }
+
+    public async Task<CleaningTask?> GetByIdAndCleanerIdAsync(Guid id, Guid CleanerId)
+    {
+        return await _context.CleaningTasks
+            .Include(t => t.Property)
+            .Include(t => t.Property.ApplicationUser)
+            .Include(t => t.AssignedUser)
+            .Include(t => t.Photos)
+            .FirstOrDefaultAsync(t => 
+                t.Id == id &&
+                t.AssignedUserId == CleanerId);
     }
 
     public async Task AddCleanerUpdateAsync(

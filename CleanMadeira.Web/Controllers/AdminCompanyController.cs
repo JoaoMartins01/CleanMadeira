@@ -1,4 +1,4 @@
-﻿using CleanMadeira.Domain.Entities.Enums;
+﻿using CleanMadeira.Domain.Enums;
 using CleanMadeira.Infrastructure.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

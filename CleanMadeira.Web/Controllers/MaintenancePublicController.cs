@@ -1,5 +1,5 @@
 ﻿using CleanMadeira.Application.Interfaces.Services;
-using CleanMadeira.Domain.Entities.Enums;
+using CleanMadeira.Domain.Enums;
 using CleanMadeira.Web.ViewModels.PublicMaintenance;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

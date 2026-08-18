@@ -1,7 +1,7 @@
 ﻿using CleanMadeira.Application.Common.Interfaces;
 using CleanMadeira.Application.Services.Interface;
 using CleanMadeira.Domain.Entities;
-using CleanMadeira.Domain.Entities.Enums;
+using CleanMadeira.Domain.Enums;
 
 namespace CleanMadeira.Application.Services.Implementation
 {
@@ -21,10 +21,7 @@ namespace CleanMadeira.Application.Services.Implementation
             return await _taskRepository.GetAllAsync();
         }
 
-        public async Task<CleaningTask?> GetByLimpadorIdAsync(Guid id)
-        {
-            return await _taskRepository.GetByLimpadorIdAsync(id);
-        }
+        
 
         public async Task<CleaningTask?> GetByIdAsync(Guid? id)
         {
@@ -105,9 +102,13 @@ namespace CleanMadeira.Application.Services.Implementation
             return await _taskRepository.GetByCompanyIdAsync(companyId);
         }
 
-        public async Task<CleaningTask?> GetByIdAndOwnerAsync(Guid id, Guid ownerId)
+        public async Task<CleaningTask?> GetByIdAndOwnerIdAsync(Guid id, Guid ownerId)
         {
-            return await _taskRepository.GetByIdAndOwnerAsync(id, ownerId);
+            return await _taskRepository.GetByIdAndOwnerIdAsync(id, ownerId);
+        }
+        public async Task<CleaningTask?> GetByIdAndCleanerIdAsync(Guid id, Guid cleanerId)
+        {
+            return await _taskRepository.GetByIdAndCleanerIdAsync(id, cleanerId);
         }
 
         public async Task<bool> HasOpenTasksByPropertyIdAsync(Guid propriedadeId)

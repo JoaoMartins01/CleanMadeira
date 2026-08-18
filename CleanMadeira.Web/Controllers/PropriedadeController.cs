@@ -68,7 +68,7 @@ public class PropriedadeController : Controller
     {
         var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-        var property = await _propertyService.GetByIdAndOwnerAsync(id, userId);
+        var property = await _propertyService.GetByIdAndOwnerIdAsync(id, userId);
 
         
 
@@ -233,7 +233,7 @@ public class PropriedadeController : Controller
     {
         var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-        var property = await _propertyService.GetByIdAndOwnerAsync(id, userId);
+        var property = await _propertyService.GetByIdAndOwnerIdAsync(id, userId);
 
         var companies = await _companyService.GetAllAsync();
 
@@ -302,7 +302,7 @@ public class PropriedadeController : Controller
 
         var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-        var property = await _propertyService.GetByIdAndOwnerAsync(id, userId);
+        var property = await _propertyService.GetByIdAndOwnerIdAsync(id, userId);
 
         if (property == null)
             return NotFound();
@@ -328,7 +328,7 @@ public class PropriedadeController : Controller
     {
         var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-        var property = await _propertyService.GetByIdAndOwnerAsync(id, userId);
+        var property = await _propertyService.GetByIdAndOwnerIdAsync(id, userId);
 
         if (property == null)
             return NotFound();
@@ -350,7 +350,7 @@ public class PropriedadeController : Controller
     {
         var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-        var property = await _propertyService.GetByIdAndOwnerAsync(id, userId);
+        var property = await _propertyService.GetByIdAndOwnerIdAsync(id, userId);
 
         if (property == null)
             return NotFound();
@@ -396,7 +396,7 @@ public class PropriedadeController : Controller
     {
         var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-        var property = await _propertyService.GetByIdAndOwnerAsync(id, userId);
+        var property = await _propertyService.GetByIdAndOwnerIdAsync(id, userId);
 
         if (property == null)
             return NotFound();
@@ -418,7 +418,7 @@ public class PropriedadeController : Controller
     {
         var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-        var property = await _propertyService.GetByIdAndOwnerAsync(id, userId);
+        var property = await _propertyService.GetByIdAndOwnerIdAsync(id, userId);
 
         if (property == null)
             return NotFound();

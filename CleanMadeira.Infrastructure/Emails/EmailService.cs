@@ -1,6 +1,6 @@
 ﻿using CleanMadeira.Application.Contract;
 using CleanMadeira.Domain.Entities;
-using CleanMadeira.Domain.Entities.Enums;
+using CleanMadeira.Domain.Enums;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Net;
@@ -17,7 +17,7 @@ public class EmailService : IEmailService
         _logger = logger;
     }
 
-   /* public async Task SendEmailAsync(
+    /*public async Task SendEmailAsync(
     string to,
     string subject,
     string body)

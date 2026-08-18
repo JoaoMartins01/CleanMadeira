@@ -1,6 +1,6 @@
 ﻿using CleanMadeira.Application.Interfaces.Repositories;
 using CleanMadeira.Domain.Entities;
-using CleanMadeira.Domain.Entities.Enums;
+using CleanMadeira.Domain.Enums;
 using CleanMadeira.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -31,6 +31,17 @@ public class MaintenanceRepository : IMaintenanceRepository
             .Include(x => x.AssignedUser)
             .Include(x => x.MaintenanceProvider)
             .FirstOrDefaultAsync(x => x.Id == id);
+    }
+
+    public async Task<Maintenance?> GetByIdAndOwnerIdAsync(Guid id, Guid OwnerId)
+    {
+        return await _context.Maintenances
+            .Include(x => x.Property)
+            .Include(x => x.AssignedUser)
+            .Include(x => x.MaintenanceProvider)
+            .FirstOrDefaultAsync(x =>
+                x.Id == id &&
+                x.Property.ApplicationUserId == OwnerId);
     }
 
     public async Task<IEnumerable<Maintenance>> GetByPropertyIdAsync(Guid propertyId)

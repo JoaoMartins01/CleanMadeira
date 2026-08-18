@@ -1,4 +1,4 @@
-﻿namespace CleanMadeira.Domain.Entities.Enums
+﻿namespace CleanMadeira.Domain.Enums
 {
     public enum UnidadeProduto
     {

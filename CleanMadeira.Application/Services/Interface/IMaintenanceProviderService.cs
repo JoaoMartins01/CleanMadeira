@@ -10,6 +10,8 @@ namespace CleanMadeira.Application.Interfaces.Services
 
         Task<MaintenanceProvider?> GetByIdAsync(Guid id);
 
+        Task<MaintenanceProvider?> GetByIdAndOwnerIdAsync(Guid id, Guid ownerId);
+
         Task AddAsync(MaintenanceProvider provider);
 
         Task UpdateAsync(MaintenanceProvider provider);

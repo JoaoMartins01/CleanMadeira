@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using CleanMadeira.Domain.Entities.Enums;
+using CleanMadeira.Domain.Enums;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace CleanMadeira.Web.ViewModels.Maintenance;

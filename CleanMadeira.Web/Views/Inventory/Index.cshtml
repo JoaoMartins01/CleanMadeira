@@ -99,12 +99,13 @@
                     primeiro precisa de adicionar uma propriedade.
                 </p>
 
-                <a asp-controller="Propriedade"
+                <a asp-controller="Inventory"
                    asp-action="Create"
+                   asp-route-propriedadeId="@Model.PropriedadeSelecionadaId"
                    class="btn btn-primary">
 
-                    <i class="bi bi-house-add me-1"></i>
-                    Adicionar propriedade
+                    <i class="bi bi-plus-lg me-1"></i>
+                    Adicionar produto
                 </a>
 
             </div>
@@ -127,6 +128,7 @@
 
                 <a asp-controller="Inventory"
                    asp-action="Create"
+                   asp-route-propriedadeId="@Model.PropriedadeSelecionadaId"
                    class="btn btn-primary">
 
                     <i class="bi bi-plus-lg me-1"></i>
@@ -182,11 +184,11 @@
 
                             <a asp-controller="Inventory"
                                asp-action="Create"
-                               asp-route-propriedadeId="@propriedade.Key.PropriedadeId"
-                               class="btn btn-sm btn-outline-primary">
+                               asp-route-propriedadeId="@Model.PropriedadeSelecionadaId"
+                               class="btn btn-primary">
 
                                 <i class="bi bi-plus-lg me-1"></i>
-                                Adicionar
+                                Adicionar produto
                             </a>
 
                         </div>

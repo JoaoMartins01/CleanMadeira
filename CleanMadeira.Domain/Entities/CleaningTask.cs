@@ -1,5 +1,5 @@
 ﻿using CheckListItem.Domain.Entities;
-using CleanMadeira.Domain.Entities.Enums;
+using CleanMadeira.Domain.Enums;
 
 namespace CleanMadeira.Domain.Entities
 {

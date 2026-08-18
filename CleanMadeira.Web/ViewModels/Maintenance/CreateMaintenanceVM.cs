@@ -1,4 +1,4 @@
-﻿using CleanMadeira.Domain.Entities.Enums;
+﻿using CleanMadeira.Domain.Enums;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 

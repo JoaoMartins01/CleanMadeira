@@ -35,6 +35,7 @@ public class MaintenanceReportRepository
             .Include(x => x.ReportedByUser)
             .Include(x => x.Maintenance)
             .Where(x => x.Property.ApplicationUserId == ownerId)
+            .OrderByDescending(x => x.ReportedAt)
             .ToListAsync();
     }
 

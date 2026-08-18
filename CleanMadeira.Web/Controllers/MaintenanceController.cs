@@ -4,7 +4,7 @@ using CleanMadeira.Application.Interfaces.Services;
 using CleanMadeira.Application.Services.Implementation;
 using CleanMadeira.Application.Services.Interface;
 using CleanMadeira.Domain.Entities;
-using CleanMadeira.Domain.Entities.Enums;
+using CleanMadeira.Domain.Enums;
 using CleanMadeira.Web.ViewModels.Maintenance;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -53,7 +53,9 @@ public class MaintenanceController : Controller
 
     public async Task<IActionResult> Details(Guid id)
     {
-        var maintenance = await _maintenanceService.GetByIdAsync(id);
+        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+        var maintenance = await _maintenanceService.GetByIdAndOwnerIdAsync(id, userId);
 
         if (maintenance == null)
             return NotFound();
@@ -196,7 +198,9 @@ public class MaintenanceController : Controller
     public async Task<IActionResult> Edit(Guid id)
     {
 
-        var maintenance = await _maintenanceService.GetByIdAsync(id);
+        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+        var maintenance = await _maintenanceService.GetByIdAndOwnerIdAsync(id, userId);
 
         if (maintenance == null)
             return NotFound();
@@ -250,7 +254,9 @@ public class MaintenanceController : Controller
     [HttpGet]
     public async Task<IActionResult> Delete(Guid id)
     {
-        var maintenance = await _maintenanceService.GetByIdAsync(id);
+        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+        var maintenance = await _maintenanceService.GetByIdAndOwnerIdAsync(id, userId);
 
         if (maintenance == null)
             return NotFound();

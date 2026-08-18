@@ -67,7 +67,9 @@ namespace CleanMadeira.Web.Controllers
 
         public async Task<IActionResult> Edit(Guid id)
         {
-            var provider = await _maintenanceProviderService.GetByIdAsync(id);
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+            var provider = await _maintenanceProviderService.GetByIdAndOwnerIdAsync(id, userId);
 
             if (provider == null)
                 return NotFound();
@@ -115,7 +117,9 @@ namespace CleanMadeira.Web.Controllers
 
         public async Task<IActionResult> Delete(Guid id)
         {
-            var provider = await _maintenanceProviderService.GetByIdAsync(id);
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+            var provider = await _maintenanceProviderService.GetByIdAndOwnerIdAsync(id, userId);
 
             if (provider == null)
                 return NotFound();
@@ -151,7 +155,9 @@ namespace CleanMadeira.Web.Controllers
 
         public async Task<IActionResult> Details(Guid id)
         {
-            var provider = await _maintenanceProviderService.GetByIdAsync(id);
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+            var provider = await _maintenanceProviderService.GetByIdAndOwnerIdAsync(id, userId);
 
             if (provider == null)
                 return NotFound();

@@ -1,6 +1,6 @@
 ﻿using CleanMadeira.Application.Interfaces;
 using CleanMadeira.Domain.Entities;
-using CleanMadeira.Domain.Entities.Enums;
+using CleanMadeira.Domain.Enums;
 using CleanMadeira.Domain.Interfaces;
 
 namespace CleanMadeira.Application.Services;

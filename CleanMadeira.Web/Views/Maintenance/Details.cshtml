@@ -1,8 +1,12 @@
-﻿@using CleanMadeira.Domain.Entities.Enums
+﻿@using CleanMadeira.Domain.Enums
 @model CleanMadeira.Web.ViewModels.Maintenance.MaintenanceDetailsVM
 
 @{
     ViewData["Title"] = "Detalhes da Manutenção";
+
+    var description = string.IsNullOrWhiteSpace(Model.Description)
+        ? "Sem descrição."
+        : Model.Description.Trim();
 }
 
 <div class="container">
@@ -188,8 +192,8 @@
                 }
                 else
                 {
-                    <div class="border rounded p-3 bg-light" style="white-space: pre-line;">
-                        @Model.Description
+                    <div class="bg-light rounded p-3">
+                        <span style="white-space: pre-line;">@description</span>
                     </div>
                 }
 

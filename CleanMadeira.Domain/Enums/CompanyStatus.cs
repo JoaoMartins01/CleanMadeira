@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CleanMadeira.Domain.Entities.Enums
+namespace CleanMadeira.Domain.Enums
 {
     public enum CompanyStatus
     {

@@ -1,5 +1,5 @@
 ﻿//using CleanMadeira.Domain.Enums;
-using CleanMadeira.Domain.Entities.Enums;
+using CleanMadeira.Domain.Enums;
 using System.ComponentModel.DataAnnotations;
 
 namespace CleanMadeira.Web.ViewModels;
