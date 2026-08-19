@@ -1,7 +1,12 @@
 ﻿@model IEnumerable<CleanMadeira.Domain.Entities.Maintenance>
 
+@{
+    ViewData["Title"] = "Manutenção";
+}
+
 <div class="container-fluid py-4">
 
+    <!-- CABEÇALHO -->
     <div class="d-flex flex-column flex-md-row
         justify-content-between align-items-md-center
         gap-3 mb-4">
@@ -17,28 +22,32 @@
             </p>
         </div>
 
-        <a asp-controller="MaintenanceProvider"
-           asp-action="Index"
-           class="btn btn-outline-secondary">
-            <i class="bi bi-person-workspace"></i>
-            Prestadores
-        </a>
+        <div class="d-flex flex-column flex-sm-row gap-2">
 
-        <a asp-controller="Maintenance"
-           asp-action="Create"
-           class="btn btn-primary">
+            <a asp-controller="MaintenanceProvider"
+               asp-action="Index"
+               class="btn btn-outline-secondary">
 
-            <i class="bi bi-plus-lg me-1"></i>
-            Adicionar manutenção
-        </a>
+                <i class="bi bi-person-workspace me-1"></i>
+                Prestadores
+            </a>
 
+            <a asp-controller="Maintenance"
+               asp-action="Create"
+               class="btn btn-primary">
 
+                <i class="bi bi-plus-lg me-1"></i>
+                Adicionar manutenção
+            </a>
+
+        </div>
     </div>
 
+
+    <!-- ALERTAS -->
     @if (TempData["Success"] != null)
     {
-        <div class="alert alert-success alert-dismissible fade show"
-             role="alert">
+        <div class="alert alert-success alert-dismissible fade show">
 
             <i class="bi bi-check-circle me-2"></i>
             @TempData["Success"]
@@ -47,13 +56,13 @@
                     class="btn-close"
                     data-bs-dismiss="alert">
             </button>
+
         </div>
     }
 
     @if (TempData["Error"] != null)
     {
-        <div class="alert alert-danger alert-dismissible fade show"
-             role="alert">
+        <div class="alert alert-danger alert-dismissible fade show">
 
             <i class="bi bi-exclamation-circle me-2"></i>
             @TempData["Error"]
@@ -62,190 +71,471 @@
                     class="btn-close"
                     data-bs-dismiss="alert">
             </button>
+
         </div>
     }
 
+
     @if (!Model.Any())
     {
+        <!-- SEM MANUTENÇÕES -->
+
         <div class="card border-0 shadow-sm">
+
             <div class="card-body text-center py-5">
 
-                <i class="bi bi-box-seam display-4 text-muted"></i>
+                <i class="bi bi-tools display-4 text-muted"></i>
 
                 <h2 class="h5 fw-semibold mt-3">
                     Ainda não existem manutenções
                 </h2>
 
                 <p class="text-muted">
-                    Adiciona o primeira manutenção à propriedade.
+                    Adiciona a primeira manutenção a uma propriedade.
                 </p>
 
-                <a asp-controller="Maintenance"
-                   asp-action="Create"
+                <a asp-action="Create"
                    class="btn btn-primary">
 
                     <i class="bi bi-plus-lg me-1"></i>
-                    Adicionar Manutenção
+                    Adicionar manutenção
                 </a>
 
-
-
-
             </div>
+
         </div>
     }
     else
     {
-        
+        <!-- ============================================
+             DESKTOP
+             ============================================ -->
 
+        <div class="card border-0 shadow-sm d-none d-md-block">
 
+            <div class="table-responsive">
 
+                <table class="table table-hover align-middle mb-0">
 
-                <!-- Desktop e tablet -->
-                <div class="table-responsive d-none d-md-block">
+                    <thead class="table-light">
 
-            
-                
-            
-
-                    <table class="table table-hover align-middle mb-0">
-
-                        <thead class="table-light">
-                            <tr>
-                                <th>Título</th>
-                                <th>Propriedade</th>
-                                <th>Prestador</th>
-                                <th>Data</th>
-                                <th>Prioridade</th>
-                                <th>Estado</th>
-                                <th class="text-end">Ações</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            @foreach (var maintenance in Model)
-                            {
                         <tr>
-                            <td>@maintenance.Title</td>
-                            <td>@maintenance.Property.Name</td>
-                            <td>@maintenance.MaintenanceProvider?.Name</td>
-                            <td>
-                                @maintenance.ScheduledDate.ToString("dd/MM/yyyy HH:mm")
-                            </td>
-                            <td>@maintenance.Priority</td>
-                            <td>@maintenance.Status</td>
-                            <td class="text-end">
-                                <a asp-controller="Maintenance"
-                                   asp-action="Edit"
-                                   asp-route-id="@maintenance.Id"
-                                   class="btn btn-sm btn-outline-primary"
-                                   title="Editar">
-
-                                    <i class="bi bi-pencil"></i>
-                                </a>
-
-                                <a asp-controller="Maintenance"
-                                   asp-action="Details"
-                                   asp-route-id="@maintenance.Id"
-                                   class="btn btn-sm btn-outline-secondary"
-                                   title="Detalhes">
-
-                                    <i class="bi bi-eye"></i>
-                                </a>
-
-                                <a asp-controller="Maintenance"
-                                   asp-action="Delete"
-                                   asp-route-id="@maintenance.Id"
-                                   class="btn btn-sm btn-outline-danger"
-                                   title="Eliminar">
-
-                                   <i class="bi bi-trash"></i>
-                                </a>
-                            </td>
+                            <th class="ps-3">Título</th>
+                            <th>Propriedade</th>
+                            <th>Prestador</th>
+                            <th>Data</th>
+                            <th>Prioridade</th>
+                            <th>Estado</th>
+                            <th class="text-end pe-3">
+                                Ações
+                            </th>
                         </tr>
-                            }
-                        </tbody>
 
-                    </table>
+                    </thead>
 
-                </div>
-
-                <!-- Mobile -->
-                <div class="d-md-none p-3">
-
-                    <div class="row g-3">
+                    <tbody>
 
                         @foreach (var maintenance in Model)
                         {
-                    <div class="col-12">
-                        <div class="card shadow-sm border-0">
-                            <div class="card-body">
+                            <tr>
 
-                                <div class="d-flex justify-content-between align-items-start gap-2 mb-3">
-                                    <div>
-                                        <h5 class="mb-1">
-                                            @maintenance.Title
-                                        </h5>
+                                <!-- TÍTULO -->
+                                <td class="ps-3 fw-semibold">
+                                    @maintenance.Title
+                                </td>
 
+
+                                <!-- PROPRIEDADE -->
+                                <td>
+                                    @maintenance.Property?.Name
+                                </td>
+
+
+                                <!-- PRESTADOR -->
+                                <td>
+
+                                    @if (maintenance.MaintenanceProvider != null)
+                                    {
+                                        @maintenance.MaintenanceProvider.Name
+                                    }
+                                    else
+                                    {
                                         <span class="text-muted">
-                                            @maintenance.Property.Name
+                                            Não atribuído
                                         </span>
-                                    </div>
+                                    }
 
-                                    <span class="badge bg-primary">
-                                        @maintenance.Status
-                                    </span>
-                                </div>
+                                </td>
 
-                                <div class="mb-2">
-                                    <small class="text-muted">Data</small>
+
+                                <!-- DATA -->
+                                <td>
+
                                     <div>
-                                        @maintenance.ScheduledDate.ToString("dd/MM/yyyy HH:mm")
+                                        @maintenance.ScheduledDate.ToString("dd/MM/yyyy")
+                                        
                                     </div>
-                                </div>
 
-                                <div class="mb-2">
-                                    <small class="text-muted">Prestador</small>
-                                    <div>
-                                        @(maintenance.MaintenanceProvider.Name ?? "Não atribuído")
-                                    </div>
-                                </div>
+                                    <small class="text-muted">
+                                        @maintenance.ScheduledDate.ToString("HH:mm")
+                                    </small>
 
-                                <div class="mb-3">
-                                    <small class="text-muted">Prioridade</small>
-                                    <div>
-                                        @maintenance.Priority
-                                    </div>
-                                </div>
+                                </td>
 
-                                <div class="d-grid gap-2">
+
+                                <!-- PRIORIDADE -->
+                                <td>
+
+                                    @switch (maintenance.Priority.ToString())
+                                    {
+                                        case "Baixa":
+
+                                            <span class="badge bg-success-subtle text-success">
+                                                Baixa
+                                            </span>
+
+                                            break;
+
+                                        case "Media":
+
+                                            <span class="badge bg-primary-subtle text-primary">
+                                                Média
+                                            </span>
+
+                                            break;
+
+                                        case "Alta":
+
+                                            <span class="badge bg-warning-subtle text-warning-emphasis">
+                                                Alta
+                                            </span>
+
+                                            break;
+
+                                        case "Urgente":
+
+                                            <span class="badge bg-danger-subtle text-danger">
+                                                Urgente
+                                            </span>
+
+                                            break;
+                                    }
+
+                                </td>
+
+
+                                <!-- ESTADO -->
+                                <td>
+
+                                    @switch (maintenance.Status.ToString())
+                                    {
+                                        case "Pendente":
+
+                                            <span class="badge bg-warning-subtle text-warning-emphasis">
+                                                Pendente
+                                            </span>
+
+                                            break;
+
+                                        case "Aceite":
+
+                                            <span class="badge bg-info-subtle text-info-emphasis">
+                                                Aceite
+                                            </span>
+
+                                            break;
+
+                                        case "EmProgresso":
+
+                                            <span class="badge bg-primary-subtle text-primary">
+                                                Em progresso
+                                            </span>
+
+                                            break;
+
+                                        case "Completo":
+
+                                            <span class="badge bg-success-subtle text-success">
+                                                Concluída
+                                            </span>
+
+                                            break;
+
+                                        case "Cancelado":
+
+                                            <span class="badge bg-secondary-subtle text-secondary">
+                                                Cancelado
+                                            </span>
+
+                                            break;
+
+                                        case "Rejeitada":
+
+                                            <span class="badge bg-danger-subtle text-danger">
+                                                Rejeitada
+                                            </span>
+
+                                            break;
+                                    }
+
+                                </td>
+
+
+                                <!-- AÇÕES -->
+                                <td class="text-end pe-3">
+
                                     <a asp-action="Details"
                                        asp-route-id="@maintenance.Id"
-                                       class="btn btn-primary">
-                                        Ver manutenção
+                                       class="btn btn-sm btn-outline-secondary"
+                                       title="Detalhes">
+
+                                        <i class="bi bi-eye"></i>
                                     </a>
 
                                     <a asp-action="Edit"
                                        asp-route-id="@maintenance.Id"
-                                       class="btn btn-outline-secondary">
-                                        Editar
+                                       class="btn btn-sm btn-outline-primary"
+                                       title="Editar">
+
+                                        <i class="bi bi-pencil"></i>
                                     </a>
 
                                     <a asp-action="Delete"
                                        asp-route-id="@maintenance.Id"
-                                       class="btn btn-outline-danger">
-                                        Eliminar
+                                       class="btn btn-sm btn-outline-danger"
+                                       title="Eliminar">
+
+                                        <i class="bi bi-trash"></i>
                                     </a>
+
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+
+        <!-- ============================================
+             MOBILE
+             ============================================ -->
+
+        <div class="d-md-none">
+
+            <div class="d-flex flex-column gap-3">
+
+                @foreach (var maintenance in Model)
+                {
+                    <div class="card border-0 shadow-sm">
+
+                        <div class="card-body">
+
+                            <!-- TÍTULO + ESTADO -->
+
+                            <div class="d-flex
+                                justify-content-between
+                                align-items-start
+                                gap-2 mb-3">
+
+                                <div>
+
+                                    <h2 class="h5 fw-bold mb-1">
+                                        @maintenance.Title
+                                    </h2>
+
+                                    <div class="text-muted small">
+
+                                        <i class="bi bi-house-door me-1"></i>
+
+                                        @maintenance.Property?.Name
+
+                                    </div>
+
+                                </div>
+
+
+                                @switch (maintenance.Status.ToString())
+                                {
+                                    case "Pendente":
+
+                                        <span class="badge bg-warning-subtle text-warning-emphasis">
+                                            Pendente
+                                        </span>
+
+                                        break;
+
+                                    case "Aceite":
+
+                                        <span class="badge bg-info-subtle text-info-emphasis">
+                                            Aceite
+                                        </span>
+
+                                        break;
+
+                                    case "EmProgresso":
+
+                                        <span class="badge bg-primary-subtle text-primary">
+                                            Em progresso
+                                        </span>
+
+                                        break;
+
+                                    case "Completo":
+
+                                        <span class="badge bg-success-subtle text-success">
+                                            Concluída
+                                        </span>
+
+                                        break;
+
+                                    case "Cancelado":
+
+                                        <span class="badge bg-secondary-subtle text-secondary">
+                                            Cancelado
+                                        </span>
+
+                                        break;
+
+                                    case "Rejeitada":
+
+                                        <span class="badge bg-danger-subtle text-danger">
+                                            Rejeitada
+                                        </span>
+
+                                        break;
+                                }
+
+                            </div>
+
+
+                            <!-- INFORMAÇÃO -->
+
+                            <div class="mb-2">
+
+                                <small class="text-muted">
+                                    Data
+                                </small>
+
+                                <div>
+                                    @maintenance.ScheduledDate.ToString("dd/MM/yyyy 'às' HH:mm")
+                                    
                                 </div>
 
                             </div>
+
+
+                            <div class="mb-2">
+
+                                <small class="text-muted">
+                                    Prestador
+                                </small>
+
+                                <div>
+                                    @(maintenance.MaintenanceProvider?.Name
+                                        ?? "Não atribuído")
+                                </div>
+
+                            </div>
+
+
+                            <div class="mb-3">
+
+                                <small class="text-muted d-block mb-1">
+                                    Prioridade
+                                </small>
+
+                                @switch (maintenance.Priority.ToString())
+                                {
+                                    case "Baixa":
+
+                                        <span class="badge bg-success-subtle text-success">
+                                            Baixa
+                                        </span>
+
+                                        break;
+
+                                    case "Media":
+
+                                        <span class="badge bg-primary-subtle text-primary">
+                                            Média
+                                        </span>
+
+                                        break;
+
+                                    case "Alta":
+
+                                        <span class="badge bg-warning-subtle text-warning-emphasis">
+                                            Alta
+                                        </span>
+
+                                        break;
+
+                                    case "Urgente":
+
+                                        <span class="badge bg-danger-subtle text-danger">
+                                            Urgente
+                                        </span>
+
+                                        break;
+                                }
+
+                            </div>
+
+
+                            <!-- AÇÕES -->
+
+                            <div class="d-grid gap-2">
+
+                                <a asp-action="Details"
+                                   asp-route-id="@maintenance.Id"
+                                   class="btn btn-primary">
+
+                                    <i class="bi bi-eye me-1"></i>
+                                    Ver manutenção
+                                </a>
+
+                                <div class="row g-2">
+
+                                    <div class="col-6">
+
+                                        <a asp-action="Edit"
+                                           asp-route-id="@maintenance.Id"
+                                           class="btn btn-outline-secondary w-100">
+
+                                            Editar
+                                        </a>
+
+                                    </div>
+
+                                    <div class="col-6">
+
+                                        <a asp-action="Delete"
+                                           asp-route-id="@maintenance.Id"
+                                           class="btn btn-outline-danger w-100">
+
+                                            Eliminar
+                                        </a>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
                         </div>
-                    </div>
-                        }
 
                     </div>
+                }
 
-                </div>
+            </div>
+
+        </div>
     }
 
 </div>

@@ -22,6 +22,10 @@
         MaintenancePriority.Urgente => "bg-dark",
         _ => "bg-secondary"
     };
+
+    var description = string.IsNullOrWhiteSpace(Model.Description)
+        ? "Sem descrição."
+        : Model.Description.Trim();
 }
 
 <!DOCTYPE html>
@@ -232,29 +236,19 @@
                             Descrição do problema
                         </h2>
 
-                        <div class="information-box">
-                            <p class="mb-0 text-break"
-                               style="white-space: pre-line;">
-                                @Model.Description
+                        @if (string.IsNullOrWhiteSpace(Model.Description))
+                        {
+                            <p class="text-muted">
+                                Sem descrição.
                             </p>
-                        </div>
-                    </section>
-
-                    @if (!string.IsNullOrWhiteSpace(Model.ProviderNotes))
-                    {
-                        <section class="mb-4">
-                            <h2 class="h6 mb-2">
-                                Notas do prestador
-                            </h2>
-
-                            <div class="information-box">
-                                <p class="mb-0 text-break"
-                                   style="white-space: pre-line;">
-                                    @Model.ProviderNotes
-                                </p>
+                        }
+                        else
+                        {
+                            <div class="bg-light rounded p-3">
+                                <span style="white-space: pre-line;">@description</span>
                             </div>
-                        </section>
-                    }
+                        }
+                    </section>
 
                     <section class="border-top pt-4">
 
@@ -302,16 +296,18 @@
                                                name="token"
                                                value="@Model.AccessToken" />
 
-                                        <label for="rejectionReason"
-                                               class="form-label">
-                                            Motivo da rejeição
-                                        </label>
+                                        <div class="mb-3">
+                                            <label for="RejectionReason"
+                                                   class="form-label">
+                                                Motivo
+                                            </label>
 
-                                        <textarea id="rejectionReason"
-                                                  name="notes"
-                                                  class="form-control mb-3"
-                                                  rows="3"
-                                                  placeholder="Indique, se necessário, o motivo da rejeição."></textarea>
+                                            <textarea asp-for="RejectionReason"
+                                                      class="form-control"
+                                                      rows="4"
+                                                      placeholder="Indique, se necessário, o motivo da rejeição."></textarea>
+                                        </div>
+                                       
 
                                         <button type="submit"
                                                 class="btn btn-danger w-100 action-button">
@@ -345,7 +341,8 @@
                         }
                         else if (Model.Status == MaintenanceStatus.EmProgresso)
                         {
-                            <form asp-action="Complete"
+                            <form asp-controller="PublicMaintenance"
+                                  asp-action="Complete"
                                   method="post">
 
                                 @Html.AntiForgeryToken()
@@ -355,13 +352,12 @@
                                        value="@Model.AccessToken" />
 
                                 <div class="mb-3">
-                                    <label for="providerNotes"
+                                    <label for="ProviderNotes"
                                            class="form-label">
-                                        Notas da conclusão
+                                        Observações
                                     </label>
 
-                                    <textarea id="providerNotes"
-                                              name="notes"
+                                    <textarea asp-for="ProviderNotes"
                                               class="form-control"
                                               rows="4"
                                               placeholder="Descreva o trabalho realizado."></textarea>
@@ -369,8 +365,10 @@
 
                                 <button type="submit"
                                         class="btn btn-success btn-lg w-100 action-button">
+
                                     <i class="bi bi-check2-circle me-2"></i>
                                     Concluir manutenção
+
                                 </button>
 
                             </form>

@@ -1,0 +1,20 @@
+﻿/* =========================================
+   INVENTÁRIO - INDEX
+   ========================================= */
+
+.cm-stock-low {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.cm-stock-ok {
+    background: #d1e7dd;
+    color: #0f5132;
+}
+
+.cm-inventory-item {
+    padding: 16px;
+    background: #fff;
+    border: 1px solid var(--cm-border);
+    border-radius: 14px;
+}

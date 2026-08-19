@@ -70,6 +70,8 @@ public class MaintenanceController : Controller
             AssignedUserName = maintenance.MaintenanceProvider?.Name,
             Title = maintenance.Title,
             Description = maintenance.Description,
+            RejectionReason = maintenance.RejectionReason,
+            ProviderNotes = maintenance.ProviderNotes,
             Priority = maintenance.Priority,
             Status = maintenance.Status,
             ScheduledDate = maintenance.ScheduledDate,

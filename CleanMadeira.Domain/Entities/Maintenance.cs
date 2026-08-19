@@ -14,6 +14,8 @@ namespace CleanMadeira.Domain.Entities
         public MaintenanceProvider? MaintenanceProvider { get; set; }
         public string Title { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
+        public string? ProviderNotes { get; set; } = string.Empty;
+        public string? RejectionReason { get; set; } = string.Empty;
         public MaintenancePriority Priority { get; set; }
         public MaintenanceStatus Status { get; set; }
 

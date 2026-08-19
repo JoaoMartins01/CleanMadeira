@@ -25,7 +25,6 @@ public class PublicMaintenanceVM
 
     public DateTime ScheduledDate { get; set; }
 
-    [StringLength(2000)]
-    [Display(Name = "Observações")]
     public string? ProviderNotes { get; set; }
+    public string? RejectionReason { get; set; }
 }

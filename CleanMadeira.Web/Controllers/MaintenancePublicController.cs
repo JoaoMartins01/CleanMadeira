@@ -44,8 +44,6 @@ namespace CleanMadeira.Web.Controllers
 
                 Status = maintenance.Status,
 
-                ProviderNotes = maintenance.Description,
-
                 ProviderName = maintenance.MaintenanceProvider?.Name
                     ?? "Prestador não definido",
 
@@ -97,7 +95,7 @@ namespace CleanMadeira.Web.Controllers
         // POST: /PublicMaintenance/Reject
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Reject(Guid token)
+        public async Task<IActionResult> Reject(Guid token, PublicMaintenanceVM model)
         {
             if (token == Guid.Empty)
                 return BadRequest("O token de acesso não é válido.");
@@ -119,6 +117,8 @@ namespace CleanMadeira.Web.Controllers
             }
 
             maintenance.Status = MaintenanceStatus.Rejeitada;
+            maintenance.RejectionReason = model.RejectionReason;
+
 
             await _maintenanceService.UpdateAsync(maintenance);
 
@@ -157,7 +157,7 @@ namespace CleanMadeira.Web.Controllers
                     new { token = model.AccessToken });
             }
 
-            maintenance.Description = model.ProviderNotes;
+            maintenance.ProviderNotes = model.ProviderNotes;
 
             switch (action?.ToLowerInvariant())
             {
@@ -235,7 +235,7 @@ namespace CleanMadeira.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Complete(Guid token)
+        public async Task<IActionResult> Complete(Guid token, PublicMaintenanceVM model)
         {
             var maintenance = await _maintenanceService.GetByAccessTokenAsync(token);
 
@@ -243,6 +243,7 @@ namespace CleanMadeira.Web.Controllers
                 return NotFound();
 
             maintenance.Status = MaintenanceStatus.Completo;
+            maintenance.ProviderNotes = model.ProviderNotes;
 
             await _maintenanceService.UpdateAsync(maintenance);
 

@@ -7,216 +7,450 @@
     var description = string.IsNullOrWhiteSpace(Model.Description)
         ? "Sem descrição."
         : Model.Description.Trim();
+
+    var rejectionReason = string.IsNullOrWhiteSpace(Model.RejectionReason)
+        ? "Sem motivo."
+        : Model.RejectionReason.Trim();
+
+    var providerNotes = string.IsNullOrWhiteSpace(Model.ProviderNotes)
+        ? "Sem motivo."
+        : Model.ProviderNotes.Trim();
+
+    var priorityClass = Model.Priority switch
+    {
+        MaintenancePriority.Baixa => "cm-priority-low",
+        MaintenancePriority.Media => "cm-priority-normal",
+        MaintenancePriority.Alta => "cm-priority-high",
+        MaintenancePriority.Urgente => "cm-priority-urgent",
+        _ => "cm-status-neutral"
+    };
+
+    var priorityIcon = Model.Priority switch
+    {
+        MaintenancePriority.Baixa => "bi-arrow-down-circle",
+        MaintenancePriority.Media => "bi-dash-circle",
+        MaintenancePriority.Alta => "bi-arrow-up-circle",
+        MaintenancePriority.Urgente => "bi-exclamation-octagon-fill",
+        _ => "bi-circle"
+    };
+
+    var priorityText = Model.Priority switch
+    {
+        MaintenancePriority.Media => "Média",
+        _ => Model.Priority.ToString()
+    };
+
+
+    var statusClass = Model.Status switch
+    {
+        MaintenanceStatus.Pendente => "cm-status-pending",
+        MaintenanceStatus.Aceite => "cm-status-success",
+        MaintenanceStatus.EmProgresso => "cm-status-progress",
+        MaintenanceStatus.Completo => "cm-status-success",
+        MaintenanceStatus.Cancelado => "cm-status-danger",
+        MaintenanceStatus.Rejeitada => "cm-status-danger",
+        _ => "cm-status-neutral"
+    };
+
+    var statusIcon = Model.Status switch
+    {
+        MaintenanceStatus.Pendente => "bi-hourglass-split",
+        MaintenanceStatus.Aceite => "bi-check-circle",
+        MaintenanceStatus.EmProgresso => "bi-play-circle-fill",
+        MaintenanceStatus.Completo => "bi-check-circle-fill",
+        MaintenanceStatus.Cancelado => "bi-x-circle",
+        MaintenanceStatus.Rejeitada => "bi-x-octagon-fill",
+        _ => "bi-circle"
+    };
+
+    var statusText = Model.Status switch
+    {
+        MaintenanceStatus.EmProgresso => "Em progresso",
+        MaintenanceStatus.Completo => "Concluída",
+        _ => Model.Status.ToString()
+    };
 }
 
-<div class="container">
+<div class="container-fluid py-4">
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
+
+    <!-- CABEÇALHO -->
+    <div class="cm-page-header">
 
         <div>
-            <h2>Detalhes da Manutenção</h2>
+            <h1 class="h3 fw-bold mb-1">
+                <i class="bi bi-tools me-2 text-primary"></i>
+                Detalhes da Manutenção
+            </h1>
+
             <p class="text-muted mb-0">
-                Informação completa da manutenção.
+                Informação completa da manutenção
             </p>
         </div>
 
-        <div>
+        <div class="cm-page-header-actions">
+
             <a asp-action="Edit"
                asp-route-id="@Model.Id"
-               class="btn btn-warning">
+               class="btn btn-outline-primary">
+
+                <i class="bi bi-pencil me-1"></i>
                 Editar
             </a>
 
             <a asp-action="Index"
-               class="btn btn-secondary">
+               class="btn btn-outline-secondary">
+
+                <i class="bi bi-arrow-left me-1"></i>
                 Voltar
             </a>
+
         </div>
 
     </div>
 
-    <div class="card shadow-sm">
 
-        <div class="card-header">
-            <h4 class="mb-0">@Model.Title</h4>
+    <div class="row g-4">
+
+        <!-- COLUNA PRINCIPAL -->
+        <div class="col-12 col-xl-8">
+
+            <div class="cm-card mb-4">
+
+                <div class="cm-card-header">
+
+                    <div class="d-flex
+                        flex-column
+                        flex-md-row
+                        justify-content-between
+                        align-items-md-start
+                        gap-3">
+
+                        <div>
+
+                            <div class="text-muted small mb-1">
+                                Manutenção
+                            </div>
+
+                            <h2 class="h4 fw-bold mb-0">
+                                @Model.Title
+                            </h2>
+
+                        </div>
+
+                        <div class="d-flex flex-wrap gap-2">
+
+                            <span class="cm-badge @priorityClass">
+
+                                <i class="bi @priorityIcon me-1"></i>
+                                @priorityText
+
+                            </span>
+
+                            <span class="cm-badge @statusClass">
+
+                                <i class="bi @statusIcon me-1"></i>
+                                @statusText
+
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="cm-card-body">
+
+                    <!-- PROPRIEDADE E RESPONSÁVEL -->
+
+                    <div class="row g-3 mb-4">
+
+                        <div class="col-12 col-md-6">
+
+                            <div class="cm-info-box h-100">
+
+                                <div class="d-flex align-items-center gap-3">
+
+                                    <div class="cm-icon-box">
+                                        <i class="bi bi-house-door"></i>
+                                    </div>
+
+                                    <div>
+
+                                        <div class="text-muted small">
+                                            Propriedade
+                                        </div>
+
+                                        <div class="fw-semibold">
+                                            @Model.PropertyName
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="col-12 col-md-6">
+
+                            <div class="cm-info-box h-100">
+
+                                <div class="d-flex align-items-center gap-3">
+
+                                    <div class="cm-icon-box">
+                                        <i class="bi bi-person-workspace"></i>
+                                    </div>
+
+                                    <div>
+
+                                        <div class="text-muted small">
+                                            Responsável
+                                        </div>
+
+                                        <div class="fw-semibold">
+
+                                            @if (string.IsNullOrWhiteSpace(Model.AssignedUserName))
+                                            {
+                                                <span class="text-muted">
+                                                    Não atribuído
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                @Model.AssignedUserName
+                                            }
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- DATAS -->
+
+                    <div class="row g-3 mb-4">
+
+                        <div class="col-12 col-md-6">
+
+                            <div class="cm-info-box h-100">
+
+                                <div class="d-flex align-items-center gap-3">
+
+                                    <div class="cm-icon-box">
+                                        <i class="bi bi-calendar-event"></i>
+                                    </div>
+
+                                    <div>
+
+                                        <div class="text-muted small">
+                                            Data prevista
+                                        </div>
+
+                                        <div class="fw-semibold">
+                                            @Model.ScheduledDate.ToString("dd/MM/yyyy 'às' HH:mm")
+                                            
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="col-12 col-md-6">
+
+                            <div class="cm-info-box h-100">
+
+                                <div class="d-flex align-items-center gap-3">
+
+                                    <div class="cm-icon-box">
+                                        <i class="bi bi-clock-history"></i>
+                                    </div>
+
+                                    <div>
+
+                                        <div class="text-muted small">
+                                            Criado em
+                                        </div>
+
+                                        <div class="fw-semibold">
+                                            @Model.CreatedAt.ToString("dd/MM/yyyy 'às' HH:mm")
+                                            
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- DESCRIÇÃO -->
+
+                    <div>
+
+                        <div class="d-flex align-items-center gap-2 mb-2">
+
+                            <i class="bi bi-text-paragraph text-primary"></i>
+
+                            <h3 class="h6 fw-bold mb-0">
+                                Descrição
+                            </h3>
+
+                        </div>
+
+                        <div class="cm-description-box">
+                            <span style="white-space: pre-line;">@description</span>
+                        </div>
+
+                    </div>
+
+
+                    <!-- MOTIVO DE REJEIÇÃO -->
+                    @if (!string.IsNullOrWhiteSpace(Model.RejectionReason))
+                    {
+                        <div class="mt-4">
+
+                            <div class="d-flex align-items-center gap-2 mb-2">
+
+                                <i class="bi bi-x-octagon-fill text-danger"></i>
+
+                                <h3 class="h6 fw-bold mb-0">
+                                    Motivo da rejeição
+                                </h3>
+
+                            </div>
+
+                            <div class="cm-rejection-box">
+                                <span style="white-space: pre-line;">
+                                    @rejectionReason
+                                </span>
+                            </div>
+
+                        </div>
+                    }
+
+                    <!-- Notas do Prestador -->
+                    @if (!string.IsNullOrWhiteSpace(Model.ProviderNotes))
+                    {
+                        <div class="mt-4">
+
+                            <div class="d-flex align-items-center gap-2 mb-2">
+
+                                <i class="bi bi-x-octagon-fill text-danger"></i>
+
+                                <h3 class="h6 fw-bold mb-0">
+                                    Notas do prestador
+                                </h3>
+
+                            </div>
+
+                            <div class="cm-rejection-box">
+                                <span style="white-space: pre-line;">
+                                    @providerNotes
+                                </span>
+                            </div>
+
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
         </div>
 
-        <div class="card-body">
 
-            <div class="row mb-3">
+        <!-- COLUNA LATERAL -->
+        <div class="col-12 col-xl-4">
 
-                <div class="col-md-6">
+            <div class="cm-card">
 
-                    <label class="fw-bold">
-                        Propriedade
-                    </label>
+                <div class="cm-card-header">
 
-                    <p>
-                        @Model.PropertyName
-                    </p>
-
-                </div>
-
-                <div class="col-md-6">
-
-                    <label class="fw-bold">
-                        Responsável
-                    </label>
-
-                    <p>
-                        @(string.IsNullOrWhiteSpace(Model.AssignedUserName)
-                            ? "Não atribuído"
-                            : Model.AssignedUserName)
-                    </p>
+                    <h2 class="h5 fw-bold mb-0">
+                        <i class="bi bi-info-circle me-2 text-primary"></i>
+                        Estado da manutenção
+                    </h2>
 
                 </div>
 
-            </div>
+                <div class="cm-card-body">
 
-            <div class="row mb-3">
+                    <div class="mb-4">
 
-                <div class="col-md-6">
+                        <div class="text-muted small mb-2">
+                            Prioridade
+                        </div>
 
-                    <label class="fw-bold">
-                        Prioridade
-                    </label>
+                        <span class="cm-badge @priorityClass">
 
-                    <p>
+                            <i class="bi @priorityIcon me-1"></i>
+                            @priorityText
 
-                        @switch (Model.Priority)
-                        {
-                            case MaintenancePriority.Baixa:
-                                <span class="badge bg-success">Baixa</span>
-                                break;
+                        </span>
 
-                            case MaintenancePriority.Media:
-                                <span class="badge bg-warning text-dark">Média</span>
-                                break;
-
-                            case MaintenancePriority.Alta:
-                                <span class="badge bg-danger">Alta</span>
-                                break;
-
-                            case MaintenancePriority.Urgente:
-                                <span class="badge bg-dark">Urgente</span>
-                                break;
-                        }
-
-                    </p>
-
-                </div>
-
-                <div class="col-md-6">
-
-                    <label class="fw-bold">
-                        Estado
-                    </label>
-
-                    <p>
-
-                        @switch (Model.Status)
-                        {
-                            case MaintenanceStatus.Pendente:
-                                <span class="badge bg-secondary">Pendente</span>
-                                break;
-
-                            case MaintenanceStatus.Aceite:
-                                <span class="badge bg-success">Aceite</span>
-                                break;
-
-                            case MaintenanceStatus.EmProgresso:
-                                <span class="badge bg-primary">Em progresso</span>
-                                break;
-
-                            case MaintenanceStatus.Completo:
-                                <span class="badge bg-success">Concluída</span>
-                                break;
-
-                            case MaintenanceStatus.Cancelado:
-                                <span class="badge bg-danger">Cancelado</span>
-                                break;
-
-                            case MaintenanceStatus.Rejeitada:
-                                <span class="badge bg-danger">Rejeitada</span>
-                                break;
-
-                        }
-
-                    </p>
-
-                </div>
-
-            </div>
-
-            <div class="row mb-3">
-
-                <div class="col-md-6">
-
-                    <label class="fw-bold">
-                        Data Prevista
-                    </label>
-
-                    <p>
-                        @Model.ScheduledDate.ToString("dd/MM/yyyy HH:mm")
-                    </p>
-
-                </div>
-
-                <div class="col-md-6">
-
-                    <label class="fw-bold">
-                        Criado em
-                    </label>
-
-                    <p>
-                        @Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")
-                    </p>
-
-                </div>
-
-            </div>
-
-            <hr />
-
-            <div>
-
-                <label class="fw-bold">
-                    Descrição
-                </label>
-
-                @if (string.IsNullOrWhiteSpace(Model.Description))
-                {
-                    <p class="text-muted">
-                        Sem descrição.
-                    </p>
-                }
-                else
-                {
-                    <div class="bg-light rounded p-3">
-                        <span style="white-space: pre-line;">@description</span>
                     </div>
-                }
 
-            </div>
 
-            <div>
+                    <div class="mb-4">
 
-                <label class="fw-bold">
-                    Motivo
-                </label>
+                        <div class="text-muted small mb-2">
+                            Estado atual
+                        </div>
 
-                @if (string.IsNullOrWhiteSpace(Model.Description))
-                {
-                    <p class="text-muted">
-                        Sem descrição.
-                    </p>
-                }
-                else
-                {
-                    <div class="border rounded p-3 bg-light">
-                        @Model.Description
+                        <span class="cm-badge @statusClass">
+
+                            <i class="bi @statusIcon me-1"></i>
+                            @statusText
+
+                        </span>
+
                     </div>
-                }
+
+
+                    <hr />
+
+
+                    <div class="d-grid gap-2">
+
+                        <a asp-action="Edit"
+                           asp-route-id="@Model.Id"
+                           class="btn btn-primary">
+
+                            <i class="bi bi-pencil me-1"></i>
+                            Editar manutenção
+                        </a>
+
+                        <a asp-action="Index"
+                           class="btn btn-outline-secondary">
+
+                            <i class="bi bi-arrow-left me-1"></i>
+                            Voltar às manutenções
+                        </a>
+
+                    </div>
+
+                </div>
 
             </div>
 

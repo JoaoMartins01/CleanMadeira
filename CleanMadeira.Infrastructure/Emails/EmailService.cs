@@ -11,7 +11,7 @@ public class EmailService : IEmailService
     private readonly IConfiguration _configuration;
     private readonly ILogger<EmailService> _logger;
 
-    public EmailService(IConfiguration configuration, ILogger<EmailService> logger)
+    /*public EmailService(IConfiguration configuration, ILogger<EmailService> logger)
     {
         _configuration = configuration;
         _logger = logger;
@@ -99,10 +99,9 @@ public class EmailService : IEmailService
 
             throw;
         }
-    }
+    }*/
 
-    
-    /*public async Task SendEmailAsync(
+    public async Task SendEmailAsync(
         string to,
         string subject,
         string body)
@@ -149,7 +148,7 @@ public class EmailService : IEmailService
         message.To.Add(to);
 
         await client.SendMailAsync(message);
-    }*/
+    }
 
     public async Task SendConfirmationEmailAsync(
     ApplicationUser user,

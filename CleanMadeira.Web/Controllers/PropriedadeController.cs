@@ -317,6 +317,7 @@ public class PropriedadeController : Controller
         property.Rooms = vm.Quartos;
         property.NumberGuests = vm.NumeroHospedes;
         property.Description = vm.Descricao;
+        property.CleaningCompanyId = vm.CleaningCompanyId,
         property.Active = vm.Active;
 
         await _propertyService.UpdateAsync(property);
