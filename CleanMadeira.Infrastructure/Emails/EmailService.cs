@@ -17,7 +17,7 @@ public class EmailService : IEmailService
         _logger = logger;
     }
 
-    /*public async Task SendEmailAsync(
+    public async Task SendEmailAsync(
     string to,
     string subject,
     string body)
@@ -99,10 +99,10 @@ public class EmailService : IEmailService
 
             throw;
         }
-    }*/
+    }
 
     
-    public async Task SendEmailAsync(
+    /*public async Task SendEmailAsync(
         string to,
         string subject,
         string body)
@@ -149,7 +149,7 @@ public class EmailService : IEmailService
         message.To.Add(to);
 
         await client.SendMailAsync(message);
-    }
+    }*/
 
     public async Task SendConfirmationEmailAsync(
     ApplicationUser user,

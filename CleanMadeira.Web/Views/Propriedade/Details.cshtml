@@ -508,10 +508,7 @@
                                         me-1
                                         text-muted"></i>
 
-                                        @item.LastSync.Value
-                                        .ToLocalTime()
-                                        .ToString("dd/MM/yyyy 'às' HH:mm")
-
+                                        @item.LastSync.Value.ToLocalTime().ToString("dd/MM/yyyy 'às' HH:mm")
                                     </div>
                                 }
                                 else
