@@ -1,0 +1,250 @@
+﻿@using CleanMadeira.Web.Views.Propriedade
+@model PropertyCleaningSettingsVM
+
+@{
+    ViewData["Title"] = "Configuração das Limpezas";
+}
+
+<div class="container py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <h1 class="h3 fw-bold mb-1">
+                <i class="bi bi-gear me-2"></i>
+                Configuração das Limpezas
+            </h1>
+
+            <p class="text-muted mb-0">
+                @Model.PropertyName
+            </p>
+        </div>
+
+        <a asp-controller="Property"
+           asp-action="Details"
+           asp-route-id="@Model.PropertyId"
+           class="btn btn-outline-secondary">
+
+            Voltar
+        </a>
+
+    </div>
+
+    <div class="card shadow-sm border-0">
+
+        <div class="card-body">
+
+            <form asp-action="CleaningSettings"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <input asp-for="PropertyId"
+                       type="hidden" />
+
+                <div class="form-check form-switch mb-4">
+
+                    <input asp-for="AutoIntermediateCleaning"
+                           class="form-check-input" />
+
+                    <label asp-for="AutoIntermediateCleaning"
+                           class="form-check-label">
+
+                        Criar limpezas intermédias automaticamente
+
+                    </label>
+
+                </div>
+
+                <div class="mb-4">
+
+                    <label asp-for="IntermediateCleaningIntervalDays"
+                           class="form-label fw-semibold">
+
+                        Intervalo entre limpezas
+
+                    </label>
+
+                    <select asp-for="IntermediateCleaningIntervalDays"
+                            class="form-select">
+
+                        @for (int i = 2; i <= 14; i++)
+                        {
+                            <option value="@i">
+                                A cada @i dias
+                            </option>
+                        }
+
+                    </select>
+
+                    <div class="form-text mb-3">
+                        Exemplo: 7 dias cria uma limpeza intermédia ao 7.º dia de estadia.
+                    </div>
+
+                    <div class="alert alert-light border"
+                         id="cleaningPreview">
+
+                        <strong>Pré-visualização</strong>
+
+                        <div class="mt-2 text-muted">
+                            Escolhe um intervalo para veres um exemplo.
+                        </div>
+
+                    </div>
+                </div>
+
+                <button type="submit"
+                        class="btn btn-primary">
+
+                    <i class="bi bi-save me-1"></i>
+                    Guardar configuração
+
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@section Scripts {
+
+    <script>
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            function() {
+
+                const intervalSelect =
+                    document.getElementById(
+                        "IntermediateCleaningIntervalDays"
+                    );
+
+                const preview =
+                    document.getElementById(
+                        "cleaningPreview"
+                    );
+
+                if (!intervalSelect || !preview) {
+                    return;
+                }
+
+
+                function updatePreview() {
+
+                    const interval =
+                        parseInt(
+                            intervalSelect.value
+                        );
+
+                    if (!interval ||
+                        interval < 1) {
+
+                        preview.innerHTML = `
+                                    <strong>Pré-visualização</strong>
+
+                                    <div class="mt-2 text-muted">
+                                        Escolhe um intervalo válido.
+                                    </div>
+                                `;
+
+                        return;
+                    }
+
+
+                    /*
+                     * Usamos uma estadia de exemplo
+                     * para o utilizador perceber
+                     * rapidamente o comportamento.
+                     */
+                    const exampleStayDays =
+                        interval * 2 + 2;
+
+                    const cleaningDays = [];
+
+                    for (
+                        let day = interval;
+                        day < exampleStayDays;
+                        day += interval
+                    ) {
+                        cleaningDays.push(day);
+                    }
+
+
+                    let cleaningText = "";
+
+                    if (cleaningDays.length === 0) {
+
+                        cleaningText =
+                            "Não seria criada nenhuma limpeza intermédia.";
+
+                    }
+                    else {
+
+                        cleaningText =
+                            cleaningDays
+                                .map(
+                                    day =>
+                                        `Dia ${day}`
+                                )
+                                .join(", ");
+                    }
+
+
+                    preview.innerHTML = `
+                                <strong>
+                                    Pré-visualização
+                                </strong>
+
+                                <div class="mt-2">
+
+                                    Numa estadia de
+                                    <strong>
+                                        ${exampleStayDays} dias
+                                    </strong>:
+
+                                </div>
+
+                                <div class="mt-1">
+
+                                    <i class="bi bi-stars
+                                              text-primary
+                                              me-1">
+                                    </i>
+
+                                    Limpezas intermédias:
+                                    <strong>
+                                        ${cleaningText}
+                                    </strong>
+
+                                </div>
+
+                                <div class="small
+                                            text-muted
+                                            mt-2">
+
+                                    A limpeza do checkout
+                                    continua a ser criada
+                                    normalmente.
+
+                                </div>
+                            `;
+                }
+
+
+                intervalSelect.addEventListener(
+                    "change",
+                    updatePreview
+                );
+
+                updatePreview();
+
+            }
+        );
+
+    </script>
+
+}

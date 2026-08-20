@@ -30,6 +30,10 @@
 
         public ICollection<CalendarIntegration> CalendarIntegrations { get; set; }
         = new List<CalendarIntegration>();
+        public bool AutoIntermediateCleaning { get; set; } = true;
+
+        public int IntermediateCleaningIntervalDays { get; set; } = 7;
+
         public bool Active { get; set; }
 
         public DateTime? DeletedAt { get; set; }

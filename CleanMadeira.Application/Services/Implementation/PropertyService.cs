@@ -62,6 +62,30 @@ public class PropertyService : IPropertyService
             p.Name.Trim().ToLower() == nome.Trim().ToLower());
     }
 
+    public async Task UpdateCleaningSettingsAsync(
+    Guid propertyId,
+    Guid userId,
+    bool autoIntermediateCleaning,
+    int intermediateCleaningIntervalDays)
+    {
+        var property = await _propertyRepository
+            .GetByIdAndOwnerIdAsync(propertyId, userId);
+
+        if (property == null)
+        {
+            throw new KeyNotFoundException(
+                "Propriedade não encontrada.");
+        }
+
+        property.AutoIntermediateCleaning =
+            autoIntermediateCleaning;
+
+        property.IntermediateCleaningIntervalDays =
+            intermediateCleaningIntervalDays;
+
+        await _propertyRepository.UpdateAsync(property);
+    }
+
     public Task<IEnumerable<Property>> GetByEmpresaAsync(Guid applicationUserId)
     {
         return _propertyRepository.GetByApplicationUserAsync(applicationUserId);

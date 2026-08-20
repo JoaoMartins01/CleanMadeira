@@ -3,6 +3,7 @@ using CleanMadeira.Domain.Entities;
 using CleanMadeira.Web.ViewModels;
 using CleanMadeira.Web.ViewModels.CleaningTask;
 using CleanMadeira.Web.ViewModels.Propriedade;
+using CleanMadeira.Web.Views.Propriedade;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -431,6 +432,50 @@ public class PropriedadeController : Controller
         TempData["Success"] = "Propriedade reativada com sucesso.";
 
         return RedirectToAction(nameof(Inactive));
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> CleaningSettings(Guid id)
+    {
+        var property = await _propertyService.GetByIdAsync(id);
+
+        var vm = new PropertyCleaningSettingsVM
+        {
+            PropertyId = property.Id,
+            PropertyName = property.Name,
+            AutoIntermediateCleaning = property.AutoIntermediateCleaning,
+            IntermediateCleaningIntervalDays = property.IntermediateCleaningIntervalDays
+        };
+
+        return View(vm);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> CleaningSettings(
+    PropertyCleaningSettingsVM vm)
+    {
+        if (!ModelState.IsValid)
+        {
+            return View(vm);
+        }
+
+        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+        await _propertyService.UpdateCleaningSettingsAsync(
+            vm.PropertyId,
+            userId,
+            vm.AutoIntermediateCleaning,
+            vm.IntermediateCleaningIntervalDays
+        );
+
+        TempData["Success"] =
+            "Configuração das limpezas atualizada com sucesso.";
+
+        return RedirectToAction(
+            "Details",
+            new { id = vm.PropertyId }
+        );
     }
 
     private double? ParseCoordinate(string? value)
