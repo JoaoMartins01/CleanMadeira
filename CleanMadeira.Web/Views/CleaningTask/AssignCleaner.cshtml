@@ -147,6 +147,22 @@ else
                                             <i class="bi bi-upc-scan me-1"></i>
                                             @cleaner.LimpadorCodigo
                                         </span>
+                                        <div class="mt-2">
+                                            @if (cleaner.CompanyId.HasValue)
+                                            {
+                                                <span class="badge bg-primary-subtle text-primary">
+                                                    <i class="bi bi-building me-1"></i>
+                                                    @cleaner.CompanyName
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-secondary-subtle text-secondary">
+                                                    <i class="bi bi-person-workspace me-1"></i>
+                                                    Independente
+                                                </span>
+                                            }
+                                        </div>
                                     </div>
 
                                     <div class="selected-indicator">

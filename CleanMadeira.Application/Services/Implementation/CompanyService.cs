@@ -1,9 +1,7 @@
 ﻿using CleanMadeira.Application.Common.Interfaces;
+using CleanMadeira.Application.Services.Interface;
 using CleanMadeira.Domain.Entities;
 
-public interface ICompanyService : IService<Company>
-{
-}
 public class CompanyService : ICompanyService
 {
     private readonly ICompanyRepository _companyRepository;
@@ -17,10 +15,52 @@ public class CompanyService : ICompanyService
     {
         return await _companyRepository.GetAllAsync();
     }
+    public async Task<List<Company>> GetCleaningCompaniesAsync()
+    {
+        return await _companyRepository
+            .GetCleaningCompaniesAsync();
+    }
 
     public async Task<Company?> GetByIdAsync(Guid? id)
     {
         return await _companyRepository.GetByIdAsync(id);
+    }
+
+    public async Task<Company?> GetByIdWithMembersAsync(Guid id)
+    {
+        return await _companyRepository
+            .GetByIdWithMembersAsync(id);
+    }
+
+    public async Task AddInvitationAsync(
+    CompanyInvitation invitation)
+    {
+        await _companyRepository
+            .AddInvitationAsync(invitation);
+    }
+
+    public async Task<bool> HasPendingInvitationAsync(
+        Guid companyId,
+        string email)
+    {
+        return await _companyRepository
+            .HasPendingInvitationAsync(
+                companyId,
+                email);
+    }
+
+    public async Task<CompanyInvitation?>
+        GetInvitationByTokenAsync(Guid token)
+    {
+        return await _companyRepository
+            .GetInvitationByTokenAsync(token);
+    }
+
+    public async Task UpdateInvitationAsync(
+    CompanyInvitation invitation)
+    {
+        await _companyRepository
+            .UpdateInvitationAsync(invitation);
     }
 
     public async Task CreateAsync(Company company)

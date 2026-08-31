@@ -49,6 +49,34 @@ public class CleaningTaskRepository
             .ToListAsync();
     }
 
+    public async Task<IEnumerable<CleaningTask>> GetAccessibleCleaningTasksAsync(
+    Guid userId,
+    Guid? companyId)
+    {
+        var query = _context.CleaningTasks
+            .AsNoTracking()
+            .Include(x => x.Property)
+            .Include(x => x.AssignedUser)
+            .Include(x => x.Photos)
+            .AsQueryable();
+
+        if (companyId.HasValue)
+        {
+            query = query.Where(x =>
+                x.Property.CompanyId == companyId.Value);
+        }
+        else
+        {
+            query = query.Where(x =>
+                x.Property.ApplicationUserId== userId &&
+                x.Property.CompanyId == null);
+        }
+
+        return await query
+            .OrderByDescending(x => x.ScheduledDate)
+            .ToListAsync();
+    }
+
     public async Task<IEnumerable<CleaningTask>> GetByLimpadorUserIdAsync(Guid cleanerUserId)
     {
         return await _context.CleaningTasks
@@ -71,6 +99,7 @@ public class CleaningTaskRepository
             .OrderBy(t => t.ScheduledDate)
             .ToListAsync();
     }
+   
 
     public async Task<IEnumerable<CleaningTask>> GetByCompanyIdAsync(Guid CompanyId)
     {
@@ -94,6 +123,34 @@ public class CleaningTaskRepository
                 x.Property.ApplicationUserId == ownerId);
     }
 
+    public async Task<CleaningTask?> GetAccessibleByIdAsync(
+    Guid cleaningTaskId,
+    Guid userId,
+    Guid? companyId)
+    {
+        var query = _context.CleaningTasks
+            .AsNoTracking()
+            .Include(x => x.Property)
+                .ThenInclude(x => x.ApplicationUser)
+            .Include(x => x.AssignedUser)
+            .AsQueryable();
+
+        if (companyId.HasValue)
+        {
+            query = query.Where(x =>
+                x.Property.CompanyId == companyId.Value);
+        }
+        else
+        {   
+            query = query.Where(x =>
+                x.Property.ApplicationUserId == userId &&
+                x.Property.CompanyId == null);
+        }
+
+        return await query
+            .FirstOrDefaultAsync(x => x.Id == cleaningTaskId);
+    }
+
     public async Task<CleaningTask?> GetByIdAndCleanerIdAsync(Guid id, Guid CleanerId)
     {
         return await _context.CleaningTasks
@@ -104,6 +161,42 @@ public class CleaningTaskRepository
             .FirstOrDefaultAsync(t => 
                 t.Id == id &&
                 t.AssignedUserId == CleanerId);
+    }
+
+    public async Task<IEnumerable<CleaningTask>> GetByCleaningCompanyAsync(
+    Guid? cleaningCompanyId)
+    {
+        return await _context.CleaningTasks
+            .AsNoTracking()
+            .Include(x => x.Property)
+            .Include(x => x.AssignedUser)
+            .Where(x =>
+                x.Property.CleaningCompanyId == cleaningCompanyId)
+            .OrderByDescending(x => x.ScheduledDate)
+            .ToListAsync();
+    }
+
+    public async Task<CleaningTask?> GetAccessibleByCleaningCompanyAsync(
+    Guid taskId,
+    Guid cleaningCompanyId)
+    {
+        return await _context.CleaningTasks
+            .AsNoTracking()
+
+            .Include(x => x.Property)
+                .ThenInclude(x => x.ApplicationUser)
+
+            .Include(x => x.Property)
+                .ThenInclude(x => x.Company)
+
+            .Include(x => x.AssignedUser)
+
+            .Include(x => x.Photos)
+            .Include(x => x.ChecklistItems)
+
+            .FirstOrDefaultAsync(x =>
+                x.Id == taskId &&
+                x.Property.CleaningCompanyId == cleaningCompanyId);
     }
 
     public async Task AddCleanerUpdateAsync(
@@ -150,5 +243,22 @@ public class CleaningTaskRepository
         _context.TaskPhotos.Remove(photo);
 
         await _context.SaveChangesAsync();
+    }
+
+    public async Task<List<CleaningTask>> GetByPeriodAsync(
+    Guid ownerId,
+    DateTime start,
+    DateTime end)
+    {
+        return await _context.CleaningTasks
+            .AsNoTracking()
+            .Include(x => x.Property)
+            .Include(x => x.AssignedUser)
+            .Where(x =>
+                x.Property.ApplicationUserId == ownerId &&
+                x.ScheduledDate >= start &&
+                x.ScheduledDate < end)
+            .OrderBy(x => x.ScheduledDate)
+            .ToListAsync();
     }
 }

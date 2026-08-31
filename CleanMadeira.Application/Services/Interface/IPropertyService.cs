@@ -7,6 +7,8 @@ namespace CleanMadeira.Application.Services.Interface
     {
         Task<IEnumerable<Property>> GetByUserAsync(Guid applicationUserId);
         Task<Property?> GetByIdAndOwnerIdAsync(Guid id, Guid ownerId);
+        Task<Property?> GetAccessibleByIdAsync(Guid propertyId, Guid userId, Guid? companyId);
+        Task<List<Property>> GetAccessiblePropertiesAsync(Guid userId, Guid? companyId);
         Task UpdateCleaningSettingsAsync(Guid propertyId, Guid userId,bool autoIntermediateCleaning, int intermediateCleaningIntervalDays);
         Task<bool> ExistsAsync(string nome, Guid id);
         Task<List<Property>> GetInactiveAsync(Guid applicationUserId);

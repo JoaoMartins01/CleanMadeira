@@ -38,52 +38,58 @@ public class PropriedadeController : Controller
         _signInManager = signInManager;
     }
 
+    [HttpGet]
     public async Task<IActionResult> Index()
     {
         var user = await _userManager.GetUserAsync(User);
 
-        var properties = await _propertyService.GetByUserAsync(user.Id);
+        if (user == null)
+            return Unauthorized();
 
-        ViewBag.InactiveCount = await _propertyService.CountInactiveAsync(user.Id);
+        var properties = await _propertyService
+            .GetAccessiblePropertiesAsync(
+                user.Id,
+                user.CompanyId);
 
-        properties = properties
-            .Where(p => p.Active)
-            .ToList();
-
-        var vm = properties.Select(p => new PropriedadeVM
+        var model = properties
+        .Select(x => new PropriedadeVM
         {
-            Id = p.Id,
-            Nome = p.Name,
-            Endereco = p.Address,
-            Freguesia = p.Freguesia,
-            Quartos = p.Rooms,
-            CasasBanho = p.Bathrooms,
-            Active = p.Active
-        });
+            Id = x.Id,
+            Nome = x.Name,
+            Endereco = x.Address,
+            Freguesia = x.Freguesia,
+        })
+        .ToList();
 
-        return View(vm);
+        return View(model);
     }
 
     [HttpGet]
     public async Task<IActionResult> Details(Guid id)
     {
-        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var user = await _userManager.GetUserAsync(User);
 
-        var property = await _propertyService.GetByIdAndOwnerIdAsync(id, userId);
-
-        
+        var property = await _propertyService.GetAccessibleByIdAsync(id, user.Id, user.CompanyId);
 
         if (property == null)
             return NotFound();
 
-        if (property.ApplicationUserId != userId)
-            return Forbid();
+        if (property.CompanyId.HasValue)
+        {
+            if (user.CompanyId != property.CompanyId)
+                return Forbid();
+        }
+        else
+        {
+            if (property.ApplicationUserId != user.Id)
+                return Forbid();
+        }
 
         var calendarIntegrations =
-            await _calendarIntegrationService.GetByPropertyIdAsync(id, userId);
+            await _calendarIntegrationService.GetByPropertyIdAsync(id, user.Id);
 
         var cleaningTasks =
-            await _cleaningTaskService.GetByOwnerIdAsync(userId);
+            await _cleaningTaskService.GetByOwnerIdAsync(user.Id);
 
         var inventory = 0;
 
@@ -134,7 +140,7 @@ public class PropriedadeController : Controller
 
     public async Task<IActionResult> CreateAsync()
     {
-        var companies = await _companyService.GetAllAsync();
+        var companies = await _companyService.GetCleaningCompaniesAsync();
 
         ViewBag.Companies = new SelectList(
             companies,
@@ -153,7 +159,7 @@ public class PropriedadeController : Controller
         var exists = await _propertyService.ExistsAsync(vm.Nome,
              user.Id);
 
-        var companies = await _companyService.GetAllAsync();
+        var companies = await _companyService.GetCleaningCompaniesAsync();
 
         ViewBag.Companies = new SelectList(
             companies,
@@ -222,6 +228,7 @@ public class PropriedadeController : Controller
             Description = vm.Descricao,
             ApplicationUserId = user.Id,
             CleaningCompanyId = vm.CleaningCompanyId,
+            CompanyId = user.CompanyId,
             Active = true
         };
 
@@ -232,11 +239,11 @@ public class PropriedadeController : Controller
 
     public async Task<IActionResult> Edit(Guid id)
     {
-        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var user = await _userManager.GetUserAsync(User);
 
-        var property = await _propertyService.GetByIdAndOwnerIdAsync(id, userId);
+        var property = await _propertyService.GetAccessibleByIdAsync(id, user.Id, user.CompanyId);
 
-        var companies = await _companyService.GetAllAsync();
+        var companies = await _companyService.GetCleaningCompaniesAsync();
 
         ViewBag.Companies = new SelectList(
             companies,
@@ -274,7 +281,7 @@ public class PropriedadeController : Controller
         if (id != vm.Id)
             return NotFound();
 
-        var companies = await _companyService.GetAllAsync();
+        var companies = await _companyService.GetCleaningCompaniesAsync();
 
         ViewBag.Companies = new SelectList(
             companies,
@@ -301,9 +308,9 @@ public class PropriedadeController : Controller
         if (!ModelState.IsValid)
             return View(vm);
 
-        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var user = await _userManager.GetUserAsync(User);
 
-        var property = await _propertyService.GetByIdAndOwnerIdAsync(id, userId);
+        var property = await _propertyService.GetAccessibleByIdAsync(id, user.Id, user.CompanyId);
 
         if (property == null)
             return NotFound();
@@ -328,9 +335,9 @@ public class PropriedadeController : Controller
 
     public async Task<IActionResult> Delete(Guid id)
     {
-        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var user = await _userManager.GetUserAsync(User);
 
-        var property = await _propertyService.GetByIdAndOwnerIdAsync(id, userId);
+        var property = await _propertyService.GetAccessibleByIdAsync(id, user.Id, user.CompanyId);
 
         if (property == null)
             return NotFound();
@@ -350,9 +357,9 @@ public class PropriedadeController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(Guid id)
     {
-        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var user = await _userManager.GetUserAsync(User);
 
-        var property = await _propertyService.GetByIdAndOwnerIdAsync(id, userId);
+        var property = await _propertyService.GetAccessibleByIdAsync(id, user.Id, user.CompanyId);
 
         if (property == null)
             return NotFound();
@@ -477,6 +484,7 @@ public class PropriedadeController : Controller
             new { id = vm.PropertyId }
         );
     }
+
 
     private double? ParseCoordinate(string? value)
     {

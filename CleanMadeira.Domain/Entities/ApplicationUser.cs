@@ -28,7 +28,9 @@ public class ApplicationUser : IdentityUser<Guid>
 
     public Guid? CompanyId { get; set; }
 
-    public String? CompanyName { get; set; }
+    public Company? Company { get; set; }
+
+    public CompanyRole? CompanyRole { get; set; }
 
     public ICollection<CleaningTask> CleaningTasks { get; set; }
         = new List<CleaningTask>();

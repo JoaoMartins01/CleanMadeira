@@ -1,4 +1,5 @@
 ﻿using CleanMadeira.Application.Common.Interfaces;
+using CleanMadeira.Application.DTOs.Reports;
 using CleanMadeira.Application.Services.Interface;
 using CleanMadeira.Domain.Entities;
 using CleanMadeira.Domain.Enums;
@@ -21,7 +22,16 @@ namespace CleanMadeira.Application.Services.Implementation
             return await _taskRepository.GetAllAsync();
         }
 
-        
+        public async Task<IEnumerable<CleaningTask>> GetAccessibleCleaningTasksAsync(
+            Guid userId,
+            Guid? companyId)
+        {
+            return await _taskRepository
+                .GetAccessibleCleaningTasksAsync(
+                    userId,
+                    companyId);
+        }
+
 
         public async Task<CleaningTask?> GetByIdAsync(Guid? id)
         {
@@ -97,6 +107,35 @@ namespace CleanMadeira.Application.Services.Implementation
             return await _taskRepository.GetByOwnerIdAsync(ownerId);
         }
 
+        public async Task<CleaningTask?> GetAccessibleByIdAsync(
+            Guid cleaningTaskId,
+            Guid userId,
+            Guid? companyId)
+        {
+            return await _taskRepository
+                .GetAccessibleByIdAsync(
+                    cleaningTaskId,
+                    userId,
+                    companyId);
+        }
+
+        public async Task<IEnumerable<CleaningTask>> GetByCleaningCompanyAsync(
+            Guid? cleaningCompanyId)
+        {
+            return await _taskRepository
+                .GetByCleaningCompanyAsync(cleaningCompanyId);
+        }
+
+        public async Task<CleaningTask?> GetAccessibleByCleaningCompanyAsync(
+            Guid taskId,
+            Guid cleaningCompanyId)
+        {
+            return await _taskRepository
+                .GetAccessibleByCleaningCompanyAsync(
+                    taskId,
+                    cleaningCompanyId);
+        }
+
         public async Task<IEnumerable<CleaningTask>> GetByCompanyIdAsync(Guid companyId)
         {
             return await _taskRepository.GetByCompanyIdAsync(companyId);
@@ -142,6 +181,54 @@ namespace CleanMadeira.Application.Services.Implementation
             return true;
         }
 
+        public async Task<MonthlyCleaningReportDto> GetMonthlyReportAsync(
+    Guid ownerId,
+    int year,
+    int month)
+        {
+            var start = new DateTime(year, month, 1);
+            var end = start.AddMonths(1);
 
+            var tasks = await _taskRepository
+                .GetByPeriodAsync(ownerId, start, end);
+
+            return new MonthlyCleaningReportDto
+            {
+                Year = year,
+                Month = month,
+
+                Total = tasks.Count,
+
+                Completed = tasks.Count(x =>
+                    x.Status == CleaningStatus.Completo),
+
+                Pending = tasks.Count(x =>
+                    x.Status == CleaningStatus.Pendente),
+
+                InProgress = tasks.Count(x =>
+                    x.Status == CleaningStatus.EmProgresso),
+
+                Cancelled = tasks.Count(x =>
+                    x.Status == CleaningStatus.Cancelado),
+
+                Tasks = tasks.Select(x => new MonthlyCleaningReportItemDto
+                {
+                    Id = x.Id,
+
+                    PropertyName = x.Property.Name,
+
+                    CleanerName = x.AssignedUser == null
+                        ? null
+                        : $"{x.AssignedUser.PrimeiroNome} {x.AssignedUser.UltimoNome}",
+
+                    ScheduledDate = x.ScheduledDate,
+
+                    Status = x.Status.ToString(),
+
+                    Priority = x.Priority.ToString()
+
+                }).ToList()
+            };
+        }
     }
 }

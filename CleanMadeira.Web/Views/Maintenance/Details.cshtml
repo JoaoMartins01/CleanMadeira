@@ -259,7 +259,7 @@
                                         </div>
 
                                         <div class="fw-semibold">
-                                            @Model.ScheduledDate.ToString("dd/MM/yyyy 'às' HH:mm")
+                                            @Model.ScheduledDate.ToLocalTime().ToString("dd/MM/yyyy 'às' HH:mm")
                                             
                                         </div>
 
@@ -288,9 +288,12 @@
                                             Criado em
                                         </div>
 
-                                        <div class="fw-semibold">
-                                            @Model.CreatedAt.ToString("dd/MM/yyyy 'às' HH:mm")
-                                            
+                                        <div class="local-date"
+                                             data-format="long-pt" ,
+                                             data-date="@DateTime.SpecifyKind(
+                                             @Model.CreatedAt,
+                                             DateTimeKind.Utc
+                                             ).ToString("O")">
                                         </div>
 
                                     </div>

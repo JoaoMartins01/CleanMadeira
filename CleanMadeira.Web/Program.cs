@@ -1,4 +1,5 @@
 using CleanMadeira.Application.Common.Interfaces;
+using CleanMadeira.Application.Common.Interfaces;
 using CleanMadeira.Application.Contract;
 using CleanMadeira.Application.Interfaces;
 using CleanMadeira.Application.Interfaces.Repositories;
@@ -17,6 +18,7 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using QuestPDF.Infrastructure;
 using SendGrid.Helpers.Mail;
 using System.Security.Claims;
 using System.Text;
@@ -138,11 +140,18 @@ builder.Services.AddAuthentication()
         };
     });
 
+builder.Services.AddDistributedMemoryCache();
 
-
-
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
 
 builder.Services.AddAuthorization();
+
+QuestPDF.Settings.License = LicenseType.Community;
 
 var app = builder.Build();
 
@@ -157,6 +166,8 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+app.UseSession();
 
 app.UseAuthentication();
 app.UseAuthorization();

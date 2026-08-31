@@ -1,4 +1,5 @@
-﻿using CleanMadeira.Application.Common.Interfaces;
+﻿using CleanMadeira.Application.Common.DTO;
+using CleanMadeira.Application.Common.Interfaces;
 using CleanMadeira.Application.Services.Interface;
 using CleanMadeira.Domain.Entities;
 public class InventoryService : IInventoryService
@@ -85,9 +86,73 @@ public class InventoryService : IInventoryService
         return await _inventoryRepository.GetByIdAndOwnerAsync(id, ownerId);
     }
 
+    public async Task<IEnumerable<InventoryItem>> GetAccessibleInventoryAsync(
+    Guid userId,
+    Guid? companyId)
+    {
+        return await _inventoryRepository
+            .GetAccessibleInventoryAsync(userId, companyId);
+    }
+
+    public async Task<InventoryItem?> GetAccessibleByIdAsync(
+        Guid inventoryItemId,
+        Guid userId,
+        Guid? companyId)
+    {
+        return await _inventoryRepository
+            .GetAccessibleByIdAsync(
+                inventoryItemId,
+                userId,
+                companyId);
+    }
+
     public async Task<IEnumerable<InventoryItem>> GetLowStockByOwnerIdAsync(Guid ownerId)
     {
         return await _inventoryRepository.GetLowStockByOwnerIdAsync(ownerId);
+    }
+
+    public async Task<InventoryReportDto> GetInventoryReportAsync(
+    Guid ownerId)
+    {
+        var items = await _inventoryRepository
+            .GetReportItemsAsync(ownerId);
+
+        return new InventoryReportDto
+        {
+            TotalItems = items.Count,
+
+            LowStockItems = items.Count(x =>
+                x.Quantity > 0 &&
+                x.Quantity <= x.MinimumQuantity),
+
+            OutOfStockItems = items.Count(x =>
+                x.Quantity <= 0),
+
+            PropertiesWithInventory = items
+                .Select(x => x.PropertyId)
+                .Distinct()
+                .Count(),
+
+            Items = items.Select(x =>
+                new InventoryReportItemDto
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+
+                    PropertyName =
+                        x.Property.Name,
+
+                    Quantity =
+                        (decimal)x.Quantity,
+
+                    MinimumQuantity =
+                        (decimal)x.MinimumQuantity,
+
+                    Unit =
+                        x.Unity
+                })
+                .ToList()
+        };
     }
 
     /*public async Task CheckInventoryAsync(InventoryCheckVM vm, Guid userId)

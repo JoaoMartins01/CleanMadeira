@@ -14,7 +14,12 @@ public interface IMaintenanceRepository
 
     Task<IEnumerable<Maintenance>> GetByOwnerIdAsync(Guid ownerId);
 
+    Task<IEnumerable<Maintenance>> GetAccessibleMaintenancesAsync(Guid userId, Guid? companyId);
+    
+    Task<Maintenance?> GetAccessibleByIdAsync(Guid maintenanceId, Guid userId, Guid? companyId);
+    
     Task<IEnumerable<Maintenance>> GetByOwnerAndAssignedUserIdAsync(Guid ownerId, Guid userId);
+    
     Task<IEnumerable<Maintenance>> GetByDateRangeAsync(
         Guid ownerId,
         DateTime startDate,
@@ -25,6 +30,8 @@ public interface IMaintenanceRepository
     Task<int> GetInProgressCountAsync(Guid ownerId);
 
     Task<int> GetCompletedCountAsync(Guid ownerId);
+
+    Task<List<Maintenance>> GetByPeriodAsync(Guid ownerId, DateTime start, DateTime end);
 
     Task AddAsync(Maintenance maintenance);
 

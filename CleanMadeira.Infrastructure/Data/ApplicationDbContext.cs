@@ -41,6 +41,8 @@ public class ApplicationDbContext
 
     public DbSet<MaintenanceReport> MaintenanceReports { get; set; }
 
+    public DbSet<CompanyInvitation> CompanyInvitations { get; set; }
+
     //public DbSet<Notification> Notifications { get; set; }
 
     public DbSet<AuditLog> AuditLogs { get; set; }

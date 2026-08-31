@@ -45,6 +45,55 @@ public class PropertyRepository
                 x.ApplicationUserId == ownerId);
     }
 
+    public async Task<Property?> GetAccessibleByIdAsync(
+    Guid propertyId,
+    Guid userId,
+    Guid? companyId)
+    {
+        var query = _context.Properties
+            .AsNoTracking()
+            .AsQueryable();
+
+        if (companyId.HasValue)
+        {
+            query = query.Where(x =>
+                x.CompanyId == companyId.Value);
+        }
+        else
+        {
+            query = query.Where(x =>
+                x.ApplicationUserId == userId &&
+                x.CompanyId == null);
+        }
+
+        return await query
+            .FirstOrDefaultAsync(x => x.Id == propertyId);
+    }
+
+    public async Task<List<Property>> GetAccessiblePropertiesAsync(
+    Guid userId,
+    Guid? companyId)
+    {
+        var query = _context.Properties
+            .AsNoTracking()
+            .AsQueryable();
+
+        if (companyId.HasValue)
+        {
+            query = query.Where(x =>
+                x.CompanyId == companyId.Value);
+        }
+        else
+        {
+            query = query.Where(x =>
+                x.ApplicationUserId == userId);
+        }
+
+        return await query
+            .OrderBy(x => x.Name)
+            .ToListAsync();
+    }
+
     public async Task<List<Property>> GetInactiveAsync(Guid userId)
     {
         return await _context.Properties

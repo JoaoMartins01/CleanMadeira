@@ -3,11 +3,13 @@ using CleanMadeira.Application.Services.Interface;
 using CleanMadeira.Domain.Entities;
 using CleanMadeira.Domain.Enums;
 using CleanMadeira.Web.ViewModels.CleaningTask;
+using DocumentFormat.OpenXml.Office2010.Excel;
 using ImageMagick;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using SkiaSharp;
 using System.Diagnostics.Metrics;
 using System.Net.NetworkInformation;
@@ -59,16 +61,20 @@ public class CleaningTaskController : Controller
 
         if (user.Role == UserRole.Dono)
         {
-            task = await _cleaningTaskService.GetByIdAndOwnerIdAsync(id, userId);
+            task = await _cleaningTaskService.GetAccessibleByIdAsync(id, user.Id, user.CompanyId);
         }
-        else
+        if (user.Role == UserRole.Limpador)
         {
             task = await _cleaningTaskService.GetByIdAndCleanerIdAsync(id, userId);
         }
-
+        if (user.Role == UserRole.GestorELimpador)
+        {
+            task = await _cleaningTaskService.GetAccessibleByCleaningCompanyAsync(id, (Guid)user.CompanyId);
+        }
 
         if (task == null)
             return NotFound();
+
 
         var vm = new CleaningTaskVM
         {
@@ -78,15 +84,17 @@ public class CleaningTaskController : Controller
             TipoServico = task.CleaningType,
             Morada = task.Property?.Address ?? "",
             Freguesia = task.Property?.Freguesia ?? "",
-            GestorNome = task.Property?.ApplicationUser != null
-                 ? $"{task.Property.ApplicationUser.PrimeiroNome} {task.Property.ApplicationUser.UltimoNome}"
-                  : "",
 
-            GestorTelefone = task.Property?.ApplicationUser.PhoneNumber,
+            GestorNome = task.Property?.ApplicationUser != null
+                ? $"{task.Property.ApplicationUser.PrimeiroNome} {task.Property.ApplicationUser.UltimoNome}"
+                : "Não disponível",
+
+            GestorTelefone = task.Property?.ApplicationUser?.PhoneNumber,
 
             AssignedUserName = task.AssignedUser != null
                 ? $"{task.AssignedUser.PrimeiroNome} {task.AssignedUser.UltimoNome}"
                 : "Não atribuído",
+
             AssignedUserPhone = task.AssignedUser?.PhoneNumber,
             AssignedUserCode = task.AssignedUser?.CleanerCode,
 
@@ -101,20 +109,19 @@ public class CleaningTaskController : Controller
             EstimatedMinutes = task.EstimatedMinutes,
 
             Notas = task.Notes,
-
             CleanerNotes = task.CleanerNotes,
 
-            Photos = task.Photos
+            Photos = task.Photos?
                 .Select(p => new CleaningPhotoVM
                 {
                     Id = p.Id,
                     FileUrl = p.FileUrl,
                     FileName = p.FileName
                 })
-                .ToList(),
+                .ToList() ?? new List<CleaningPhotoVM>(),
 
-            StartTime = task.StartTime
-        };
+                    StartTime = task.StartTime
+                };
 
         return View(vm);
     }
@@ -177,9 +184,9 @@ public class CleaningTaskController : Controller
 
     public async Task<IActionResult> Edit(Guid id)
     {
-        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var user = await _userManager.GetUserAsync(User);
 
-        var task = await _cleaningTaskService.GetByIdAndOwnerIdAsync(id, userId);
+        var task = await _cleaningTaskService.GetAccessibleByIdAsync(id, user.Id, user.CompanyId);
 
         if (task == null)
             return NotFound();
@@ -209,9 +216,9 @@ public class CleaningTaskController : Controller
         if (!ModelState.IsValid)
             return View(vm);
 
-        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var user = await _userManager.GetUserAsync(User);
 
-        var task = await _cleaningTaskService.GetByIdAndOwnerIdAsync(vm.Id, userId);
+        var task = await _cleaningTaskService.GetAccessibleByIdAsync(vm.Id, user.Id, user.CompanyId);
 
         if (task == null)
             return NotFound();
@@ -231,9 +238,9 @@ public class CleaningTaskController : Controller
 
     public async Task<IActionResult> Delete(Guid id)
     {
-        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var user = await _userManager.GetUserAsync(User);
 
-        var task = await _cleaningTaskService.GetByIdAndOwnerIdAsync(id, userId);
+        var task = await _cleaningTaskService.GetAccessibleByIdAsync(id, user.Id, user.CompanyId);
 
         if (task == null)
             return NotFound();
@@ -257,9 +264,9 @@ public class CleaningTaskController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(Guid id)
     {
-        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var user = await _userManager.GetUserAsync(User);
 
-        var task = await _cleaningTaskService.GetByIdAndOwnerIdAsync(id, userId);
+        var task = await _cleaningTaskService.GetAccessibleByIdAsync(id, user.Id, user.CompanyId);
 
         if (task == null)
             return NotFound();
@@ -378,15 +385,15 @@ public class CleaningTaskController : Controller
     {
         var user = await _userManager.GetUserAsync(User);
 
-        var tasks = await _cleaningTaskService.GetAllAsync();
+        var tasks = await _cleaningTaskService.GetAccessibleCleaningTasksAsync(user.Id, user.CompanyId);
 
         if (user.Role == UserRole.Dono)
         {
-            tasks = await _cleaningTaskService.GetByOwnerIdAsync(user.Id);
+            tasks = await _cleaningTaskService.GetAccessibleCleaningTasksAsync(user.Id, user.CompanyId);
         }
         else
         {
-            tasks = await _cleaningTaskService.GetByCompanyIdAsync((Guid)user?.CompanyId);
+            tasks = await _cleaningTaskService.GetByCleaningCompanyAsync(user.CompanyId);
         }
 
         var rawStatus = Request.Query["status"].ToString();
@@ -456,7 +463,7 @@ public class CleaningTaskController : Controller
     {
         var user = await _userManager.GetUserAsync(User);
 
-        var properties = await _propertyService.GetByUserAsync(user.Id);
+        var properties = await _propertyService.GetAccessiblePropertiesAsync(user.Id, user?.CompanyId);
 
         ViewBag.Propriedades = new SelectList(
             properties,
@@ -888,11 +895,18 @@ public class CleaningTaskController : Controller
     {
         var user = await _userManager.GetUserAsync(User);
 
+        var task = await _cleaningTaskService.GetAccessibleByIdAsync(id, user.Id, user.CompanyId);
+
+
+        if (user.Role != UserRole.Gestor)
+        {
+            task = await _cleaningTaskService.GetAccessibleByCleaningCompanyAsync(id, (Guid)user.CompanyId);
+        }
+
+        var property = task.Property;
+
         if (user == null)
             return Challenge();
-
-        var task = await _cleaningTaskService
-            .GetByIdAsync(id);
 
         if (task == null)
             return NotFound();
@@ -925,8 +939,19 @@ public class CleaningTaskController : Controller
                  u.PhoneNumber.Contains(term)));
         }
 
+        var cleaningCompanyId = property.CleaningCompanyId;
+
         var cleaners = await query
-            .Where(u => u.CompanyId == user.CompanyId)
+            .Where(u =>
+                (u.Role == UserRole.Limpador ||
+                 u.Role == UserRole.GestorELimpador)
+                &&
+                (
+                    u.CompanyId == null ||
+                    (cleaningCompanyId.HasValue &&
+                     u.CompanyId == cleaningCompanyId.Value)
+                )
+            )
             .OrderBy(u => u.PrimeiroNome)
             .ThenBy(u => u.UltimoNome)
             .Take(30)
@@ -934,11 +959,15 @@ public class CleaningTaskController : Controller
             {
                 Id = u.Id,
                 LimpadorCodigo = u.CleanerCode,
-                NomeCompleto =
-                    u.PrimeiroNome + " " + u.UltimoNome,
+                NomeCompleto = u.PrimeiroNome + " " + u.UltimoNome,
                 Email = u.Email ?? "",
                 Telemovel = u.PhoneNumber,
-                Active = u.Active
+                Active = u.Active,
+
+                CompanyId = u.CompanyId,
+                CompanyName = u.Company != null
+                    ? u.Company.Name
+                    : null
             })
             .ToListAsync();
 
@@ -958,7 +987,12 @@ public class CleaningTaskController : Controller
                     u.PrimeiroNome + " " + u.UltimoNome,
                 Email = u.Email ?? "",
                 Telemovel = u.PhoneNumber,
-                Active = u.Active
+                Active = u.Active,
+
+                CompanyId = u.CompanyId,
+                CompanyName = u.Company != null
+                    ? u.Company.Name
+                    : null
             })
             .ToListAsync();
         }
@@ -1101,6 +1135,8 @@ public class CleaningTaskController : Controller
 
         return View(membros);
     }
+
+
 
 
 

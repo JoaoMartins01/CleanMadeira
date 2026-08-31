@@ -1,7 +1,17 @@
-﻿@model CreateCleaningTaskVM
+﻿@using System.Globalization
+@using CleanMadeira.Domain.Entities
+@using CleanMadeira.Domain.Enums
+@using Microsoft.AspNetCore.Identity
+
+@inject UserManager<ApplicationUser> UserManager
+
+@model CreateCleaningTaskVM
 
 @{
     ViewData["Title"] = "Calendário de Limpezas";
+
+    var currentUser = await UserManager.GetUserAsync(User);
+    var isCleanerAndManager = currentUser?.Role == UserRole.GestorELimpador;
 }
 
 <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css"
@@ -577,37 +587,62 @@
 
             </div>
 
-            <div class="modal-footer">
-                    <a id="detailsFullBtn"
-                       class="btn btn-primary">
-                        <i class="bi bi-eye-fill"></i>
-                        Ver detalhes completos
-                    </a>
+                @if (!isCleanerAndManager)
+                {
+                    <div class="modal-footer">
+                        <a id="detailsFullBtn"
+                        class="btn btn-primary">
+                            <i class="bi bi-eye-fill"></i>
+                            Ver detalhes completos
+                        </a>
 
-                    <a id="assignCleanerBtn"
-                       class="btn btn-primary">
-                        <i class="bi bi-person-plus-fill me-1"></i>
-                        Atribuir limpador
-                    </a>
+                        <a id="assignCleanerBtn"
+                        class="btn btn-primary">
+                            <i class="bi bi-person-plus-fill me-1"></i>
+                            Atribuir limpador
+                        </a>
 
-                    <a id="detailsEditBtn"
-                       class="btn btn-outline-warning">
-                        <i class="bi bi-pencil-square"></i>
-                        Editar
-                    </a>
+                        <a id="detailsEditBtn"
+                        class="btn btn-outline-warning">
+                            <i class="bi bi-pencil-square"></i>
+                            Editar
+                        </a>
 
-                    <a id="detailsDeleteBtn"
-                       class="btn btn-outline-danger">
-                        <i class="bi bi-trash-fill"></i>
-                        Eliminar
-                    </a>
+                        <a id="detailsDeleteBtn"
+                        class="btn btn-outline-danger">
+                            <i class="bi bi-trash-fill"></i>
+                            Eliminar
+                        </a>
 
-                    <button type="button"
-                            class="btn btn-secondary"
-                            data-bs-dismiss="modal">
-                        Fechar
-                    </button>
-             </div>
+                        <button type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal">
+                            Fechar
+                        </button>
+                    </div>
+                }
+                else
+                {
+                    <div class="modal-footer">
+                        <a id="detailsFullBtn"
+                           class="btn btn-primary">
+                            <i class="bi bi-eye-fill"></i>
+                            Ver detalhes completos
+                        </a>
+
+                        <a id="assignCleanerBtn"
+                           class="btn btn-primary">
+                            <i class="bi bi-person-plus-fill me-1"></i>
+                            Atribuir limpador
+                        </a>
+
+                        <button type="button"
+                                class="btn btn-secondary"
+                                data-bs-dismiss="modal">
+                            Fechar
+                        </button>
+                    </div>
+                }
 
         </div>
     </div>

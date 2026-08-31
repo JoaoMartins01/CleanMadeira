@@ -423,8 +423,7 @@
                                 </small>
 
                                 <div>
-                                    @maintenance.ScheduledDate.ToString("dd/MM/yyyy 'às' HH:mm")
-                                    
+                                    @maintenance.ScheduledDate.ToLocalTime().ToString("dd/MM/yyyy 'às' HH:mm")
                                 </div>
 
                             </div>

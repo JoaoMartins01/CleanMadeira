@@ -1,4 +1,6 @@
-﻿using CleanMadeira.Domain.Entities;
+﻿using CleanMadeira.Application.Common.DTO;
+using CleanMadeira.Application.Interfaces.Repositories;
+using CleanMadeira.Domain.Entities;
 
 namespace CleanMadeira.Application.Interfaces.Services;
 
@@ -12,6 +14,10 @@ public interface IMaintenanceService
 
     Task<IEnumerable<Maintenance>> GetByOwnerIdAsync(Guid ownerId);
 
+    Task<IEnumerable<Maintenance>> GetAccessibleMaintenancesAsync(Guid userId, Guid? companyId);
+
+    Task<Maintenance?> GetAccessibleByIdAsync(Guid maintenanceId, Guid userId, Guid? companyId);
+
     Task<IEnumerable<Maintenance>> GetByAssignedUserIdAsync(Guid userId);
 
     Task<IEnumerable<Maintenance>> GetByOwnerAndAssignedUserIdAsync(
@@ -22,6 +28,11 @@ public interface IMaintenanceService
         Guid ownerId,
         DateTime startDate,
         DateTime endDate);
+
+    Task<MonthlyMaintenanceReportDto> GetMonthlyReportAsync(
+    Guid ownerId,
+    int year,
+    int month);
 
     Task CreateAsync(Maintenance maintenance);
 

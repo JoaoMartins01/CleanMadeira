@@ -66,6 +66,59 @@ namespace CleanMadeira.Infrastructure.Repository
                     x.Property.ApplicationUserId == ownerId);
         }
 
+        public async Task<IEnumerable<InventoryItem>> GetAccessibleInventoryAsync(
+            Guid userId,
+            Guid? companyId)
+        {
+            var query = _context.InventoryItems
+                .AsNoTracking()
+                .Include(x => x.Property)
+                .AsQueryable();
+
+            if (companyId.HasValue)
+            {
+                query = query.Where(x =>
+                    x.Property.CompanyId == companyId.Value);
+            }
+            else
+            {
+                query = query.Where(x =>
+                    x.Property.ApplicationUserId == userId &&
+                    x.Property.CompanyId == null);
+            }
+
+            return await query
+                .OrderBy(x => x.Property.Name)
+                .ThenBy(x => x.Name)
+                .ToListAsync();
+        }
+
+        public async Task<InventoryItem?> GetAccessibleByIdAsync(
+            Guid inventoryItemId,
+            Guid userId,
+            Guid? companyId)
+        {
+            var query = _context.InventoryItems
+                .AsNoTracking()
+                .Include(x => x.Property)
+                .AsQueryable();
+
+            if (companyId.HasValue)
+            {
+                query = query.Where(x =>
+                    x.Property.CompanyId == companyId.Value);
+            }
+            else
+            {
+                query = query.Where(x =>
+                    x.Property.ApplicationUserId == userId &&
+                    x.Property.CompanyId == null);
+            }
+
+            return await query
+                .FirstOrDefaultAsync(x => x.Id == inventoryItemId);
+        }
+
         public async Task<IEnumerable<InventoryItem>> GetLowStockByOwnerIdAsync(Guid ownerId)
         {
             return await _context.InventoryItems
@@ -75,6 +128,19 @@ namespace CleanMadeira.Infrastructure.Repository
                             i.Quantity <= i.MinimumQuantity)
                 .OrderBy(i => i.Property.Name)
                 .ThenBy(i => i.Name)
+                .ToListAsync();
+        }
+
+        public async Task<List<InventoryItem>> GetReportItemsAsync(
+        Guid ownerId)
+        {
+            return await _context.InventoryItems
+                .AsNoTracking()
+                .Include(x => x.Property)
+                .Where(x =>
+                    x.Property.ApplicationUserId == ownerId)
+                .OrderBy(x => x.Property.Name)
+                .ThenBy(x => x.Name)
                 .ToListAsync();
         }
     }

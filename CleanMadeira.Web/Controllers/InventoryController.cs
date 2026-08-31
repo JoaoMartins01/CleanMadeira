@@ -34,7 +34,7 @@ public class InventoryController : Controller
     {
         var user = await _userManager.GetUserAsync(User);
 
-        var propriedades = await _propertyService.GetByUserAsync(user.Id);
+        var propriedades = await _propertyService.GetAccessiblePropertiesAsync(user.Id , user.CompanyId);
 
         // Se não existirem propriedades, devolve a página vazia
         if (propriedades == null || !propriedades.Any())
@@ -92,9 +92,9 @@ public class InventoryController : Controller
 
     public async Task<IActionResult> Details(Guid id)
     {
-        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var user = await _userManager.GetUserAsync(User);
 
-        var item = await _inventoryService.GetByIdAndOwnerAsync(id, userId);
+        var item = await _inventoryService.GetAccessibleByIdAsync(id, user.Id, user.CompanyId);
 
         if (item == null)
             return NotFound();
@@ -122,7 +122,7 @@ public class InventoryController : Controller
             return Unauthorized();
 
         var properties = await _propertyService
-            .GetByUserAsync(user.Id);
+            .GetAccessiblePropertiesAsync(user.Id, user.CompanyId);
 
         if (propriedadeId.HasValue &&
             !properties.Any(p => p.Id == propriedadeId.Value))
@@ -158,7 +158,7 @@ public class InventoryController : Controller
             return Unauthorized();
 
         var properties = await _propertyService
-            .GetByUserAsync(user.Id);
+            .GetAccessiblePropertiesAsync(user.Id, user.CompanyId);
 
         if (!properties.Any(p => p.Id == vm.PropriedadeId))
         {
@@ -202,11 +202,11 @@ public class InventoryController : Controller
 
     public async Task<IActionResult> Edit(Guid id)
     {
-        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var user = await _userManager.GetUserAsync(User);
 
-        var item = await _inventoryService.GetByIdAndOwnerAsync(id, userId);
+        var item = await _inventoryService.GetAccessibleByIdAsync(id, user.Id, user.CompanyId);
 
-        var propriedade = await _propertyService.GetByIdAsync(item.PropertyId);
+        var propriedade = await _propertyService.GetAccessibleByIdAsync((Guid)item.PropertyId, user.Id, user.CompanyId);
 
         if (item == null)
             return NotFound();
@@ -236,9 +236,9 @@ public class InventoryController : Controller
         if (!ModelState.IsValid)
             return View(vm);
 
-        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var user = await _userManager.GetUserAsync(User);
 
-        var item = await _inventoryService.GetByIdAndOwnerAsync(id, userId);
+        var item = await _inventoryService.GetAccessibleByIdAsync(id, user.Id, user.CompanyId);
 
         if (item == null)
             return NotFound();
@@ -261,9 +261,9 @@ public class InventoryController : Controller
 
     public async Task<IActionResult> Delete(Guid id)
     {
-        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var user = await _userManager.GetUserAsync(User);
 
-        var item = await _inventoryService.GetByIdAndOwnerAsync(id, userId);
+        var item = await _inventoryService.GetAccessibleByIdAsync(id, user.Id, user.CompanyId);
 
         if (item == null)
             return NotFound();
@@ -285,9 +285,9 @@ public class InventoryController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(Guid id)
     {
-        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var user = await _userManager.GetUserAsync(User);
 
-        var item = await _inventoryService.GetByIdAndOwnerAsync(id, userId);
+        var item = await _inventoryService.GetAccessibleByIdAsync(id, user.Id, user.CompanyId);
 
         if (item == null)
             return NotFound();
@@ -388,7 +388,7 @@ public class InventoryController : Controller
         var user = await _userManager.GetUserAsync(User);
 
         var propriedades = await _propertyService
-            .GetByUserAsync(user.Id);
+            .GetAccessiblePropertiesAsync(user.Id, user.CompanyId);
 
         ViewBag.Propriedades = new SelectList(
             propriedades,

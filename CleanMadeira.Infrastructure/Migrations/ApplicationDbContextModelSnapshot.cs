@@ -66,8 +66,8 @@ namespace CleanMadeira.Infrastructure.Migrations
                     b.Property<Guid?>("CompanyId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("CompanyName")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("CompanyRole")
+                        .HasColumnType("int");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
@@ -294,22 +294,25 @@ namespace CleanMadeira.Infrastructure.Migrations
                     b.Property<bool>("Active")
                         .HasColumnType("bit");
 
-                    b.Property<string>("Adress")
+                    b.Property<string>("Address")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<Guid>("CreatedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Name")
+                    b.Property<string>("NIF")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Nif")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -330,6 +333,38 @@ namespace CleanMadeira.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Companies");
+                });
+
+            modelBuilder.Entity("CleanMadeira.Domain.Entities.CompanyInvitation", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("Accepted")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("CompanyId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("Token")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CompanyId");
+
+                    b.ToTable("CompanyInvitations");
                 });
 
             modelBuilder.Entity("CleanMadeira.Domain.Entities.InventoryItem", b =>
@@ -546,6 +581,9 @@ namespace CleanMadeira.Infrastructure.Migrations
                     b.Property<Guid?>("CleaningCompanyId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("CompanyId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
@@ -588,6 +626,8 @@ namespace CleanMadeira.Infrastructure.Migrations
                     b.HasIndex("CleanerId");
 
                     b.HasIndex("CleaningCompanyId");
+
+                    b.HasIndex("CompanyId");
 
                     b.ToTable("Properties");
                 });
@@ -878,9 +918,11 @@ namespace CleanMadeira.Infrastructure.Migrations
 
             modelBuilder.Entity("CleanMadeira.Domain.Entities.ApplicationUser", b =>
                 {
-                    b.HasOne("CleanMadeira.Domain.Entities.Company", null)
+                    b.HasOne("CleanMadeira.Domain.Entities.Company", "Company")
                         .WithMany("Users")
                         .HasForeignKey("CompanyId");
+
+                    b.Navigation("Company");
                 });
 
             modelBuilder.Entity("CleanMadeira.Domain.Entities.CalendarIntegration", b =>
@@ -916,6 +958,17 @@ namespace CleanMadeira.Infrastructure.Migrations
                     b.Navigation("CleaningCompany");
 
                     b.Navigation("Property");
+                });
+
+            modelBuilder.Entity("CleanMadeira.Domain.Entities.CompanyInvitation", b =>
+                {
+                    b.HasOne("CleanMadeira.Domain.Entities.Company", "Company")
+                        .WithMany()
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Company");
                 });
 
             modelBuilder.Entity("CleanMadeira.Domain.Entities.InventoryItem", b =>
@@ -1013,11 +1066,17 @@ namespace CleanMadeira.Infrastructure.Migrations
                         .HasForeignKey("CleaningCompanyId")
                         .OnDelete(DeleteBehavior.SetNull);
 
+                    b.HasOne("CleanMadeira.Domain.Entities.Company", "Company")
+                        .WithMany()
+                        .HasForeignKey("CompanyId");
+
                     b.Navigation("ApplicationUser");
 
                     b.Navigation("Cleaner");
 
                     b.Navigation("CleaningCompany");
+
+                    b.Navigation("Company");
                 });
 
             modelBuilder.Entity("CleanMadeira.Domain.Entities.Reservation", b =>

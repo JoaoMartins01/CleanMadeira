@@ -7,10 +7,13 @@ namespace CleanMadeira.Application.Common.Interfaces
         Task<IEnumerable<InventoryItem>> GetLowStockAsync();
 
         Task<IEnumerable<InventoryItem>> GetByPropertyIdAsync(Guid propertyId);
-
+        Task<IEnumerable<InventoryItem>> GetAccessibleInventoryAsync(Guid userId, Guid? companyId);
+        Task<InventoryItem?> GetAccessibleByIdAsync(Guid inventoryItemId, Guid userId, Guid? companyId);
         Task UpdateQuantityAsync(Guid inventoryItemId, int quantity);
         Task<IEnumerable<InventoryItem>> GetByOwnerIdAsync(Guid ownerId);
         Task<InventoryItem?> GetByIdAndOwnerAsync(Guid id, Guid ownerId);
         Task<IEnumerable<InventoryItem>> GetLowStockByOwnerIdAsync(Guid ownerId);
+        Task<List<InventoryItem>> GetReportItemsAsync(Guid ownerId);
+
     }
 }

@@ -10,6 +10,10 @@
 
         public string NomeCompleto { get; set; } = string.Empty;
 
+        public string? CompanyName { get; set; }
+
+        public Guid? CompanyId { get; set; }
+
         public string Email { get; set; } = string.Empty;
 
         public string? Telemovel { get; set; }

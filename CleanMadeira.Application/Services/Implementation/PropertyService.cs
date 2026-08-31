@@ -26,6 +26,28 @@ public class PropertyService : IPropertyService
         return await _propertyRepository.GetByIdAndOwnerIdAsync(id, ownerId);
     }
 
+    public async Task<Property?> GetAccessibleByIdAsync(
+    Guid propertyId,
+    Guid userId,
+    Guid? companyId)
+    {
+        return await _propertyRepository
+            .GetAccessibleByIdAsync(
+                propertyId,
+                userId,
+                companyId);
+    }
+
+    public async Task<List<Property>> GetAccessiblePropertiesAsync(
+    Guid userId,
+    Guid? companyId)
+    {
+        return await _propertyRepository
+            .GetAccessiblePropertiesAsync(
+                userId,
+                companyId);
+    }
+
     public async Task CreateAsync(Property propriedade)
     {
         propriedade.Id = Guid.NewGuid();

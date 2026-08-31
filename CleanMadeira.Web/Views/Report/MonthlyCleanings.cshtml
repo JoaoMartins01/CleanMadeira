@@ -1,0 +1,619 @@
+﻿@using System.Globalization
+@model CleanMadeira.Web.ViewModels.Report.MonthlyCleaningReportVM
+
+@{
+    ViewData["Title"] = "Relatório Mensal de Limpezas";
+
+    var culture = new CultureInfo("pt-PT");
+
+    var monthName = culture.DateTimeFormat
+        .GetMonthName(Model.Month);
+
+    monthName = char.ToUpper(monthName[0]) +
+                monthName.Substring(1);
+}
+
+<div class="container-fluid py-4">
+
+    <div class="d-flex flex-column flex-md-row
+        justify-content-between
+        align-items-md-center
+        gap-3 mb-4">
+
+        <div>
+
+            <h1 class="h3 fw-bold mb-1">
+                <i class="bi bi-bar-chart-line me-2"></i>
+                Relatório Mensal
+            </h1>
+
+            <p class="text-muted mb-0">
+                Resumo das limpezas de
+                @monthName de @Model.Year
+            </p>
+
+        </div>
+
+        <div class="d-flex gap-2">
+
+            <a asp-controller="Report"
+               asp-action="ExportMonthlyCleaningsExcel"
+               asp-route-year="@Model.Year"
+               asp-route-month="@Model.Month"
+               class="btn btn-outline-success">
+
+                <i class="bi bi-file-earmark-excel me-1"></i>
+                Excel
+            </a>
+
+            <a asp-controller="Report"
+               asp-action="ExportMonthlyCleaningsPdf"
+               asp-route-year="@Model.Year"
+               asp-route-month="@Model.Month"
+               class="btn btn-outline-danger">
+
+                <i class="bi bi-file-earmark-pdf me-1"></i>
+                PDF
+            </a>
+
+            <a asp-controller="Report"
+               asp-action="Index"
+               class="btn btn-outline-secondary">
+
+                <i class="bi bi-arrow-left me-1"></i>
+                Voltar
+            </a>
+
+        </div>
+    </div>
+
+    <!-- FILTRO -->
+
+    <div class="card border-0 shadow-sm mb-4">
+
+        <div class="card-body">
+
+            <form asp-controller="Report"
+                  asp-action="MonthlyCleanings"
+                  method="get"
+                  class="row g-3 align-items-end">
+
+                <div class="col-12 col-sm-5 col-md-4">
+
+                    <label for="month"
+                           class="form-label fw-semibold">
+                        Mês
+                    </label>
+
+                    <select id="month"
+                            name="month"
+                            class="form-select">
+
+                        @for (var i = 1; i <= 12; i++)
+                        {
+                            var name = culture.DateTimeFormat
+                                .GetMonthName(i);
+
+                            name =
+                                char.ToUpper(name[0]) +
+                                name.Substring(1);
+
+                            if (i == Model.Month)
+                            {
+                                <option value="@i"
+                                        selected>
+                                    @name
+                                </option>
+                            }
+                            else
+                            {
+                                <option value="@i">
+                                    @name
+                                </option>
+                            }
+                        }
+
+                    </select>
+
+                </div>
+
+
+                <div class="col-12 col-sm-4 col-md-3">
+
+                    <label for="year"
+                           class="form-label fw-semibold">
+                        Ano
+                    </label>
+
+                    <input id="year"
+                           name="year"
+                           type="number"
+                           min="2020"
+                           max="2100"
+                           value="@Model.Year"
+                           class="form-control" />
+
+                </div>
+
+
+                <div class="col-12 col-sm-auto">
+
+                    <button type="submit"
+                            class="btn btn-primary w-100">
+
+                        <i class="bi bi-search me-1"></i>
+                        Ver relatório
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- RESUMO -->
+
+    <div class="row g-3 mb-4">
+
+        <div class="col-6 col-lg">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <div class="text-muted small mb-1">
+                        Total
+                    </div>
+
+                    <div class="h3 fw-bold mb-0">
+                        @Model.Total
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-6 col-lg">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <div class="text-muted small mb-1">
+                        Concluídas
+                    </div>
+
+                    <div class="h3 fw-bold text-success mb-0">
+                        @Model.Completed
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-6 col-lg">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <div class="text-muted small mb-1">
+                        Pendentes
+                    </div>
+
+                    <div class="h3 fw-bold text-warning mb-0">
+                        @Model.Pending
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-6 col-lg">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <div class="text-muted small mb-1">
+                        Em progresso
+                    </div>
+
+                    <div class="h3 fw-bold text-primary mb-0">
+                        @Model.InProgress
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-6 col-lg">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <div class="text-muted small mb-1">
+                        Canceladas
+                    </div>
+
+                    <div class="h3 fw-bold text-danger mb-0">
+                        @Model.Cancelled
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    @if (!Model.Tasks.Any())
+    {
+        <div class="card border-0 shadow-sm">
+
+            <div class="card-body text-center py-5">
+
+                <i class="bi bi-calendar-x
+                    display-4
+                    text-muted">
+                </i>
+
+                <h2 class="h5 fw-semibold mt-3">
+                    Sem limpezas neste mês
+                </h2>
+
+                <p class="text-muted mb-0">
+                    Não existem limpezas agendadas para
+                    @monthName de @Model.Year.
+                </p>
+
+            </div>
+
+        </div>
+    }
+    else
+    {
+        <!-- DESKTOP -->
+
+        <div class="card border-0 shadow-sm d-none d-md-block">
+
+            <div class="table-responsive">
+
+                <table class="table
+                    table-hover
+                    align-middle
+                    mb-0">
+
+                    <thead class="table-light">
+
+                        <tr>
+                            <th class="ps-3">Data</th>
+                            <th>Propriedade</th>
+                            <th>Limpador</th>
+                            <th>Estado</th>
+                            <th>Prioridade</th>
+
+                            <th class="text-end pe-3">
+                                Ações
+                            </th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        @foreach (var task in Model.Tasks)
+                        {
+                            <tr>
+
+                                <td class="ps-3">
+
+                                    <div class="fw-semibold">
+                                        @task.ScheduledDate.ToString("dd/MM/yyyy")
+                                    </div>
+
+                                    <small class="text-muted">
+
+                                        <i class="bi bi-clock me-1"></i>
+
+                                        @task.ScheduledDate.ToString("HH:mm")
+                                        
+
+                                    </small>
+
+                                </td>
+
+
+                                <td>
+                                    @task.PropertyName
+                                </td>
+
+
+                                <td>
+
+                                    @if (string.IsNullOrWhiteSpace(
+                                        task.CleanerName))
+                                    {
+                                        <span class="text-muted">
+
+                                            <i class="bi bi-person-x
+                                                text-danger
+                                                me-1">
+                                            </i>
+
+                                            Não atribuído
+
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        @task.CleanerName
+                                    }
+
+                                </td>
+
+
+                                <td>
+
+                                    @switch (task.Status)
+                                    {
+                                        case "Pendente":
+
+                                            <span class="badge
+                                                bg-warning-subtle
+                                                text-warning-emphasis">
+                                                Pendente
+                                            </span>
+
+                                            break;
+
+                                        case "EmProgresso":
+
+                                            <span class="badge
+                                                bg-primary-subtle
+                                                text-primary">
+                                                Em progresso
+                                            </span>
+
+                                            break;
+
+                                        case "Completo":
+
+                                            <span class="badge
+                                                bg-success-subtle
+                                                text-success">
+                                                Concluída
+                                            </span>
+
+                                            break;
+
+                                        case "Cancelado":
+
+                                            <span class="badge
+                                                bg-danger-subtle
+                                                text-danger">
+                                                Cancelada
+                                            </span>
+
+                                            break;
+
+                                        default:
+
+                                            <span class="badge
+                                                bg-secondary-subtle
+                                                text-secondary">
+                                                @task.Status
+                                            </span>
+
+                                            break;
+                                    }
+
+                                </td>
+
+
+                                <td>
+
+                                    @switch (task.Priority)
+                                    {
+                                        case "Baixa":
+
+                                            <span class="badge
+                                                bg-success-subtle
+                                                text-success">
+                                                Baixa
+                                            </span>
+
+                                            break;
+
+                                        case "Media":
+
+                                            <span class="badge
+                                                bg-primary-subtle
+                                                text-primary">
+                                                Média
+                                            </span>
+
+                                            break;
+
+                                        case "Alta":
+
+                                            <span class="badge
+                                                bg-warning-subtle
+                                                text-warning-emphasis">
+                                                Alta
+                                            </span>
+
+                                            break;
+
+                                        case "Urgente":
+
+                                            <span class="badge
+                                                bg-danger-subtle
+                                                text-danger">
+                                                Urgente
+                                            </span>
+
+                                            break;
+
+                                        default:
+
+                                            <span class="badge
+                                                bg-secondary-subtle
+                                                text-secondary">
+                                                @task.Priority
+                                            </span>
+
+                                            break;
+                                    }
+
+                                </td>
+
+
+                                <td class="text-end pe-3">
+
+                                    <a asp-controller="CleaningTask"
+                                       asp-action="Details"
+                                       asp-route-id="@task.Id"
+                                       class="btn
+                                        btn-sm
+                                        btn-outline-secondary">
+
+                                        <i class="bi bi-eye"></i>
+
+                                    </a>
+
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+
+        <!-- MOBILE -->
+
+        <div class="d-md-none">
+
+            <div class="d-flex flex-column gap-3">
+
+                @foreach (var task in Model.Tasks)
+                {
+                    <div class="card border-0 shadow-sm">
+
+                        <div class="card-body">
+
+                            <div class="d-flex
+                                justify-content-between
+                                align-items-start
+                                gap-3 mb-3">
+
+                                <div>
+
+                                    <h2 class="h5 fw-bold mb-1">
+                                        @task.PropertyName
+                                    </h2>
+
+                                    <div class="text-muted small">
+
+                                        <i class="bi bi-calendar3 me-1"></i>
+                                        @task.ScheduledDate.ToString("dd/MM/yyyy 'às' HH:mm")
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="mb-2">
+
+                                <small class="text-muted">
+                                    Limpador
+                                </small>
+
+                                <div>
+
+                                    @(string.IsNullOrWhiteSpace(
+                                        task.CleanerName)
+                                            ? "Não atribuído"
+                                            : task.CleanerName)
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="row g-2 mb-3">
+
+                                <div class="col-6">
+
+                                    <small class="text-muted d-block">
+                                        Estado
+                                    </small>
+
+                                    <strong>
+                                        @task.Status
+                                    </strong>
+
+                                </div>
+
+                                <div class="col-6">
+
+                                    <small class="text-muted d-block">
+                                        Prioridade
+                                    </small>
+
+                                    <strong>
+                                        @task.Priority
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+
+                            <a asp-controller="CleaningTask"
+                               asp-action="Details"
+                               asp-route-id="@task.Id"
+                               class="btn btn-primary w-100">
+
+                                <i class="bi bi-eye me-1"></i>
+                                Ver limpeza
+
+                            </a>
+
+                        </div>
+
+                    </div>
+                }
+
+            </div>
+
+        </div>
+    }
+
+</div>

@@ -251,6 +251,8 @@
 
                     @Html.AntiForgeryToken()
 
+                    <input asp-for="ReturnUrl" type="hidden" />
+
                     <div asp-validation-summary="All"
                          class="text-danger mb-3">
                     </div>

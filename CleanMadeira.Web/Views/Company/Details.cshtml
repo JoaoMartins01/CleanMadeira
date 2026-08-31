@@ -1,55 +1,467 @@
-﻿@using CleanMadeira.Web.ViewModels.Empresa
-@model EmpresaVM
+﻿@model CleanMadeira.Web.ViewModels.Company.CompanyDetailsVM
 
 @{
-    ViewData["Title"] = "Detalhes";
+    ViewData["Title"] = "Minha Empresa";
 }
 
-<div class="card">
+<div class="container-fluid py-4">
 
-    <div class="card-header">
-        <h3>@Model.Nome</h3>
+    <!-- CABEÇALHO -->
+    <div class="d-flex flex-column flex-md-row
+        justify-content-between
+        align-items-md-center
+        gap-3 mb-4">
+
+        <div>
+            <div class="d-flex align-items-center gap-3">
+
+                <div class="d-flex align-items-center
+                    justify-content-center
+                    rounded-3 bg-primary-subtle
+                    text-primary flex-shrink-0"
+                     style="width:52px;height:52px;">
+
+                    <i class="bi bi-buildings fs-4"></i>
+
+                </div>
+
+                <div>
+                    <h1 class="h3 fw-bold mb-1">
+                        @Model.Name
+                    </h1>
+
+                    <p class="text-muted mb-0">
+                        Empresa de gestão de alojamento local
+                    </p>
+                </div>
+
+            </div>
+        </div>
+
+
+        <div class="d-flex flex-wrap gap-2">
+
+            <a asp-controller="Company"
+               asp-action="Edit"
+               asp-route-id="@Model.Id"
+               class="btn btn-outline-secondary">
+
+                <i class="bi bi-pencil me-1"></i>
+                Editar empresa
+
+            </a>
+
+        </div>
+
     </div>
 
-    <div class="card-body">
 
-        <p>
-            <strong>NIF:</strong>
-            @Model.Nif
-        </p>
+    <!-- RESUMO -->
+    <div class="row g-3 mb-4">
 
-        <p>
-            <strong>Email:</strong>
-            @Model.Email
-        </p>
+        <div class="col-6 col-lg-3">
 
-        <p>
-            <strong>Telefone:</strong>
-            @Model.Telefone
-        </p>
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
 
-        <p>
-            <strong>Morada:</strong>
-            @Model.Endereço
-        </p>
+                    <div class="d-flex align-items-center gap-3">
 
-        <p>
-            <strong>Estado:</strong>
+                        <div class="rounded-3 bg-primary-subtle
+                            text-primary
+                            d-flex align-items-center
+                            justify-content-center"
+                             style="width:45px;height:45px;">
 
-            @if (Model.Active)
-            {
-                <span class="badge bg-success">
-                    Ativa
-                </span>
-            }
-            else
-            {
-                <span class="badge bg-danger">
-                    Inativa
-                </span>
-            }
+                            <i class="bi bi-house-door fs-5"></i>
 
-        </p>
+                        </div>
+
+                        <div>
+                            <div class="text-muted small">
+                                Propriedades
+                            </div>
+
+                            <div class="h4 fw-bold mb-0">
+                                @Model.PropertyCount
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="col-6 col-lg-3">
+
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+
+                    <div class="d-flex align-items-center gap-3">
+
+                        <div class="rounded-3 bg-success-subtle
+                            text-success
+                            d-flex align-items-center
+                            justify-content-center"
+                             style="width:45px;height:45px;">
+
+                            <i class="bi bi-people fs-5"></i>
+
+                        </div>
+
+                        <div>
+                            <div class="text-muted small">
+                                Gestores
+                            </div>
+
+                            <div class="h4 fw-bold mb-0">
+                                @Model.MemberCount
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="row g-4">
+
+        <!-- =====================================================
+             DADOS DA EMPRESA
+             ===================================================== -->
+
+        <div class="col-12 col-xl-5">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-header bg-transparent border-0 pt-4 px-4">
+
+                    <h2 class="h5 fw-bold mb-0">
+
+                        <i class="bi bi-building me-2"></i>
+                        Dados da empresa
+
+                    </h2>
+
+                </div>
+
+
+                <div class="card-body px-4">
+
+                    <!-- NIF -->
+                    <div class="py-3 border-bottom">
+
+                        <div class="text-muted small mb-1">
+                            NIF
+                        </div>
+
+                        <div class="fw-semibold">
+                            @Model.NIF
+                        </div>
+
+                    </div>
+
+
+                    <!-- EMAIL -->
+                    <div class="py-3 border-bottom">
+
+                        <div class="text-muted small mb-1">
+                            Email
+                        </div>
+
+                        <div>
+
+                            <i class="bi bi-envelope me-2 text-muted"></i>
+
+                            <a href="mailto:@Model.Email"
+                               class="text-decoration-none">
+                                @Model.Email
+                            </a>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- TELEFONE -->
+                    <div class="py-3 border-bottom">
+
+                        <div class="text-muted small mb-1">
+                            Telefone
+                        </div>
+
+                        <div>
+
+                            <i class="bi bi-telephone me-2 text-muted"></i>
+
+                            <a href="tel:@Model.Phone"
+                               class="text-decoration-none">
+                                @Model.Phone
+                            </a>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- MORADA -->
+                    <div class="py-3 border-bottom">
+
+                        <div class="text-muted small mb-1">
+                            Morada
+                        </div>
+
+                        <div>
+                            <i class="bi bi-geo-alt me-2 text-muted"></i>
+                            @Model.Address
+                        </div>
+
+                    </div>
+
+
+                    <!-- CRIAÇÃO -->
+                    <div class="pt-3">
+
+                        <div class="text-muted small mb-1">
+                            Empresa criada em
+                        </div>
+
+                        <div>
+                            <i class="bi bi-calendar3 me-2 text-muted"></i>
+
+                            @Model.CreatedAt.ToString("dd/MM/yyyy")
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             GESTORES
+             ===================================================== -->
+
+        <div class="col-12 col-xl-7">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-header bg-transparent
+                    border-0 pt-4 px-4">
+
+                    <div class="d-flex
+                        justify-content-between
+                        align-items-center
+                        gap-3">
+
+                        <div>
+
+                            <h2 class="h5 fw-bold mb-1">
+                                <i class="bi bi-people me-2"></i>
+                                Gestores
+                            </h2>
+
+                            <p class="text-muted small mb-0">
+                                Utilizadores com acesso à empresa
+                            </p>
+
+                        </div>
+
+
+                        <a asp-controller="Company"
+                           asp-action="InviteManager"
+                           asp-route-id="@Model.Id"
+                           class="btn btn-primary btn-sm">
+
+                            <i class="bi bi-person-plus me-1"></i>
+
+                            <span class="d-none d-sm-inline">
+                                Adicionar gestor
+                            </span>
+
+                            <span class="d-sm-none">
+                                Adicionar
+                            </span>
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+
+                <div class="card-body px-4">
+
+                    @if (!Model.Members.Any())
+                    {
+                        <div class="text-center py-5">
+
+                            <i class="bi bi-people
+                                display-5
+                                text-muted">
+                            </i>
+
+                            <h3 class="h6 fw-semibold mt-3">
+                                Ainda não existem gestores
+                            </h3>
+
+                            <p class="text-muted small mb-3">
+                                Adicione gestores para ajudar
+                                a gerir os alojamentos.
+                            </p>
+
+                            <a asp-controller="Company"
+                               asp-action="InviteManager"
+                               asp-route-id="@Model.Id"
+                               class="btn btn-primary btn-sm">
+
+                                <i class="bi bi-person-plus me-1"></i>
+                                Adicionar gestor
+
+                            </a>
+
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="d-flex flex-column">
+
+                            @foreach (var member in Model.Members)
+                            {
+                                <div class="d-flex
+                                    justify-content-between
+                                    align-items-center
+                                    gap-3 py-3 border-bottom">
+
+                                    <div class="d-flex
+                                        align-items-center
+                                        gap-3">
+
+                                        <!-- AVATAR -->
+                                        <div class="rounded-circle
+                                            bg-primary-subtle
+                                            text-primary
+                                            d-flex
+                                            align-items-center
+                                            justify-content-center
+                                            flex-shrink-0"
+                                             style="width:42px;height:42px;">
+
+                                            <i class="bi bi-person"></i>
+
+                                        </div>
+
+
+                                        <div>
+
+                                            <div class="fw-semibold">
+                                                @member.Name
+                                            </div>
+
+                                            <div class="text-muted small">
+                                                @member.Email
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <div class="d-flex
+                                        align-items-center
+                                        gap-2">
+
+                                        @if (member.Role == "Admin")
+                                        {
+                                            <span class="badge
+                                                bg-primary-subtle
+                                                text-primary">
+
+                                                Administrador
+
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge
+                                                bg-secondary-subtle
+                                                text-secondary">
+
+                                                Gestor
+
+                                            </span>
+                                        }
+
+                                    </div>
+
+                                </div>
+                            }
+
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================================
+         PROPRIEDADES
+         ========================================================= -->
+
+    <div class="card border-0 shadow-sm mt-4">
+
+        <div class="card-body p-4">
+
+            <div class="d-flex flex-column flex-sm-row
+                justify-content-between
+                align-items-sm-center
+                gap-3">
+
+                <div>
+
+                    <h2 class="h5 fw-bold mb-1">
+
+                        <i class="bi bi-houses me-2"></i>
+                        Propriedades
+
+                    </h2>
+
+                    <p class="text-muted mb-0">
+                        Consulte as propriedades geridas
+                        pela empresa.
+                    </p>
+
+                </div>
+
+
+                <a asp-controller="Propriedade"
+                   asp-action="Index"
+                   class="btn btn-outline-primary">
+
+                    Ver propriedades
+
+                    <i class="bi bi-arrow-right ms-1"></i>
+
+                </a>
+
+            </div>
+
+        </div>
 
     </div>
 

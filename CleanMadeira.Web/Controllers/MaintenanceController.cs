@@ -44,18 +44,18 @@ public class MaintenanceController : Controller
 
     public async Task<IActionResult> Index()
     {
-        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var user = await _userManager.GetUserAsync(User);
 
-        var model = await _maintenanceService.GetByOwnerIdAsync(userId);
+        var model = await _maintenanceService.GetAccessibleMaintenancesAsync(user.Id, user.CompanyId);
 
         return View(model);
     }
 
     public async Task<IActionResult> Details(Guid id)
     {
-        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var user = await _userManager.GetUserAsync(User);
 
-        var maintenance = await _maintenanceService.GetByIdAndOwnerIdAsync(id, userId);
+        var maintenance = await _maintenanceService.GetAccessibleByIdAsync(id, user.Id, user.CompanyId);
 
         if (maintenance == null)
             return NotFound();
@@ -94,6 +94,9 @@ public class MaintenanceController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(CreateMaintenanceVM model)
     {
+
+        var user = await _userManager.GetUserAsync(User);
+
         if (!ModelState.IsValid)
         {
             return View(model);
@@ -113,12 +116,11 @@ public class MaintenanceController : Controller
         };
 
 
-
         await _maintenanceService.CreateAsync(maintenance);
 
         TempData["Success"] = "Manutenção criada com sucesso.";
 
-        var propriedade = await _propertyService.GetByIdAsync(model.PropertyId);
+        var propriedade = await _propertyService.GetAccessibleByIdAsync(model.PropertyId, user.Id, user.CompanyId);
 
         var provider = await _maintenanceProviderService.GetByIdAsync(model.AssignedUserId);
 
@@ -144,15 +146,15 @@ public class MaintenanceController : Controller
 
                     <h2>CleanMadeira</h2>
 
-                    <p>Olá <strong>{provider.Name}</strong>,</p>
+                    <p>Olá <strong>{provider?.Name}</strong>,</p>
 
                     <p>
                         Foi-lhe atribuído um novo pedido de manutenção.
                     </p>
 
-                    <p><strong>Propriedade:</strong> {maintenance.Property.Name}</p>
+                    <p><strong>Propriedade:</strong> {propriedade.Name}</p>
 
-                    <p><strong>Morada:</strong> {maintenance.Property.Address}</p>
+                    <p><strong>Morada:</strong> {propriedade.Address}</p>
 
                     <p><strong>Descrição:</strong></p>
 
@@ -200,9 +202,9 @@ public class MaintenanceController : Controller
     public async Task<IActionResult> Edit(Guid id)
     {
 
-        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var user = await _userManager.GetUserAsync(User);
 
-        var maintenance = await _maintenanceService.GetByIdAndOwnerIdAsync(id, userId);
+        var maintenance = await _maintenanceService.GetAccessibleByIdAsync(id, user.Id, user.CompanyId);
 
         if (maintenance == null)
             return NotFound();
@@ -256,9 +258,9 @@ public class MaintenanceController : Controller
     [HttpGet]
     public async Task<IActionResult> Delete(Guid id)
     {
-        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var user = await _userManager.GetUserAsync(User);
 
-        var maintenance = await _maintenanceService.GetByIdAndOwnerIdAsync(id, userId);
+        var maintenance = await _maintenanceService.GetAccessibleByIdAsync(id, user.Id, user.CompanyId);
 
         if (maintenance == null)
             return NotFound();
@@ -297,7 +299,7 @@ public class MaintenanceController : Controller
     {
         var user = await _userManager.GetUserAsync(User);
 
-        var propriedades = await _propertyService.GetByUserAsync(user.Id);
+        var propriedades = await _propertyService.GetAccessiblePropertiesAsync(user.Id, user.CompanyId);
 
         ViewBag.Propriedades = new SelectList(
             propriedades,
@@ -461,8 +463,6 @@ public class MaintenanceController : Controller
 
 
             Status = MaintenanceStatus.Pendente,
-
-            CreatedAt = DateTime.UtcNow
         };
 
         await _maintenanceService.CreateAsync(maintenance);

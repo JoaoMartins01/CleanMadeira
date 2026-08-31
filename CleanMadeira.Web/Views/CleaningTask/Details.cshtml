@@ -34,54 +34,15 @@
         </p>
 
         <div class="row g-3">
-            @if (!isCleaner)
+
+            @if (isCleaner)
             {
                 <div class="col-md-6">
                     <div class="detail-box">
-                        <i class="bi bi-person-fill text-primary"></i>
+                        <i class="bi bi-person-badge-fill text-primary"></i>
 
                         <div class="flex-grow-1">
-                            <small>Funcionário</small>
-
-                            <strong>@Model.AssignedUserName</strong>
-
-                            @if (!string.IsNullOrWhiteSpace(Model.AssignedUserCode))
-                            {
-                                <span class="badge bg-light text-dark mt-1">
-                                    @Model.AssignedUserCode
-                                </span>
-                            }
-
-                            @if (!string.IsNullOrWhiteSpace(Model.AssignedUserPhone))
-                            {
-                                <div class="mt-2 d-flex flex-wrap gap-2">
-                                    <a href="tel:@Model.AssignedUserPhone"
-                                    class="btn btn-outline-primary btn-sm">
-                                        <i class="bi bi-telephone-fill me-1"></i>
-                                        Ligar
-                                    </a>
-
-                                    <a href="https://wa.me/@Model.AssignedUserPhone.Replace("+", "").Replace(" ", "")"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    class="btn btn-outline-success btn-sm">
-                                        <i class="bi bi-whatsapp me-1"></i>
-                                        WhatsApp
-                                    </a>
-                                </div>
-                            }
-                        </div>
-                    </div>
-                </div>            
-            }
-            else
-            {
-                <div class="col-md-6">
-                    <div class="detail-box">
-                        <i class="bi bi-person-fill text-primary"></i>
-
-                        <div class="flex-grow-1">
-                            <small>Gestor AL</small>
+                            <small>Contacto do alojamento</small>
 
                             <strong>@Model.GestorNome</strong>
 
@@ -106,7 +67,117 @@
                         </div>
                     </div>
                 </div>
-                
+            }
+            else if (isCleanerAndManager)
+            {
+                <div class="col-md-6">
+                    <div class="detail-box">
+                        <i class="bi bi-person-badge-fill text-primary"></i>
+
+                        <div class="flex-grow-1">
+                            <small>Contacto do alojamento</small>
+
+                            <strong>@Model.GestorNome</strong>
+
+                            @if (!string.IsNullOrWhiteSpace(Model.GestorTelefone))
+                            {
+                                <div class="mt-2 d-flex flex-wrap gap-2">
+                                    <a href="tel:@Model.GestorTelefone"
+                                       class="btn btn-outline-primary btn-sm">
+                                        <i class="bi bi-telephone-fill me-1"></i>
+                                        Ligar
+                                    </a>
+
+                                    <a href="https://wa.me/@Model.GestorTelefone.Replace("+", "").Replace(" ", "")"
+                                       target="_blank"
+                                       rel="noopener noreferrer"
+                                       class="btn btn-outline-success btn-sm">
+                                        <i class="bi bi-whatsapp me-1"></i>
+                                        WhatsApp
+                                    </a>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="detail-box">
+                        <i class="bi bi-person-fill text-success"></i>
+
+                        <div class="flex-grow-1">
+                            <small>Funcionário atribuído</small>
+
+                            <strong>@Model.AssignedUserName</strong>
+
+                            @if (!string.IsNullOrWhiteSpace(Model.AssignedUserCode))
+                            {
+                                <span class="badge bg-light text-dark mt-1">
+                                    @Model.AssignedUserCode
+                                </span>
+                            }
+
+                            @if (!string.IsNullOrWhiteSpace(Model.AssignedUserPhone))
+                            {
+                                <div class="mt-2 d-flex flex-wrap gap-2">
+                                    <a href="tel:@Model.AssignedUserPhone"
+                                       class="btn btn-outline-primary btn-sm">
+                                        <i class="bi bi-telephone-fill me-1"></i>
+                                        Ligar
+                                    </a>
+
+                                    <a href="https://wa.me/@Model.AssignedUserPhone.Replace("+", "").Replace(" ", "")"
+                                       target="_blank"
+                                       rel="noopener noreferrer"
+                                       class="btn btn-outline-success btn-sm">
+                                        <i class="bi bi-whatsapp me-1"></i>
+                                        WhatsApp
+                                    </a>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="col-md-6">
+                    <div class="detail-box">
+                        <i class="bi bi-person-fill text-primary"></i>
+
+                        <div class="flex-grow-1">
+                            <small>Funcionário</small>
+
+                            <strong>@Model.AssignedUserName</strong>
+
+                            @if (!string.IsNullOrWhiteSpace(Model.AssignedUserCode))
+                            {
+                                <span class="badge bg-light text-dark mt-1">
+                                    @Model.AssignedUserCode
+                                </span>
+                            }
+
+                            @if (!string.IsNullOrWhiteSpace(Model.AssignedUserPhone))
+                            {
+                                <div class="mt-2 d-flex flex-wrap gap-2">
+                                    <a href="tel:@Model.AssignedUserPhone"
+                                       class="btn btn-outline-primary btn-sm">
+                                        <i class="bi bi-telephone-fill me-1"></i>
+                                        Ligar
+                                    </a>
+
+                                    <a href="https://wa.me/@Model.AssignedUserPhone.Replace("+", "").Replace(" ", "")"
+                                       target="_blank"
+                                       rel="noopener noreferrer"
+                                       class="btn btn-outline-success btn-sm">
+                                        <i class="bi bi-whatsapp me-1"></i>
+                                        WhatsApp
+                                    </a>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
             }
 
             <div class="col-md-6">
@@ -240,8 +311,7 @@
                             <form asp-controller="CleaningTask"
                                   asp-action="DeletePhoto"
                                   method="post"
-                                  class="photo-delete-form"
-                                  onsubmit="return confirm('Pretende eliminar esta fotografia?');">
+                                  class="photo-delete-form">
 
                                 @Html.AntiForgeryToken()
 
@@ -252,13 +322,19 @@
                                 <input type="hidden"
                                        name="taskId"
                                        value="@Model.Id" />
-                                @if(isCleaner){
+
+                                @if (isCleaner)
+                                {
                                     <button type="submit"
-                                        class="photo-delete-button"
-                                        title="Eliminar fotografia"
-                                        aria-label="Eliminar fotografia">
-                                    <i class="bi bi-trash-fill"></i>
-                                </button>
+                                            class="photo-delete-button"
+                                            title="Eliminar fotografia"
+                                            aria-label="Eliminar fotografia"
+                                            data-confirm-delete
+                                            data-confirm-message="Pretende eliminar esta fotografia?">
+
+                                        <i class="bi bi-trash-fill"></i>
+
+                                    </button>
                                 }
                             </form>
 

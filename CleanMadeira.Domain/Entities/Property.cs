@@ -22,6 +22,8 @@
         public Company? CleaningCompany { get; set; }
         public Guid? CleanerId { get; set; }
         public ApplicationUser? Cleaner { get; set; }
+        public Guid? CompanyId { get; set; }
+        public Company? Company { get; set; }
         public ICollection<CleaningTask> CleaningTasks { get; set; }
         = new List<CleaningTask>();
 

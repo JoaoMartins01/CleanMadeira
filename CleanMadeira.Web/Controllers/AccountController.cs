@@ -29,55 +29,114 @@ public class AccountController : Controller
         _cleanerNumberGenerator = cleanerNumberGenerator;
     }
 
-    public async Task<IActionResult> LoginAsync()
+    [HttpGet]
+    public async Task<IActionResult> LoginAsync(string? returnUrl = null)
     {
         if (User.Identity?.IsAuthenticated == true)
         {
+            if (!string.IsNullOrWhiteSpace(returnUrl) &&
+                Url.IsLocalUrl(returnUrl))
+            {
+                return LocalRedirect(returnUrl);
+            }
+
             var user = await _userManager.GetUserAsync(User);
 
-            if (user.Role == UserRole.Limpador || user.Role == UserRole.GestorELimpador)
-            {
-                return RedirectToAction("MyTasks", "CleaningTask");
-            }
-            else
+            if (user == null)
+                return Unauthorized();
+
+            if (user.Role == UserRole.Limpador ||
+                user.Role == UserRole.GestorELimpador)
             {
                 return RedirectToAction(
-                    "Index",
-                    "Dashboard"
+                    "MyTasks",
+                    "CleaningTask"
                 );
             }
+
+            return RedirectToAction(
+                "Index",
+                "Dashboard"
+            );
         }
 
-        return View(new LoginVM());
+        var model = new LoginVM
+        {
+            ReturnUrl = returnUrl
+        };
+
+        return View(model);
     }
+
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Login(LoginVM vm)
+    public async Task<IActionResult> LoginAsync(
+    LoginVM model)
     {
         if (!ModelState.IsValid)
-            return View(vm);
+            return View(model);
 
-        var result = await _signInManager.PasswordSignInAsync(
-            vm.Email,
-            vm.Password,
-            vm.RememberMe,
-            lockoutOnFailure: false);
+        var result =
+            await _signInManager.PasswordSignInAsync(
+                model.Email,
+                model.Password,
+                model.RememberMe,
+                lockoutOnFailure: false
+            );
 
         if (!result.Succeeded)
         {
-            ModelState.AddModelError("", "Email ou password inválidos.");
-            return View(vm);
+            ModelState.AddModelError(
+                string.Empty,
+                "Email ou palavra-passe inválidos."
+            );
+
+            return View(model);
         }
 
-        var user = await _userManager.FindByEmailAsync(vm.Email);
+        var invitationToken =
+        HttpContext.Session.GetString(
+            "PendingCompanyInvitationToken"
+        );
 
-        if (user.Role == UserRole.Limpador)
+        if (!string.IsNullOrWhiteSpace(invitationToken))
         {
-            return RedirectToAction("MyTasks", "CleaningTask");
+            HttpContext.Session.Remove(
+                "PendingCompanyInvitationToken"
+            );
+
+            return RedirectToAction(
+                "AcceptInvitation",
+                "Company",
+                new
+                {
+                    token = invitationToken
+                }
+            );
         }
 
-        return RedirectToAction("Index", "Dashboard");
+        // fluxo normal
+        var user = await _userManager.FindByEmailAsync(
+            model.Email
+        );
+
+        if (user == null)
+            return Unauthorized();
+
+        if (user.Role == UserRole.Limpador ||
+            user.Role == UserRole.GestorELimpador)
+        {
+            return RedirectToAction(
+                "MyTasks",
+                "CleaningTask"
+            );
+        }
+
+        return RedirectToAction(
+            "Index",
+            "Dashboard"
+        );
     }
 
     public IActionResult Register()
@@ -124,7 +183,6 @@ public class AccountController : Controller
             PhoneNumber = vm.Telemovel,
             PrimeiroNome = vm.PrimeiroNome,
             UltimoNome = vm.UltimoNome,
-            CompanyName = vm.EmpresaNome,
             Role = vm.Role,
             Active = true,
             CreatedAt = DateTime.UtcNow
@@ -138,7 +196,7 @@ public class AccountController : Controller
 
         var result = await _userManager.CreateAsync(user, vm.Password);
 
-        if (result.Succeeded && user.Role == UserRole.Limpador)
+        if (result.Succeeded && (user.Role == UserRole.Limpador || user.Role == UserRole.GestorELimpador))
         {
             //user.LimpadorCodigo = $"LMP-{user.SequentialNumber:D6}";
             await _userManager.UpdateAsync(user);
@@ -256,7 +314,10 @@ public class AccountController : Controller
         var user = await _userManager.FindByEmailAsync(vm.Email);
 
         if (user == null)
-            return RedirectToAction(nameof(Login));
+            return RedirectToAction(
+                "Login",
+                "Account"
+            );
 
         var result = await _userManager.ResetPasswordAsync(
             user,
@@ -271,7 +332,10 @@ public class AccountController : Controller
             return View(vm);
         }
 
-        return RedirectToAction(nameof(Login));
+        return RedirectToAction(
+            "Login",
+            "Account"
+        );
     }
 
     [HttpPost]
@@ -280,7 +344,10 @@ public class AccountController : Controller
     {
         await _signInManager.SignOutAsync();
 
-        return RedirectToAction(nameof(Login));
+        return RedirectToAction(
+            "Login",
+            "Account"
+        );
     }
 
     [Authorize]
@@ -298,7 +365,6 @@ public class AccountController : Controller
             UltimoNome = user.UltimoNome,
             Email = user.Email ?? string.Empty,
             Telemovel = user.PhoneNumber,
-            EmpresaNome = user.CompanyName,
             LimpadorCodigo = user.CleanerCode
         };
 
@@ -322,10 +388,10 @@ public class AccountController : Controller
         user.UltimoNome = vm.UltimoNome.Trim();
         user.PhoneNumber = vm.Telemovel?.Trim();
 
-        if (user.Type == OwnerType.Empresa)
+        /*if (user.Type == OwnerType.Empresa)
         {
             user.CompanyName = vm.EmpresaNome?.Trim();
-        }
+        }*/
 
         var result = await _userManager.UpdateAsync(user);
 
@@ -416,7 +482,10 @@ public class AccountController : Controller
 
         if (user == null)
         {
-            return RedirectToAction(nameof(Login));
+            return RedirectToAction(
+                "Login",
+                "Account"
+            );
         }
 
         var result = await _userManager.ChangePasswordAsync(

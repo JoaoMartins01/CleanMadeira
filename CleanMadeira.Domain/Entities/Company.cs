@@ -8,7 +8,9 @@ namespace CleanMadeira.Domain.Entities
 
         public string Name { get; set; }
 
-        public string Nif { get; set; }
+        public string NIF { get; set; }
+
+        public Guid CreatedByUserId { get; set; }
 
         public ICollection<ApplicationUser> Users { get; set; }
         = new List<ApplicationUser>();
@@ -20,7 +22,7 @@ namespace CleanMadeira.Domain.Entities
 
         public string PhoneNumber { get; set; }
 
-        public string Adress { get; set; }
+        public string Address { get; set; }
 
         public string Phone { get; set;  }
         public CompanyType Type { get; set; }

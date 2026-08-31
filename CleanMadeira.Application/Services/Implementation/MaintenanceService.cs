@@ -1,6 +1,8 @@
-﻿using CleanMadeira.Application.Interfaces.Repositories;
+﻿using CleanMadeira.Application.Common.DTO;
+using CleanMadeira.Application.Interfaces.Repositories;
 using CleanMadeira.Application.Interfaces.Services;
 using CleanMadeira.Domain.Entities;
+using CleanMadeira.Domain.Enums;
 
 namespace CleanMadeira.Application.Services;
 
@@ -35,6 +37,25 @@ public class MaintenanceService : IMaintenanceService
         return await _maintenanceRepository.GetByOwnerIdAsync(ownerId);
     }
 
+    public async Task<IEnumerable<Maintenance>> GetAccessibleMaintenancesAsync(
+    Guid userId,
+    Guid? companyId)
+    {
+        return await _maintenanceRepository
+            .GetAccessibleMaintenancesAsync(userId, companyId);
+    }
+
+    public async Task<Maintenance?> GetAccessibleByIdAsync(
+        Guid maintenanceId,
+        Guid userId,
+        Guid? companyId)
+    {
+        return await _maintenanceRepository
+            .GetAccessibleByIdAsync(
+                maintenanceId,
+                userId,
+                companyId);
+    }
     public async Task<IEnumerable<Maintenance>> GetByAssignedUserIdAsync(
         Guid userId)
     {
@@ -66,6 +87,57 @@ public class MaintenanceService : IMaintenanceService
             ownerId,
             startDate,
             endDate);
+    }
+
+    public async Task<MonthlyMaintenanceReportDto> GetMonthlyReportAsync(
+    Guid ownerId,
+    int year,
+    int month)
+    {
+        var start = new DateTime(year, month, 1);
+        var end = start.AddMonths(1);
+
+        var maintenances = await _maintenanceRepository
+            .GetByPeriodAsync(ownerId, start, end);
+
+        return new MonthlyMaintenanceReportDto
+        {
+            Year = year,
+            Month = month,
+
+            Total = maintenances.Count,
+
+            Pending = maintenances.Count(x =>
+                x.Status == MaintenanceStatus.Pendente),
+
+            Accepted = maintenances.Count(x =>
+                x.Status == MaintenanceStatus.Aceite),
+
+            InProgress = maintenances.Count(x =>
+                x.Status == MaintenanceStatus.EmProgresso),
+
+            Completed = maintenances.Count(x =>
+                x.Status == MaintenanceStatus.Completo),
+
+            Cancelled = maintenances.Count(x =>
+                x.Status == MaintenanceStatus.Cancelado),
+
+            Rejected = maintenances.Count(x =>
+                x.Status == MaintenanceStatus.Rejeitada),
+
+            Maintenances = maintenances
+                .Select(x => new MonthlyMaintenanceReportItemDto
+                {
+                    Id = x.Id,
+                    Title = x.Title,
+                    PropertyName = x.Property.Name,
+                    ProviderName = x.MaintenanceProvider?.Name,
+                    ScheduledDate = x.ScheduledDate,
+                    Status = x.Status.ToString(),
+                    Priority = x.Priority.ToString()
+                })
+                .ToList()
+        };
     }
 
     public async Task<Maintenance?> GetByAccessTokenAsync(Guid token)

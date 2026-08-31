@@ -81,6 +81,58 @@ public class MaintenanceRepository : IMaintenanceRepository
             .ToListAsync();
     }
 
+    public async Task<IEnumerable<Maintenance>> GetAccessibleMaintenancesAsync(
+    Guid userId,
+    Guid? companyId)
+    {
+        var query = _context.Maintenances
+            .AsNoTracking()
+            .Include(x => x.Property)
+            .AsQueryable();
+
+        if (companyId.HasValue)
+        {
+            query = query.Where(x =>
+                x.Property.CompanyId == companyId.Value);
+        }
+        else
+        {
+            query = query.Where(x =>
+                x.Property.ApplicationUserId == userId &&
+                x.Property.CompanyId == null);
+        }
+
+        return await query
+            .OrderByDescending(x => x.CreatedAt)
+            .ToListAsync();
+    }
+
+    public async Task<Maintenance?> GetAccessibleByIdAsync(
+    Guid maintenanceId,
+    Guid userId,
+    Guid? companyId)
+    {
+        var query = _context.Maintenances
+            .AsNoTracking()
+            .Include(x => x.Property)
+            .AsQueryable();
+
+        if (companyId.HasValue)
+        {
+            query = query.Where(x =>
+                x.Property.CompanyId == companyId.Value);
+        }
+        else
+        {
+            query = query.Where(x =>
+                x.Property.ApplicationUserId == userId &&
+                x.Property.CompanyId == null);
+        }
+
+        return await query
+            .FirstOrDefaultAsync(x => x.Id == maintenanceId);
+    }
+
     public async Task<IEnumerable<Maintenance>> GetByDateRangeAsync(
     Guid ownerId,
     DateTime startDate,
@@ -130,6 +182,23 @@ public class MaintenanceRepository : IMaintenanceRepository
             .Include(x => x.MaintenanceProvider)
             .Include(x => x.Property)
             .FirstOrDefaultAsync(x => x.AccessToken == token);
+    }
+
+    public async Task<List<Maintenance>> GetByPeriodAsync(
+    Guid ownerId,
+    DateTime start,
+    DateTime end)
+    {
+        return await _context.Maintenances
+            .AsNoTracking()
+            .Include(x => x.Property)
+            .Include(x => x.MaintenanceProvider)
+            .Where(x =>
+                x.Property.ApplicationUserId == ownerId &&
+                x.ScheduledDate >= start &&
+                x.ScheduledDate < end)
+            .OrderBy(x => x.ScheduledDate)
+            .ToListAsync();
     }
 
     public async Task AddAsync(Maintenance maintenance)

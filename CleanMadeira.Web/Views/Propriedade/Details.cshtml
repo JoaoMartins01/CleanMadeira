@@ -41,9 +41,9 @@
          CABEÇALHO
          ===================================================== -->
 
-    <div class="property-header mb-4">
+    <div class="page-header mb-4">
 
-        <div class="property-header-info">
+        <div class="page-header-content">
 
             <h2 class="fw-bold mb-1">
                 @Model.Propriedade.Nome
@@ -56,7 +56,7 @@
 
         </div>
 
-        <div class="property-header-actions">
+        <div class="page-actions">
 
             <a asp-action="Edit"
                asp-route-id="@Model.Propriedade.Id"
@@ -88,9 +88,9 @@
 
         <div class="col-12 col-sm-6 col-xl-3">
 
-            <div class="card property-stat-card h-100">
+            <div class="app-card property-stat-card h-100">
 
-                <div class="card-body text-center">
+                <div class="app-card-body text-center">
 
                     <div class="stat-icon mb-3">
                         <i class="bi bi-calendar3"></i>
@@ -124,9 +124,9 @@
 
         <div class="col-12 col-sm-6 col-xl-3">
 
-            <div class="card property-stat-card h-100">
+            <div class="app-card property-stat-card h-100">
 
-                <div class="card-body text-center">
+                <div class="app-card-body text-center">
 
                     <div class="stat-icon mb-3">
                         <i class="bi bi-stars"></i>
@@ -177,9 +177,9 @@
 
         <div class="col-12 col-sm-6 col-xl-3">
 
-            <div class="card property-stat-card h-100">
+            <div class="app-card property-stat-card h-100">
 
-                <div class="card-body text-center">
+                <div class="app-card-body text-center">
 
                     <div class="stat-icon mb-3">
                         <i class="bi bi-box-seam"></i>
@@ -213,9 +213,9 @@
 
         <div class="col-12 col-sm-6 col-xl-3">
 
-            <div class="card property-stat-card h-100">
+            <div class="app-card property-stat-card h-100">
 
-                <div class="card-body text-center">
+                <div class="app-card-body text-center">
 
                     <div class="stat-icon mb-3">
                         <i class="bi bi-camera-fill"></i>
@@ -251,9 +251,9 @@
          CALENDÁRIOS CONFIGURADOS
          ===================================================== -->
 
-    <div class="card calendar-card mt-4">
+    <div class="app-card calendar-card mt-4">
 
-        <div class="card-header bg-white">
+        <div class="app-card-header bg-white">
 
             <div class="d-flex
                 justify-content-between
@@ -272,17 +272,13 @@
 
                 </div>
 
-                <a asp-controller="CalendarIntegration"
-                   asp-action="Index"
-                   asp-route-propriedadeId="@Model.Propriedade.Id"
-                   class="btn btn-outline-primary btn-sm">
+                <a asp-controller="Propriedade"
+                   asp-action="CleaningSettings"
+                   asp-route-id="@Model.Propriedade.Id"
+                   class="btn btn-outline-primary">
 
-                    <i class="bi bi-gear"></i>
-
-                    <span class="d-none d-sm-inline ms-1">
-                        Gerir
-                    </span>
-
+                    <i class="bi bi-gear me-1"></i>
+                    Configurar limpezas intermédias
                 </a>
 
             </div>
@@ -379,12 +375,11 @@
 
                                     @if (item.LastSync.HasValue)
                                     {
-                                        <div>
-                                            @item.LastSync.Value.ToLocalTime().ToString("dd/MM/yyyy")
-                                        </div>
-
-                                        <div class="small text-muted">
-                                            @item.LastSync.Value.ToLocalTime().ToString("HH:mm")
+                                        <div class="local-date"
+                                             data-date="@DateTime.SpecifyKind(
+                                                     item.LastSync.Value,
+                                                     DateTimeKind.Utc
+                                                 ).ToString("O")">
                                         </div>
                                     }
                                     else
@@ -425,14 +420,7 @@
 
                                         </button>
 
-                                        <a asp-controller="Propriedade"
-                                           asp-action="CleaningSettings"
-                                           asp-route-id="@Model.Propriedade.Id"
-                                           class="btn btn-outline-primary">
-
-                                            <i class="bi bi-gear me-1"></i>
-                                            Configurar limpezas
-                                        </a>
+                                        
 
                                     </form>
 
@@ -566,7 +554,7 @@
         }
         else
         {
-            <div class="card-body text-center py-5">
+            <div class="app-card-body text-center py-5">
 
                 <div class="empty-calendar-icon mb-3">
                     <i class="bi bi-calendar-x"></i>
@@ -599,162 +587,6 @@
 </div>
 
 
-<style>
-
-    .property-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 20px;
-    }
-
-    .property-header-actions {
-        display: flex;
-        gap: 8px;
-    }
 
 
-    /* CARDS */
 
-    .property-stat-card {
-        border: 1px solid #e9ecef;
-        border-radius: 16px;
-        box-shadow: 0 3px 10px rgba(0, 0, 0, .06);
-    }
-
-        .property-stat-card .card-body {
-            padding: 24px 16px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 210px;
-        }
-
-    .stat-icon {
-        width: 48px;
-        height: 48px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: #eaf2ff;
-        color: #0d6efd;
-        border-radius: 14px;
-        font-size: 1.4rem;
-    }
-
-    .stat-value {
-        font-size: 2rem;
-        font-weight: 600;
-        line-height: 1;
-        margin-top: 5px;
-    }
-
-    .next-cleaning {
-        min-height: 48px;
-    }
-
-
-    /* CALENDÁRIO */
-
-    .calendar-card {
-        border: 1px solid #e9ecef;
-        border-radius: 16px;
-        overflow: hidden;
-        box-shadow: 0 3px 10px rgba(0, 0, 0, .06);
-    }
-
-        .calendar-card .card-header {
-            padding: 18px 22px;
-            border-bottom: 1px solid #e9ecef;
-        }
-
-    .calendar-provider-icon {
-        width: 36px;
-        height: 36px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: #eaf2ff;
-        color: #0d6efd;
-        border-radius: 10px;
-    }
-
-
-    /* MOBILE CALENDAR */
-
-    .calendar-mobile-item {
-        padding: 16px;
-        border: 1px solid #e5e7eb;
-        border-radius: 14px;
-        background: #fff;
-    }
-
-    .calendar-sync-info {
-        padding: 12px;
-        background: #f8f9fa;
-        border-radius: 10px;
-    }
-
-
-    /* EMPTY */
-
-    .empty-calendar-icon {
-        width: 70px;
-        height: 70px;
-        margin: auto;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: #f1f3f5;
-        color: #6c757d;
-        border-radius: 50%;
-        font-size: 2rem;
-    }
-
-
-    /* MOBILE */
-
-    @@media (max-width: 767.98px) {
-
-        .container {
-            padding-left: 12px;
-            padding-right: 12px;
-        }
-
-        .property-header {
-            flex-direction: column;
-            align-items: stretch;
-        }
-
-        .property-header-actions {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-        }
-
-            .property-header-actions .btn {
-                width: 100%;
-            }
-
-        .property-stat-card .card-body {
-            min-height: 190px;
-        }
-
-        .calendar-card .card-header {
-            padding: 16px;
-        }
-
-        .calendar-mobile-item .btn {
-            min-height: 44px;
-        }
-    }
-
-
-    @@media (max-width: 420px) {
-
-        .property-header-actions {
-            grid-template-columns: 1fr;
-        }
-    }
-
-</style>
